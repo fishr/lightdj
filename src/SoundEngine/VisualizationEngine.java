@@ -15,6 +15,7 @@ import SignalGUI.ScrollingChannelMapper;
 import SignalGUI.ScrollingSpectrumMapper;
 import Signals.FFT;
 import Signals.LinearFilter;
+import Utils.TimerTicToc;
 
 /**
  * This class is responsible for generating the visualizations.
@@ -53,6 +54,9 @@ public class VisualizationEngine {
 	// thereby reducing overall latency through parallelization
 	VisualizerHelperThread helperThread;
 	
+	// Used for profiling and debugging
+	TimerTicToc timer;
+	
 	
 	public VisualizationEngine(AudioFormat format) {
 		
@@ -79,6 +83,8 @@ public class VisualizationEngine {
 		buffer = new double[BUFFER_SIZE];
 		bufferCursor = 0;
 		
+		
+		timer = new TimerTicToc();
 		
 		initVisualizations();
 		
@@ -159,7 +165,11 @@ public class VisualizationEngine {
 	private void visualize() {
 		
 		// Compute an FFT
+		
+		timer.tic();
 		FFT fft = new FFT(buffer, SAMPLE_RATE);
+		timer.toc();
+		System.out.println(timer.getAverageTime());
 		
 		// Update the render helper thread
 		helperThread.updateFFT(fft);
@@ -168,14 +178,28 @@ public class VisualizationEngine {
 	
 	
 	public void updateVisuals(FFT fft) {
+		
+		//timer.tic();
+		
+		double[] frequencies = fft.getFrequencies();
+		double[] magnitudes = fft.getMagnitudes();
+		
+		// Compute some channel values
+		double[] channels = new double[numChannels];
+		channels[0] = bassFinder.getFreqs(frequencies, magnitudes);
+		channels[1] = 0; //clapFinder.getFreqs(frequencies, magnitudes);
+		lights.updateWithNewChannelVals(channels);
+		channelMapper.updateWithNewChannelVals(channels);
+		
+		
+		
 		//graphMapper.drawPositiveGraph(fft.getLogMagnitudes(), 4);
 		//double[] logMags = fft.getLogMagnitudes();
 		
 		// Low pass filter it, just for kicks
 		//LinearFilter filter = LinearFilter.createAveragingFilter(1);
 		//LinearFilter filter = LinearFilter.createAveragingFilter(1);//new LinearFilter(new double[]{0.25,0.5,0.25}, new double[]{0});
-		double[] frequencies = fft.getFrequencies();
-		double[] magnitudes = fft.getMagnitudes(); //filter.filterSignal(logMags);
+
 		
 		//graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), filteredData, 15, 20000, 4);
 		//if (lastData == null) {lastData = filteredData;}
@@ -184,12 +208,10 @@ public class VisualizationEngine {
 		//graphMapper.drawPositiveGraph(buffer, 2);
 		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 80);
 		
-		// Compute some channel values
-		double[] channels = new double[numChannels];
-		channels[0] = bassFinder.getFreqs(frequencies, magnitudes);
-		channels[1] = clapFinder.getFreqs(frequencies, magnitudes);
-		channelMapper.updateWithNewChannelVals(channels);
-		lights.updateWithNewChannelVals(channels);
+	
+		
+		//timer.toc();
+		//System.out.println(timer.getAverageTime());
 		
 		//lastData = logMags;
 	}

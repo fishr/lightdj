@@ -65,6 +65,8 @@ public class FrequencyRangeFinder {
 		double c = 0.75;
 		if (outputVal < c * lastOutput) {
 			actualOutput = c * lastOutput;
+		} else if (outputVal > 1.5) {
+			actualOutput = 2.0;
 		} else {
 			actualOutput = outputVal;
 		}

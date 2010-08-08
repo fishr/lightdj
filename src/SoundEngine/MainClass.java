@@ -8,9 +8,9 @@ import javax.sound.sampled.*;
 
 public class MainClass {
 
-	//private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
+	private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
-	private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
+	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
 	private static final int AUDIO_READ_BUFFER_SIZE = 256;
 	private static final boolean USE_CAPTURED_AUDIO = true;
