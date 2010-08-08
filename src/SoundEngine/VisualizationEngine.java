@@ -49,11 +49,9 @@ public class VisualizationEngine {
 	BassFinder bassFinder;
 	ClapFinder clapFinder;
 	
-	
-	double[] lastData = null;
-	
-	
-	
+	// Keep a helper thread so that visualization display when run in parallel with the FFT calculuations,
+	// thereby reducing overall latency through parallelization
+	VisualizerHelperThread helperThread;
 	
 	
 	public VisualizationEngine(AudioFormat format) {
@@ -104,6 +102,9 @@ public class VisualizationEngine {
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
 		clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);
 		
+		
+		// Start up a helper thread
+		helperThread = new VisualizerHelperThread(this);
 		
 		
 	}
@@ -160,7 +161,13 @@ public class VisualizationEngine {
 		// Compute an FFT
 		FFT fft = new FFT(buffer, SAMPLE_RATE);
 		
-		
+		// Update the render helper thread
+		helperThread.updateFFT(fft);
+	
+	}
+	
+	
+	public void updateVisuals(FFT fft) {
 		//graphMapper.drawPositiveGraph(fft.getLogMagnitudes(), 4);
 		//double[] logMags = fft.getLogMagnitudes();
 		
@@ -185,6 +192,64 @@ public class VisualizationEngine {
 		lights.updateWithNewChannelVals(channels);
 		
 		//lastData = logMags;
+	}
+
+	
+}
+
+
+// A separate thread that does rendering, so as to not slow down the FFT-calculations too much while 
+// we render the visuals
+class VisualizerHelperThread implements Runnable {
+	
+	private FFT recentFFT;
+	private VisualizationEngine engine;
+	boolean isRunning;
+	
+	public VisualizerHelperThread(VisualizationEngine engine) {
+		isRunning = false;
+		this.engine = engine;
+	}
+	
+	// Update the FFT being used
+	public void updateFFT(FFT fft) {
+		
+		// Cache a reference to this FFT
+		if (recentFFT != null) {
+			synchronized(recentFFT) {
+				recentFFT = fft;
+			}
+		} else {
+			recentFFT = fft;
+		}
+	
+		// Spawn a new thread if we haven't already!
+		if (!isRunning) {
+			isRunning = true;
+			Thread t = new Thread(this);
+			t.start();
+		}
+		
+	}
+	
+	// Run stuff!
+	public void run() {
+		
+		FFT fft;
+		
+		while (true) {
+			
+			// Store a local reference to the FFT, so that way if it
+			// gets updated later, we can still operate on the old one.
+			synchronized(recentFFT) {
+				fft = recentFFT;
+			}
+			
+			// Process this FFT
+			engine.updateVisuals(fft);
+			
+			
+		}
 	}
 	
 
