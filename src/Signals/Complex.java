@@ -14,7 +14,7 @@ public class Complex {
 		this.b = b;
 	}
 	
-	public Complex(Double a) {
+	public Complex(double a) {
 		this.a = a;
 		this.b = 0;
 	}
@@ -27,6 +27,12 @@ public class Complex {
 		return new Complex(scalar * this.a, scalar * this.b);	
 	}
 	
+	public void multiplyInto(Complex other) {
+		double temp_a = this.a*other.a - this.b*other.b;
+		this.b = this.a*other.b + this.b*other.a;
+		this.a = temp_a;
+	}
+	
 	public void scale(double scalar) {
 		a *= scalar;
 		b *= scalar;
@@ -36,8 +42,19 @@ public class Complex {
 		return new Complex(this.a + other.a, this.b + other.b);
 	}
 	
+	public void addInto(Complex other) {
+		this.a += other.a;
+		this.b += other.b;
+	}
+	
+	
 	public Complex subtract(Complex other) {
 		return new Complex(this.a - other.a, this.b - other.b);
+	}
+	
+	public void subtractInto(Complex other) {
+		this.a -= other.a;
+		this.b -= other.b;
 	}
 	
 	public static Complex exp(double theta) {

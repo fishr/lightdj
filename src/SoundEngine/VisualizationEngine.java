@@ -13,7 +13,9 @@ import SignalGUI.GUIVisualizer;
 import SignalGUI.GraphMapper;
 import SignalGUI.ScrollingChannelMapper;
 import SignalGUI.ScrollingSpectrumMapper;
+import Signals.Complex;
 import Signals.FFT;
+import Signals.FFTEngine;
 import Signals.LinearFilter;
 import Utils.TimerTicToc;
 
@@ -57,6 +59,9 @@ public class VisualizationEngine {
 	// Used for profiling and debugging
 	TimerTicToc timer;
 	
+	// The FFT engine
+	FFTEngine fftEngine;
+	
 	
 	public VisualizationEngine(AudioFormat format) {
 		
@@ -83,9 +88,19 @@ public class VisualizationEngine {
 		buffer = new double[BUFFER_SIZE];
 		bufferCursor = 0;
 		
-		
+		// Set up a profiler, for debugging use
 		timer = new TimerTicToc();
 		
+		// Start the FFT engine
+		fftEngine = new FFTEngine(BUFFER_SIZE, SAMPLE_RATE);
+//		double[] x = new double[2];
+//		x[0] = 1;
+//		x[1] = -1;
+//		FFT fft = fftEngine.computeFFT(x);
+//		
+//		System.out.println(fft);
+		
+		// Load up the visualizations
 		initVisualizations();
 		
 		
@@ -167,7 +182,7 @@ public class VisualizationEngine {
 		// Compute an FFT
 		
 		timer.tic();
-		FFT fft = new FFT(buffer, SAMPLE_RATE);
+		FFT fft = fftEngine.computeFFT(buffer);  //new FFT(buffer, SAMPLE_RATE);
 		timer.toc();
 		System.out.println(timer.getAverageTime());
 		

@@ -7,12 +7,12 @@ package Signals;
  */
 public class FFT {
 
-	private Complex[] fftValues;
+	private double[][] X;
 	private double fs;
 	
-	public FFT(double[] signal, double fs) {
+	public FFT(double[][] fftValues, double fs) {
+		this.X = fftValues;
 		this.fs = fs;
-		fftValues = computeFFT(signal);
 	}
 	
 	public double getNyquistFrequency() {
@@ -20,10 +20,10 @@ public class FFT {
 	}
 	
 	public double[] getMagnitudes() {
-		double[] mags = new double[fftValues.length];
+		double[] mags = new double[X.length];
 		
-		for(int k = 0; k < fftValues.length; k++) {
-			mags[k] = fftValues[k].radius();
+		for(int k = 0; k < X.length; k++) {
+			mags[k] = Math.sqrt(X[k][0]*X[k][0] + X[k][1]*X[k][1]);
 		}
 		
 		return mags;
@@ -31,11 +31,11 @@ public class FFT {
 	}
 	
 	public double[] getFrequencies() {
-		double[] freqs = new double[fftValues.length];
+		double[] freqs = new double[X.length];
 		
-		double scale = fs / fftValues.length;
+		double scale = fs / X.length;
 		
-		for(int i = 0; i < fftValues.length; i++) {
+		for(int i = 0; i < X.length; i++) {
 			freqs[i] = scale * i;
 		}
 		
@@ -43,25 +43,30 @@ public class FFT {
 	}
 	
 	public double[] getLogMagnitudes() {
-		double[] mags = new double[fftValues.length];
+		double[] mags = new double[X.length];
 		
-		for(int k = 0; k < fftValues.length; k++) {
-			mags[k] = Math.log10(fftValues[k].radius());
+		for(int k = 0; k < X.length; k++) {
+			mags[k] = Math.log10(Math.sqrt(X[k][0]*X[k][0] + X[k][1]*X[k][1]));
 		}
 		
 		return mags;
 	}
 	
+	
+	
 	/**
-	 * Perform an FFT on the given signal
+	 * Perform an FFT on the given signal.
+	 * 
+	 * Although this recursive, divide-and-conquer algorithm works fine,
+	 * I wrote a faster implementation in the FFT engine - which is why
+	 * this one is deprecated.
+	 * 
 	 * @param signal - a double array of time-domain values
 	 * @return - Returns a complex array corresponding to the FFT
 	 * 
 	 * PRECONDITION: ASSUMES THAT SIGNAL IS A POWER OF 2!
 	 */
-	
-	
-	private Complex[] computeFFT(double[] signal) {
+	public Complex[] computeFFT_deprecated(double[] signal) {
 		
 		int N = signal.length;
 		
@@ -85,8 +90,8 @@ public class FFT {
 		}
 		
 		// Recursively compute the FFT's of these half lists
-		Complex[] fft_evens = computeFFT(signal_even);
-		Complex[] fft_odds = computeFFT(signal_odd);
+		Complex[] fft_evens = computeFFT_deprecated(signal_even);
+		Complex[] fft_odds = computeFFT_deprecated(signal_odd);
 		
 		// Assemble them into one FFT
 		Complex[] fft_output = new Complex[N];
