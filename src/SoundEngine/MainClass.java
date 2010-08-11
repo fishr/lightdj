@@ -5,11 +5,13 @@ import java.io.IOException;
 
 import javax.sound.sampled.*;
 
+import Utils.TimerTicToc;
+
 
 public class MainClass {
 
-	private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
-	//private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
+	//private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
+	private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
 	private static final int AUDIO_READ_BUFFER_SIZE = 256;
@@ -62,11 +64,14 @@ public class MainClass {
 		try {
 			int numBytesRead = 0;
 			byte[] audioData = new byte[bytesToRead];
+			
+			
+			TimerTicToc timer = new TimerTicToc();
+			
 			while((numBytesRead = audioInputStream.read(audioData)) != -1) {
 				
 				// Send data!
 				engine.write(audioData, 0, numBytesRead);
-				
 				
 			}
 			
@@ -117,11 +122,11 @@ public class MainClass {
 			
 			int numBytesRead = 0;
 			byte[] audioData = new byte[bytesToRead];
+
 			while((numBytesRead = line.read(audioData, 0, bytesToRead)) != -1) {
 				
 				// Send data!
 				engine.write(audioData, 0, numBytesRead);
-				
 				
 			}
 			

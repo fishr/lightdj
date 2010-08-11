@@ -2,6 +2,7 @@ package SoundEngine;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.concurrent.Semaphore;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -29,6 +30,7 @@ public class VisualizationEngine {
 	private double[] buffer;
 	private int bufferCursor = 0;
 	private final int BUFFER_SIZE = 1024;
+	private final int BUFFER_OVERLAP = 2;
 	
 	// The audio format of data being written in
 	private final int FRAME_SIZE;
@@ -181,10 +183,10 @@ public class VisualizationEngine {
 		
 		// Compute an FFT
 		
-		timer.tic();
+		//timer.tic();
 		FFT fft = fftEngine.computeFFT(buffer);  //new FFT(buffer, SAMPLE_RATE);
-		timer.toc();
-		System.out.println(timer.getAverageTime());
+		//timer.toc();
+		//System.out.println(timer.getAverageTime());
 		
 		// Update the render helper thread
 		helperThread.updateFFT(fft);
@@ -219,7 +221,7 @@ public class VisualizationEngine {
 		//graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), filteredData, 15, 20000, 4);
 		//if (lastData == null) {lastData = filteredData;}
 		//graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), differenceSquared(magnitudes, lastData), 15, 20000, 8);
-		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, 30, 20000, 240);
+		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, 30, 20000, 80);
 		//graphMapper.drawPositiveGraph(buffer, 2);
 		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 80);
 		
@@ -241,11 +243,17 @@ class VisualizerHelperThread implements Runnable {
 	
 	private FFT recentFFT;
 	private VisualizationEngine engine;
-	boolean isRunning;
+	private boolean isRunning;
+	private Semaphore semaphore;
 	
 	public VisualizerHelperThread(VisualizationEngine engine) {
 		isRunning = false;
 		this.engine = engine;
+		
+		// Set up a semaphore so that we only renderer (consumer) only works
+		// when we have an FFT (from the producer)
+		semaphore = new Semaphore(1);
+		
 	}
 	
 	// Update the FFT being used
@@ -255,9 +263,17 @@ class VisualizerHelperThread implements Runnable {
 		if (recentFFT != null) {
 			synchronized(recentFFT) {
 				recentFFT = fft;
+				// Up the semaphore if necessary
+				if (semaphore.availablePermits() == 0) {
+					semaphore.release();
+				}
 			}
 		} else {
 			recentFFT = fft;
+			// Up the semaphore if necessary
+			if (semaphore.availablePermits() == 0) {
+				semaphore.release();
+			}
 		}
 	
 		// Spawn a new thread if we haven't already!
@@ -275,6 +291,9 @@ class VisualizerHelperThread implements Runnable {
 		FFT fft;
 		
 		while (true) {
+			
+			// Wait until we have data!
+			semaphore.acquireUninterruptibly();
 			
 			// Store a local reference to the FFT, so that way if it
 			// gets updated later, we can still operate on the old one.
