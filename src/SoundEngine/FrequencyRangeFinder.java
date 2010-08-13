@@ -2,7 +2,7 @@ package SoundEngine;
 
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
- * Attempts to auto-adapt to changing volume.
+ * Attempts to auto-adapt to changing volume levels.
  * @author steve
  *
  */
@@ -14,6 +14,7 @@ public class FrequencyRangeFinder {
 	protected double phi;
 	protected double averagedLevel = 0;
 	protected double lastOutput = 0;
+	protected double decayRate = 0.75;
 	
 	protected double normalizingVal = 1.0;
 	
@@ -51,7 +52,9 @@ public class FrequencyRangeFinder {
 		double level = sum / n;
 		
 		
-
+		// Compute a very low-passed version of the signal to use as an estimate of the overall
+		// level of this frequency range. This is the "adaptive" part that allows the frequency
+		// range finder to adjust to different volume levels
 		if (level > averagedLevel) { 
 			outputVal =  (level - averagedLevel) / normalizingVal;
 		} else {
@@ -62,9 +65,9 @@ public class FrequencyRangeFinder {
 		
 		double actualOutput;
 		
-		double c = 0.75;
-		if (outputVal < c * lastOutput) {
-			actualOutput = c * lastOutput;
+		// Limit how fast the output can fal, in an attempt to minimize flicker
+		if (outputVal < decayRate * lastOutput) {
+			actualOutput = decayRate * lastOutput;
 		} else if (outputVal > 1.5) {
 			actualOutput = 2.0;
 		} else {

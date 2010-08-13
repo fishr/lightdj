@@ -7,7 +7,7 @@ package Signals;
  * Trades away memory and pre-computation time, in favor of fast FFT computation time.
  * 
  * Upon being initialized, the FFT does a bunch of pre-computations to prepare itself.
- * This allows each FFT to be run faster and more efficiently.
+ * This allows each FFT call to be run faster and more efficiently.
  * 
  * @author Steve Levine
  *
@@ -20,7 +20,7 @@ public class FFTEngine {
 	private double fs;	// The sample rate
 	
 	private int[] bitReversedIndices;		// Map regular index to bit-reversed index
-	private double[][] WnPowers;				// Wn = exp(-j*2 PI / N), to several powers
+	private double[][] WnPowers;			// Wn = exp(-j*2 PI / N), to several powers
 	private int[][][] butterflyMappings;	// Each of the v entries contains N/2 entries which are triples (p, q, k), such that the
 											// butterfly computation is executed on values with indices p and q,
 											// and the complex scale WnPowers[k] is used.
@@ -85,24 +85,16 @@ public class FFTEngine {
 			
 		}
 		
-		// For testing
-		/*
-		for(int L = 0; L < v; L++) {
-			System.out.println("Butterly mappings for level " + (L + 1) + ":");
-			for(int k = 0; k < N/2; k++) {
-				System.out.println("   (" + butterflyMappings[L][k][0] + " , " + butterflyMappings[L][k][1] + ") Wn^" + butterflyMappings[L][k][2]);
-			}
-		}
-		System.out.println();
-		*/
-		
-		
 		// All done!
 		
 	}
 	
 	
-	// Compute the FFT!
+	// Compute the FFT! This algorithm is optimized to use butterfly computations.
+	// Additionally, the main calculation consists solely of additions, multiplications,
+	// and array reads/writes. Computes in place. No Java class instantiations, memory allocations, 
+	// function calls, etc. - this is to keep things as fast as possible.
+	//
 	public FFT computeFFT(double[] x) {
 		
 		// Basic error checking
@@ -142,7 +134,7 @@ public class FFTEngine {
 		}
 		
 		
-		// Done! Return the FFT
+		// Done! Return a wrapper class holding the computed values with the sample rate.
 		return new FFT(X, fs);
 		
 	}

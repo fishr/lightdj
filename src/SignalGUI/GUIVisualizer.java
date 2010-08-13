@@ -18,7 +18,7 @@ public class GUIVisualizer extends JPanel {
 		frame.add(this);
 		frame.pack();
 		setBackground(Color.BLACK);
-        frame.setSize(1100, 900);
+        frame.setSize(1100, 1000);
 		frame.setVisible(true);
 		System.out.println("GUI ready.");
 	}

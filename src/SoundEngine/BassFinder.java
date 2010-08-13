@@ -12,8 +12,9 @@ public class BassFinder extends FrequencyRangeFinder {
 		super(sampleRate, fftSize);
 		
 		minFreq = 15;
-		maxFreq = 80;
+		maxFreq = 70;
 		normalizingVal = 40.0;
+		decayRate = 0;
 	}
 	
 }

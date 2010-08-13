@@ -27,7 +27,6 @@ public class MainClass {
 			
 		} else {
 			System.out.println("Using audio file: " + soundFilename);
-			
 			runFromSoundFile();
 		}
 		

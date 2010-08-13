@@ -1,7 +1,7 @@
 package Signals;
 
 /**
- * This class performs Fast Fourier Transforms (FFT's)
+ * This class contains a computed Fast Fourier Transforms (FFT's)
  * @author steve
  *
  */

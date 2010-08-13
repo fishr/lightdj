@@ -27,10 +27,10 @@ import Utils.TimerTicToc;
  */
 public class VisualizationEngine {
 
-	private double[] buffer;
-	private int bufferCursor = 0;
-	private final int BUFFER_SIZE = 1024;
-	private final int BUFFER_OVERLAP = 2;
+	private double[][] buffers;
+	private int[] bufferCursors;
+	private final int BUFFER_SIZE = 8192;
+	private final int BUFFER_OVERLAP = 8;	// Must be a power of 2
 	
 	// The audio format of data being written in
 	private final int FRAME_SIZE;
@@ -86,21 +86,20 @@ public class VisualizationEngine {
 			
 		}
 		
-		// Set up sample buffer
-		buffer = new double[BUFFER_SIZE];
-		bufferCursor = 0;
+		// Set up sample buffers
+		buffers = new double[BUFFER_OVERLAP][BUFFER_SIZE];
+		bufferCursors = new int[BUFFER_OVERLAP];
+		for(int i = 0; i < BUFFER_OVERLAP; i++) {
+			bufferCursors[i] = i*(BUFFER_SIZE/BUFFER_OVERLAP);
+		}
+		
+		
 		
 		// Set up a profiler, for debugging use
 		timer = new TimerTicToc();
 		
 		// Start the FFT engine
 		fftEngine = new FFTEngine(BUFFER_SIZE, SAMPLE_RATE);
-//		double[] x = new double[2];
-//		x[0] = 1;
-//		x[1] = -1;
-//		FFT fft = fftEngine.computeFFT(x);
-//		
-//		System.out.println(fft);
 		
 		// Load up the visualizations
 		initVisualizations();
@@ -111,15 +110,15 @@ public class VisualizationEngine {
 	private void initVisualizations() {
 		// Set up the GUI
 		gui = GUIVisualizer.makeGUI();
-		graphMapper = new GraphMapper(30, 30, 500, 250, (Graphics2D) gui.getGraphics());
-		spectrumMapper = new ScrollingSpectrumMapper(30, 300, 800, 200, (Graphics2D) gui.getGraphics());
+		graphMapper = new GraphMapper(30, 30, 700, 350, (Graphics2D) gui.getGraphics());
+		spectrumMapper = new ScrollingSpectrumMapper(30, 400, 800, 300, (Graphics2D) gui.getGraphics());
 		
 		// Select channel colors
 		Color[] channelColors = new Color[numChannels];
 		channelColors[0] = Color.RED;
 		channelColors[1] = Color.BLUE;
-		channelMapper = new ScrollingChannelMapper(channelColors, 30, 550, 800, 200, (Graphics2D) gui.getGraphics());
-		lights = new ChannelLights(channelColors, 100, 550, 30, 300, 101, (Graphics2D) gui.getGraphics());
+		channelMapper = new ScrollingChannelMapper(channelColors, 30, 750, 800, 200, (Graphics2D) gui.getGraphics());
+		lights = new ChannelLights(channelColors, 100, 750, 30, 300, 101, (Graphics2D) gui.getGraphics());
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
@@ -150,19 +149,21 @@ public class VisualizationEngine {
 			}
 			
 			// Convert this to a double value, and store it!
-			
-			
 			dValue = (double) (lValue - MAX_SAMPLE_VAL) / (MAX_SAMPLE_VAL);
 			
-			// Put in in the buffer!
-			buffer[bufferCursor++] = dValue;
+			// Put in in the buffers!
+			for(int i = 0; i < BUFFER_OVERLAP; i++) {
 			
-			// Is it time to visualize?
-			if (bufferCursor == BUFFER_SIZE) {
-				visualize();
+				buffers[i][bufferCursors[i]++] = dValue;
 				
-				// Reset the ring buffer
-				bufferCursor = 0;
+				// Is it time to visualize?
+				if (bufferCursors[i] == BUFFER_SIZE) {
+					visualize(buffers[i]);
+					
+					// Reset the ring buffer
+					bufferCursors[i] = 0;
+				}
+				
 			}
 
 		}
@@ -179,7 +180,7 @@ public class VisualizationEngine {
 	}
 	
 	
-	private void visualize() {
+	private void visualize(double[] buffer) {
 		
 		// Compute an FFT
 		
@@ -221,9 +222,13 @@ public class VisualizationEngine {
 		//graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), filteredData, 15, 20000, 4);
 		//if (lastData == null) {lastData = filteredData;}
 		//graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), differenceSquared(magnitudes, lastData), 15, 20000, 8);
-		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, 30, 20000, 80);
+		
+		LinearFilter filter = new LinearFilter(new double[]{0.2}, new double[]{0.8});
+		//double[] lowpassedMags = filter.filterSignal(magnitudes);
+		
+		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 400);
 		//graphMapper.drawPositiveGraph(buffer, 2);
-		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 80);
+		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 500);
 		
 	
 		
@@ -303,7 +308,6 @@ class VisualizerHelperThread implements Runnable {
 			
 			// Process this FFT
 			engine.updateVisuals(fft);
-			
 			
 		}
 	}
