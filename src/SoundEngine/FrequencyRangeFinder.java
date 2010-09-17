@@ -8,7 +8,7 @@ package SoundEngine;
  */
 public class FrequencyRangeFinder {
 	
-	protected double decayPerSecond = 0.5;
+	protected double averageHalfLife = 0.5;
 	
 	protected double updatesPerSecond;
 	protected double phi;
@@ -27,7 +27,7 @@ public class FrequencyRangeFinder {
 	public FrequencyRangeFinder(int sampleRate, int fftSize) {
 		updatesPerSecond = 1.0 * sampleRate / fftSize; 
 		
-		phi = Math.exp(Math.log(decayPerSecond) / updatesPerSecond);
+		phi = Math.pow(0.5, 1/(averageHalfLife * updatesPerSecond));
 		
 	}
 	
@@ -55,27 +55,48 @@ public class FrequencyRangeFinder {
 		// Compute a very low-passed version of the signal to use as an estimate of the overall
 		// level of this frequency range. This is the "adaptive" part that allows the frequency
 		// range finder to adjust to different volume levels
-		if (level > averagedLevel) { 
-			outputVal =  (level - averagedLevel) / normalizingVal;
+		double threshold = averagedLevel * 1.25 + 5.0;
+		if (level > threshold) { 
+			outputVal =  (level - threshold) / normalizingVal;
 		} else {
 			outputVal = 0.0;
 		}
+		if (outputVal > 1.0) {
+			outputVal = 1.0;
+		}
+		
 		
 		averagedLevel = averagedLevel * phi + level*(1 - phi);
 		
 		double actualOutput;
 		
+//		// Limit how fast the output can fal, in an attempt to minimize flicker
+//		if (outputVal < decayRate * lastOutput) {
+//			actualOutput = decayRate * lastOutput;
+//		} else {
+//			actualOutput = outputVal;
+//		}
+		
 		// Limit how fast the output can fal, in an attempt to minimize flicker
-		if (outputVal < decayRate * lastOutput) {
-			actualOutput = decayRate * lastOutput;
-		} else if (outputVal > 1.5) {
-			actualOutput = 2.0;
+		if (outputVal < lastOutput - decayRate) {
+			actualOutput = lastOutput - decayRate;
 		} else {
 			actualOutput = outputVal;
 		}
 		
+		//actualOutput = Math.log(actualOutput + 1.0) / Math.log(2);
 		
-		regular = outputVal;
+		
+		
+//		if (actualOutput > 0.5) {
+//			actualOutput = actualOutput;
+//		} else {
+//			actualOutput = 0;
+//		}
+		
+		
+		
+		
 		lastOutput = actualOutput;
 		return actualOutput;
 		
@@ -86,8 +107,5 @@ public class FrequencyRangeFinder {
 		return averagedLevel;
 	}
 	
-	double getRegular() {
-		return regular;
-	}
 	
 }

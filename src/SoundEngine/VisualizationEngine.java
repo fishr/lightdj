@@ -9,6 +9,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import Arduino.LEDVisualizer;
 import SignalGUI.ChannelLights;
 import SignalGUI.GUIVisualizer;
 import SignalGUI.GraphMapper;
@@ -30,7 +31,7 @@ public class VisualizationEngine {
 	private double[][] buffers;
 	private int[] bufferCursors;
 	private final int BUFFER_SIZE = 8192;
-	private final int BUFFER_OVERLAP = 8;	// Must be a power of 2
+	private final int BUFFER_OVERLAP = 16;	// Must be a power of 2
 	
 	// The audio format of data being written in
 	private final int FRAME_SIZE;
@@ -50,9 +51,17 @@ public class VisualizationEngine {
 	ChannelLights lights;
 	
 	// State machines that output channel values
-	int numChannels = 2;
+	int numChannels = 4;
 	BassFinder bassFinder;
+	VocalsFinder vocalsFinder;
 	ClapFinder clapFinder;
+	
+	// Color controllers
+	ColorGenerator rgbController;
+	
+	
+	// The arduino LED visualizer
+	LEDVisualizer ledVisuals;
 	
 	// Keep a helper thread so that visualization display when run in parallel with the FFT calculuations,
 	// thereby reducing overall latency through parallelization
@@ -116,13 +125,25 @@ public class VisualizationEngine {
 		// Select channel colors
 		Color[] channelColors = new Color[numChannels];
 		channelColors[0] = Color.RED;
-		channelColors[1] = Color.BLUE;
+		channelColors[1] = Color.RED;
+		channelColors[2] = Color.GREEN;
+		channelColors[3] = Color.BLUE;
 		channelMapper = new ScrollingChannelMapper(channelColors, 30, 750, 800, 200, (Graphics2D) gui.getGraphics());
-		lights = new ChannelLights(channelColors, 100, 750, 30, 300, 101, (Graphics2D) gui.getGraphics());
+		lights = new ChannelLights(channelColors, 75, 750, 30, 360, 76, (Graphics2D) gui.getGraphics());
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
 		clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);
+		vocalsFinder = new VocalsFinder(SAMPLE_RATE, BUFFER_SIZE);
+		
+		// Start an RGB controller with some colors
+		//rgbController = new RGBGradientController(Color.BLUE, Color.RED);
+		rgbController = new HueRotator(0.0, 0.373);
+		
+		// Try to connect to the Arduino controlling the lights
+		ledVisuals = new LEDVisualizer();
+		//ledVisuals.lcdSetText("1", "2");
+		//ledVisuals.lcdBacklightOn();
 		
 		
 		// Start up a helper thread
@@ -202,12 +223,26 @@ public class VisualizationEngine {
 		double[] frequencies = fft.getFrequencies();
 		double[] magnitudes = fft.getMagnitudes();
 		
+		// Update the RGB controller
+		double bassLevel = bassFinder.getFreqs(frequencies, magnitudes);
+		//System.out.println(bassLevel);
+		double vocalsLevel = vocalsFinder.getFreqs(frequencies, magnitudes);
+		double clapLevel = clapFinder.getFreqs(frequencies, magnitudes);
+		//rgbController.computeGradient(clapLevel, vocalsLevel);
+		rgbController.step(clapLevel);
+		
 		// Compute some channel values
 		double[] channels = new double[numChannels];
-		channels[0] = bassFinder.getFreqs(frequencies, magnitudes);
-		channels[1] = 0; //clapFinder.getFreqs(frequencies, magnitudes);
-		lights.updateWithNewChannelVals(channels);
-		channelMapper.updateWithNewChannelVals(channels);
+		channels[0] = bassLevel;
+		channels[1] = rgbController.getRed();
+		channels[2] = rgbController.getGreen();
+		channels[3] = rgbController.getBlue();
+		ledVisuals.visualize(channels);
+		
+
+		
+		//lights.updateWithNewChannelVals(channels);
+		//channelMapper.updateWithNewChannelVals(channels);
 		
 		
 		
@@ -226,11 +261,12 @@ public class VisualizationEngine {
 		LinearFilter filter = new LinearFilter(new double[]{0.2}, new double[]{0.8});
 		//double[] lowpassedMags = filter.filterSignal(magnitudes);
 		
-		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 400);
+		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 200);
 		//graphMapper.drawPositiveGraph(buffer, 2);
-		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 500);
+		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 100);
 		
-	
+		//graphMapper.drawPositiveLogHalfX(frequencies, clapFinder.getAveragedFreqs(), null, 30, 20000, 40);
+		//spectrumMapper.updateWithNewSpectrum(frequencies, clapFinder.getAveragedFreqs(), 30, 20000, 100);
 		
 		//timer.toc();
 		//System.out.println(timer.getAverageTime());

@@ -11,10 +11,11 @@ public class BassFinder extends FrequencyRangeFinder {
 	public BassFinder(int sampleRate, int fftSize) {
 		super(sampleRate, fftSize);
 		
-		minFreq = 15;
+		minFreq = 10;
 		maxFreq = 70;
-		normalizingVal = 40.0;
-		decayRate = 0;
+		normalizingVal = 30.0;
+		averageHalfLife = 1.5;
+		decayRate = 1.0 / (50);
 	}
 	
 }

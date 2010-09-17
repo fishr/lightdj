@@ -8,12 +8,24 @@ package SoundEngine;
  */
 public class ClapFinder extends FrequencyRangeFinder {
 	
+	private double[] averagedFrequencyLevels;
+	
+	double lastOutput = 0;
+	
 	public ClapFinder(int sampleRate, int fftSize) {
 		super(sampleRate, fftSize);
 		
-		minFreq = 2000;
-		maxFreq = 15000;
+		minFreq = 1000;
+		maxFreq = 16000;
 		normalizingVal = 0.1;
+		
+		averageHalfLife = 0.125;
+		
+		// This will store a low pass on every frequency.
+		averagedFrequencyLevels = new double[fftSize];
+		for(int i = 0; i < fftSize; i++) {
+			averagedFrequencyLevels[i] = 0;
+		}
 		
 	}
 	
@@ -33,37 +45,58 @@ public class ClapFinder extends FrequencyRangeFinder {
 		double sum = 0;
 		int n = 0;
 		for(int i = minIndex; i <= maxIndex; i++) {
-			sum += Math.pow(magnitudes[i], 0.1);
+			//sum += Math.pow(magnitudes[i], 0.5);
+			averagedFrequencyLevels[i] = phi*averagedFrequencyLevels[i] + (1 - phi) *  magnitudes[i];
+			
+			if (magnitudes[i] / averagedFrequencyLevels[i] > 1.414) {
+				// Compute the percentage of points that is higher than the averaged levels
+				sum += 1.0;
+			}
+			
 			n++;
 		}
 		
-		double level = sum / n;
+		double fractionInExcess = sum / n;
+		double preLowPassRetVal;
 		
+		if (fractionInExcess > 0.0) {
+			preLowPassRetVal = fractionInExcess / 0.8;
+		} else {
+			preLowPassRetVal = 0.0;
+		}
+		
+		// Implement a half lowpass filter, to limit the decay rate
+		double c = 0.93;
+		double output;
+		if (preLowPassRetVal < c * lastOutput) {
+			output = c * lastOutput;
+		} else {
+			output = preLowPassRetVal;
+		}
+		lastOutput = output;
+		
+		return output;
+		
+		//double level = sum / n;
 		
 
-		if (level > averagedLevel) { 
-			outputVal =  (level - averagedLevel) / normalizingVal;
-		} else {
-			outputVal = 0.0;
-		}
-		
-		averagedLevel = averagedLevel * phi + level*(1 - phi);
-		
-		double actualOutput;
-		
-		double c = 0.25;
-		if (outputVal < c * lastOutput) {
-			actualOutput = c * lastOutput;
-		} else {
-			actualOutput = outputVal;
-		}
-		
-		
-		regular = outputVal;
-		lastOutput = actualOutput;
-		return actualOutput;
+//		System.out.println(level + " " + averagedLevel);
+//		
+//		averagedLevel = averagedLevel * phi + level*(1 - phi);
+//
+//		if (level / averagedLevel > 1.5) {
+//			return 1.0;
+//		} else {
+//			return 0.0;
+//		}
+//		
 		
 	}
 	
+	
+	public double[] getAveragedFreqs() {
+		return averagedFrequencyLevels;
+	}
+
 	
 }
