@@ -14,7 +14,7 @@ import javax.swing.JPanel;
  * @author steve
  *
  */
-public class GraphMapper {
+public class GraphDisplay {
 
 	private int screenX;
 	private int screenY;
@@ -25,7 +25,7 @@ public class GraphMapper {
 	private Graphics2D outputG2D;
 	
 	
-	public GraphMapper(int screenX, int screenY, int width, int height, Graphics2D g2D) {
+	public GraphDisplay(int screenX, int screenY, int width, int height, Graphics2D g2D) {
 		this.screenX = screenX;
 		this.screenY = screenY;
 		this.width = width;
@@ -178,11 +178,11 @@ public class GraphMapper {
 	 * @param x
 	 * @return
 	 */
-	public int transformX(double x) {
+	private int transformX(double x) {
 		return (int) (x);
 	}
 	
-	public int transformY(double y) {
+	private int transformY(double y) {
 		return (int) (height - y);
 	}
 	

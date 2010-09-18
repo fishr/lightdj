@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import javax.sound.sampled.*;
 
 import SignalGUI.GUIVisualizer;
-import SignalGUI.GraphMapper;
+import SignalGUI.GraphDisplay;
 
 public class SoundVisualizer {
 

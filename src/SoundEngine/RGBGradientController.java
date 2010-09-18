@@ -35,7 +35,6 @@ public class RGBGradientController implements ColorGenerator{
 			brightness = 0.0;
 		}
 		
-		
 		r = brightness * (val * c1.getRed() + (1 - val) * c0.getRed()) / 255.0;
 		g = brightness * (val * c1.getGreen() + (1 - val) * c0.getGreen()) / 255.0;
 		b = brightness * (val * c1.getBlue() + (1 - val) * c0.getBlue()) / 255.0;

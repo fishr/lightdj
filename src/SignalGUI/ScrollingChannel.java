@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  * @author steve
  *
  */
-public class ScrollingChannelMapper {
+public class ScrollingChannel {
 	private int screenX;
 	private int screenY;
 	private int width;
@@ -22,7 +22,7 @@ public class ScrollingChannelMapper {
 	
 	private int currentX = 0;
 	
-	public ScrollingChannelMapper(int screenX, int screenY, int width, int height, Graphics2D g2D) {
+	public ScrollingChannel(int screenX, int screenY, int width, int height, Graphics2D g2D) {
 		this.screenX = screenX;
 		this.screenY = screenY;
 		this.width = width;

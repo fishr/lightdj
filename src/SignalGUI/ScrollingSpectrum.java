@@ -5,11 +5,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 /**
- * Represents a sort of graph mapper for a scrolling spectrum!
- * @author steve
+ * Represents a scrolling spectrum, showing the past spectrums as a function of time!
+ * @author Steve
  *
  */
-public class ScrollingSpectrumMapper {
+public class ScrollingSpectrum {
 	private int screenX;
 	private int screenY;
 	private int width;
@@ -20,7 +20,7 @@ public class ScrollingSpectrumMapper {
 	
 	private int currentX = 0;
 	
-	public ScrollingSpectrumMapper(int screenX, int screenY, int width, int height, Graphics2D g2D) {
+	public ScrollingSpectrum(int screenX, int screenY, int width, int height, Graphics2D g2D) {
 		this.screenX = screenX;
 		this.screenY = screenY;
 		this.width = width;
@@ -30,7 +30,6 @@ public class ScrollingSpectrumMapper {
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
 	}
-	
 	
 	
 	public void updateWithNewSpectrum(double[] frequencies, double magnitudes[], double minFreq, double maxFreq, double max_val) {
@@ -61,18 +60,6 @@ public class ScrollingSpectrumMapper {
 			g2D.drawRect(currentX, height - yPixelIndex - 1, 1, 1);
 		}
 		
-//		for(int i = 0; i < magnitudes.length; i++) {
-//			
-//			// Select the current color
-//			double freqVal = magnitudes[i] / max_val;
-//			g2D.setColor(getColor(freqVal));
-//			
-//			g2D.drawRect(currentX, height - i, 1, 1);
-//		}
-		
-		
-		
-		
 		// Increment x!
 		if (currentX++ > width) {
 			currentX = 0;
@@ -98,8 +85,6 @@ public class ScrollingSpectrumMapper {
 		
 		double yPrevious = yvals[index];
 		double yNext = yvals[index + 1];
-		
-		//return yvals[index];
 		
 		// Linearly interpolate
 		return (yNext - yPrevious) * (xDesired - xPrevious) / (xNext - xPrevious) + yPrevious;
