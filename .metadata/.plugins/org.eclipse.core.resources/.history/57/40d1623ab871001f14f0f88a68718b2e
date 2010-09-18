@@ -1,0 +1,13 @@
+package SoundEngine;
+
+/**
+ * The main class
+ * @author steve
+ *
+ */
+public class MainClass {
+
+	public static void main(String[] args) {
+		// Do stuff here
+	}
+}

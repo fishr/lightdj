@@ -1,0 +1,153 @@
+package VIsualServo;
+
+import Carmen.*;
+
+/**
+ * 
+ * @author previous TA's, prentice, vona
+ *
+ */
+public class VisualServo implements CameraHandler, ParamChangeHandler {
+
+  /**
+   * <p>The blob tracker.</p>
+   **/
+  private BlobTracking blobTrack = null;
+
+  /**
+   * <p>Set default central host here.</p>
+   **/
+  public static String centralHost = "localhost";
+
+  private boolean paramChanged = false;
+  
+
+//constants for servoing towards the ball
+  private double desired_dist = 0.5;//how far we want the ball to be from us in meter
+  private double desired_angle = 0.0; //what angle we want the ball to be seen at (in radians)
+  private double p_forward = 0.3;//Proportional constant for driving to the correct distance from the ball
+  private double forward_speed = 0.0;
+  private double p_turn = 0.5;//	Proportional constant for turning to the correct angle with respect to the ball
+  private double turn_speed = 0.0; //turning component of wheel speeds for servoing towards the ball
+
+  /**
+   * <p>Create a new VisualServo object.</p>
+   */
+  public VisualServo() {
+
+    setInitialParams();
+
+    // subscribe to receive camera and param change messages
+    CameraMessage.subscribe(this);
+    ParamChangeMessage.subscribe(this);
+  }
+
+  protected void setInitialParams() {
+
+    // Begin Student Code
+
+    // set initial parameter values as you desire
+
+      //EXAMPLE
+//    Param.set("visualservo", "foo", "value");
+
+
+
+    // End Student Code
+  }
+  
+  /**
+   * <p>Handle a CameraMessage. Perform blob tracking and
+   * servo robot towards target.</p>
+   * 
+   * @param a received camera message 
+   */
+  public void handle(CameraMessage cameraMsg) {
+
+    System.err.print("c");
+
+    // on first camera message, create new BlobTracking instance
+    if (blobTrack == null || paramChanged) {
+
+      blobTrack = new BlobTracking(cameraMsg.width, cameraMsg.height);
+
+      paramChanged = false;
+
+      // Begin Student Code
+      
+      // set parameters on blobTrack as you desire
+
+      //EXAMPLE
+//      blobTrack.foo =
+//        Double.parseDouble(Param.query("visualservo", "foo"));
+
+
+
+      // End Student Code
+    }
+
+    VisionImageMessage visionMsg = new VisionImageMessage(cameraMsg);
+    
+
+    
+//     apply vision processing to raw camera image
+//    blobTrack.apply(cameraMsg.image, visionMsg.image);
+    Image src = new Image(cameraMsg.image, cameraMsg.width, cameraMsg.height);
+    Image dest = new Image(visionMsg.image, visionMsg.width, visionMsg.height);
+
+    blobTrack.apply(src, dest);
+    
+    // publish newly formed vision message
+    visionMsg.image = dest.toArray();
+    visionMsg.publish();
+    
+    // Begin Student Code
+    
+    // move robot towards target
+    //forward calculation
+	if(blobTrack.targetDetected){
+		forward_speed = p_forward*(blobTrack.targetRange-desired_dist);
+    		turn_speed = p_turn*(blobTrack.targetBearing - desired_angle);
+   		Robot.setVelocity(forward_speed, turn_speed);
+	}else
+		Robot.setVelocity(0.0, 0.0);
+
+    // End Student Code
+  }
+
+  
+  /**
+   * <p>Handle a ParamChangeMessage pertaining to VisualServo 
+   * and update instance variables</p>
+   * 
+   * @param a received param change message 
+   */
+  public void handle(ParamChangeMessage msg) {
+
+    if (!msg.moduleName.equals("visualservo"))
+      return;
+
+    System.err.println("VisualServo Parameter Changed: " +
+                       msg.variableName + " = " + msg.newValue);
+
+    paramChanged = true;
+  }
+  
+  /**
+   * <p>
+   * Run the VisualServo process
+   * </p>
+   * 
+   * @param optional
+   *            command-line argument containing hostname
+   */
+  public static void main(String argv[]) {
+    // if hostname is given on command-line, update centralHost
+    if (argv.length > 0) {
+      centralHost = argv[0];
+    }
+    Robot.initialize("VisualServo", centralHost);
+    VisualServo visualServo = new VisualServo();
+    Robot.dispatch();
+  }
+}

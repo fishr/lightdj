@@ -1,0 +1,10 @@
+package VIsualServo;
+
+/**
+ * <p>Interface for handling GUIEraseMessages.</p>
+ * 
+ * @author vona 
+ */
+public interface GUIEraseHandler {
+  public void handle (GUIEraseMessage message);
+}

@@ -1,0 +1,125 @@
+package SignalGUI;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.image.BufferedImage;
+
+
+/**
+ * Plots data as a function of time, and scrolls. Meant for debugging purposes, and to be
+ * helpful with designing new algorithms!
+ *
+ */
+public class RealtimePlotter {
+
+	private int screenX;
+	private int screenY;
+	private int width;
+	private int height;
+	
+	private BufferedImage buffer;
+	private Graphics2D outputG2D;
+	
+	private double maxY;
+	
+	// Store the last N points.
+	private int N = 100;
+	private int numPoints;
+	private double[] y_vals;
+	
+	public RealtimePlotter(int screenX, int screenY, int width, int height, double maxY, Graphics2D g2D) {
+		this.screenX = screenX;
+		this.screenY = screenY;
+		this.width = width;
+		this.height = height;
+		this.outputG2D = g2D;
+		
+		this.maxY = maxY;
+		numPoints = 0;
+		y_vals = new double[N];
+		
+		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		
+	}
+	
+	public int getScreenX() {return screenX;}
+	public int getScreenY() {return screenY;}
+	public int getWidth() {return width;}
+	public int getHeight() {return height;}
+	
+	
+	public void update(double y_val) {
+		
+		if (numPoints < N) {
+			// Just add this point to the end - not saturated and don't have to scroll yet!
+			y_vals[numPoints++] = y_val;
+		} else {
+			// Scroll all the points over by 1, and then add it
+			for(int i = 0; i < N - 1; i++) {
+				y_vals[i] = y_vals[i + 1];
+			}
+			y_vals[N - 1]  = y_val;
+		}
+		
+		
+		// Draw the graph!
+		drawGraph();
+		
+	}
+	
+	private void drawGraph() {
+		
+		Graphics2D g2D = (Graphics2D) buffer.getGraphics();
+		
+		g2D.setColor(Color.BLACK);
+		g2D.clearRect(0, 0, width, height);
+		
+		
+		g2D.setColor(Color.WHITE);
+		g2D.setBackground(Color.BLACK);
+		
+		double scaleX = (double) width / N;
+		double scaleY = (double) height / maxY;
+	
+		
+		// Draw the X and Y axes
+		g2D.drawLine(transformX(1), transformY(1), transformX(width-1), transformY(1));
+		g2D.drawLine(transformX(1), transformY(1), transformX(1), transformY(height-1));
+	
+		double lastX = 1;
+		double lastY = y_vals[0];
+		for(int i = 1; i < numPoints; i++) {
+			double x = scaleX * i;
+			double y = scaleY * y_vals[i];
+			g2D.drawLine(transformX(lastX), transformY(scaleY * lastY), transformX(scaleX * i), transformY(scaleY * y_vals[i]);
+			
+		}
+		
+		
+		// Output this buffered graph image!
+		outputGraph();
+	}
+	
+	private void outputGraph() {
+		outputG2D.drawImage(buffer, screenX, screenY, null);
+	}
+	
+	
+	/**
+	 * Transform from graph to screen coordinates
+	 * @param x
+	 * @return
+	 */
+	private int transformX(double x) {
+		return (int) (x);
+	}
+	
+	private int transformY(double y) {
+		return (int) (height - y);
+	}
+	
+	
+}
+

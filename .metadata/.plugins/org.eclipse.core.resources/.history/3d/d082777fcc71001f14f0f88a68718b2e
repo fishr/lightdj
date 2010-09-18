@@ -1,0 +1,29 @@
+package SoundEngine;
+
+import java.io.File;
+
+import javax.sound.sampled.*;
+
+/**
+ * The main class
+ * @author steve
+ *
+ */
+public class MainClass {
+
+	private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
+	
+	public static void main(String[] args) {
+		// Do stuff here
+		System.out.println("Initializing Sound Expressor...");
+		
+		// For now, attempt to play back from a clever music file.
+		File songFile = new File(soundFilename);
+		
+		AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(songFile);
+		
+		
+	}
+	
+	
+}

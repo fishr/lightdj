@@ -1,0 +1,32 @@
+package SoundEngine;
+
+import java.awt.*;
+import javax.swing.*;
+
+public class GUIVisualizer extends JFrame {
+	public GUIVisualizer() {
+		super("Sound Visualizer");
+		
+	}
+	
+	
+	private static void createAndShowGUI() {
+		// Set up the window
+		GUIVisualizer frame = new GUIVisualizer();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		Container pane = frame.getContentPane();
+		pane.setLayout(new GridLayout(2, 1));
+		
+	}
+	
+	public static void showGUI() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+	
+	
+}

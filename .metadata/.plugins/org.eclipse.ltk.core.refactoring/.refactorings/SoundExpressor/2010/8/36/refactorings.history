@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;SoundEngine.ColorSource&apos; to &apos;ColorGenerator&apos;&#x0A;- Original project: &apos;SoundExpressor&apos;&#x0A;- Original element: &apos;SoundEngine.ColorSource&apos;&#x0A;- Renamed element: &apos;SoundEngine.ColorGenerator&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;ColorSource&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;SoundEngine{ColorSource.java[ColorSource" matchStrategy="1" name="ColorGenerator" qualified="false" references="true" similarDeclarations="false" stamp="1283122743289" textual="false" version="1.0"/>
+</session>

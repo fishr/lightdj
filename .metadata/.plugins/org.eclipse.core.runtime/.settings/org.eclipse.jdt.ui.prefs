@@ -1,0 +1,21 @@
+#Sat Sep 18 04:19:36 EDT 2010
+content_assist_proposals_foreground=20,13,10
+spelling_locale_initialized=true
+org.eclipse.jdt.ui.text.templates_migrated=true
+useAnnotationsPrefPage=true
+eclipse.preferences.version=1
+org.eclipse.jface.textfont=1|Monospace|10.0|0|GTK|1|;
+tabWidthPropagated=true
+org.eclipse.jdt.ui.editor.tab.width=
+fontPropagated=true
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+org.eclipse.jdt.ui.javadoclocations.migrated=true
+proposalOrderMigrated=true
+content_assist_proposals_background=255,255,255
+org.eclipse.jdt.ui.formatterprofiles.version=11
+org.eclipse.jdt.internal.ui.navigator.layout=2
+content_assist_number_of_computers=12
+useQuickDiffPrefPage=true
+org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.awt.Paint"><rhs name\="java.awt.Color"/></lhs><lhs name\="java.awt.Transparency"><rhs name\="java.awt.Color"/></lhs><lhs name\="java.awt.Color"><rhs name\="java.awt.Color"/></lhs><lhs name\="javax.swing.JPanel"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="javax.accessibility.Accessible"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="javax.swing.JComponent"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="javax.swing.TransferHandler$HasGetTransferHandler"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="java.awt.Container"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="java.awt.Component"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="java.awt.image.ImageObserver"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="java.awt.MenuContainer"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="SignalGUI.GUIVisualizer"><rhs name\="SignalGUI.GUIVisualizer"/></lhs><lhs name\="SignalGUI.ScrollingChannelMapper"><rhs name\="SignalGUI.ScrollingChannelMapper"/></lhs><lhs name\="java.lang.Runnable"><rhs name\="SoundEngine.VisualizerHelperThread"/></lhs><lhs name\="SoundEngine.VisualizerHelperThread"><rhs name\="SoundEngine.VisualizerHelperThread"/></lhs><lhs name\="gnu.io.CommPortIdentifier"><rhs name\="gnu.io.CommPortIdentifier"/></lhs><lhs name\="Arduino.LEDVisualizer"><rhs name\="Arduino.LEDVisualizer"/></lhs><lhs name\="SoundEngine.FrequencyRangeFinder"><rhs name\="SoundEngine.VocalsFinder"/></lhs><lhs name\="SoundEngine.VocalsFinder"><rhs name\="SoundEngine.VocalsFinder"/></lhs><lhs name\="SoundEngine.RGBGradientController"><rhs name\="SoundEngine.RGBGradientController"/></lhs><lhs name\="SoundEngine.ColorGenerator"><rhs name\="SoundEngine.HueRotator"/></lhs><lhs name\="SignalGUI.ColoredLight"><rhs name\="SignalGUI.ColoredLight"/></lhs></history>
+org.eclipse.jdt.ui.text.code_templates_migrated=true

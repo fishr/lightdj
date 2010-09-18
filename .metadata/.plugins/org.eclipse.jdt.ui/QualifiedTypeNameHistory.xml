@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="javax.swing.JPanel"/>
+<fullyQualifiedTypeName name="java.awt.RenderingHints"/>
+<fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
+<fullyQualifiedTypeName name="Signals.FFT"/>
+<fullyQualifiedTypeName name="javax.sound.sampled.AudioFormat"/>
+<fullyQualifiedTypeName name="SignalGUI.GraphMapper"/>
+<fullyQualifiedTypeName name="SignalGUI.GUIVisualizer"/>
+<fullyQualifiedTypeName name="java.awt.Graphics2D"/>
+<fullyQualifiedTypeName name="SignalGUI.ScrollingSpectrumMapper"/>
+<fullyQualifiedTypeName name="SignalGUI.ScrollingChannelMapper"/>
+<fullyQualifiedTypeName name="SignalGUI.ChannelLights"/>
+<fullyQualifiedTypeName name="SoundEngine.VisualizerHelperThread"/>
+<fullyQualifiedTypeName name="Signals.FFTEngine"/>
+<fullyQualifiedTypeName name="Signals.Complex"/>
+<fullyQualifiedTypeName name="java.util.concurrent.Semaphore"/>
+<fullyQualifiedTypeName name="Utils.TimerTicToc"/>
+<fullyQualifiedTypeName name="java.awt.BasicStroke"/>
+<fullyQualifiedTypeName name="java.awt.Stroke"/>
+<fullyQualifiedTypeName name="gnu.io.CommPortIdentifier"/>
+<fullyQualifiedTypeName name="gnu.io.CommPort"/>
+<fullyQualifiedTypeName name="gnu.io.SerialPort"/>
+<fullyQualifiedTypeName name="java.io.OutputStream"/>
+<fullyQualifiedTypeName name="java.io.IOException"/>
+<fullyQualifiedTypeName name="Arduino.ArduinoController"/>
+<fullyQualifiedTypeName name="Arduino.LEDVisualizer"/>
+<fullyQualifiedTypeName name="SoundEngine.VocalsFinder"/>
+<fullyQualifiedTypeName name="SoundEngine.RGBGradientController"/>
+<fullyQualifiedTypeName name="SoundEngine.ColorGenerator"/>
+<fullyQualifiedTypeName name="SoundEngine.HueRotator"/>
+<fullyQualifiedTypeName name="SignalGUI.ColoredLight"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="SignalGUI.RGBLight"/>
+<fullyQualifiedTypeName name="SignalGUI.RealtimePlotter"/>
+</qualifiedTypeNameHistroy>

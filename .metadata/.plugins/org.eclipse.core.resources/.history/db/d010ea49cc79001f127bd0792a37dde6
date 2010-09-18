@@ -1,0 +1,175 @@
+package SoundEngine;
+
+import java.awt.Graphics2D;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
+
+import SignalGUI.GUIVisualizer;
+import SignalGUI.GraphMapper;
+import Signals.FFT;
+import Signals.LinearFilter;
+
+/**
+ * This class is responsible for generating the visualizations.
+ * @author steve
+ *
+ */
+public class VisualizationEngine {
+
+	private double[] buffer;
+	private int bufferCursor = 0;
+	private final int BUFFER_SIZE = 1024;
+	
+	// The audio format of data being written in
+	private final int FRAME_SIZE;
+	private final int BYTES_PER_SAMPLE;
+	private final long MAX_SAMPLE_VAL;
+	private final int SAMPLE_RATE;
+	
+	
+	// For multi-channel audio (ex., stereo), only use this channel for processing
+	private final int CHANNEL_TO_PROCESS = 0;
+	
+	// Visualization stuff
+	GUIVisualizer gui;
+	GraphMapper graphMapper;
+	
+	
+	
+	
+	
+	
+	SourceDataLine outputLine;
+	
+	
+	
+	
+	
+	public VisualizationEngine(AudioFormat format) {
+		
+		// Remember stuff about the audio format
+		// For simplicity for now, only support 16 bit samples
+		if (format.getSampleSizeInBits() != 16) {
+			System.out.println("Error: I currently only support 16 bit linear PCM audio data!");
+			throw new RuntimeException("I only support 16 bit linear PCM audio data!");	
+		} else if (format.isBigEndian()){
+			System.out.println("Error: I don't feel like supporting big endian!");
+			throw new RuntimeException("I don't feel like supporting big endian!");	
+		} else {
+			// Okay
+			BYTES_PER_SAMPLE = 2;
+			FRAME_SIZE = format.getFrameSize();
+			MAX_SAMPLE_VAL = (long) Math.pow(2, 8*BYTES_PER_SAMPLE - 1);
+			SAMPLE_RATE = (int) format.getSampleRate();
+			
+			System.out.println("Audio frame size: " + format.getFrameSize());
+			
+		}
+		
+		// Set up sample buffer
+		buffer = new double[BUFFER_SIZE];
+		bufferCursor = 0;
+		
+		
+		initVisualizations();
+		
+		
+		
+		
+		AudioFormat format2 = new AudioFormat(44100, 16, 1, true, false);
+		
+		try {
+		outputLine = AudioSystem.getSourceDataLine(format2);
+		outputLine.open(format2, 1024*64);
+	} catch (LineUnavailableException e) {
+		System.out.println("SoundVisualizer cannot open source data line!");
+		e.printStackTrace();
+		return;
+	}
+	outputLine.start();
+		
+		
+		
+		
+	}
+	
+	private void initVisualizations() {
+		// Set up the GUI
+		gui = GUIVisualizer.makeGUI();
+		graphMapper = new GraphMapper(30, 30, 500, 250, (Graphics2D) gui.getGraphics());
+		
+		
+		
+	}
+	
+	
+	/**
+	 * Write data into the buffer, and visualize when appropriate.
+	 */
+	public void write(byte[] data, int offset, int length) {
+		// Data is in the form of frames, which could be multi-channel audio.
+		// Read in by samples
+		long lValue;
+		double dValue;
+		
+		for(int dataCursor = offset; dataCursor < length + offset; dataCursor += FRAME_SIZE) {
+			// Read in one sample
+			lValue = 0;
+			if (BYTES_PER_SAMPLE == 2) {
+				lValue = ((((short) data[dataCursor + 1]) + 128) << 8) | (((short) data[dataCursor]) + 128);
+			}
+			
+			// Convert this to a double value, and store it!
+			
+			
+			dValue = (double) (lValue - MAX_SAMPLE_VAL) / (MAX_SAMPLE_VAL);
+			
+			// Put in in the buffer!
+			buffer[bufferCursor++] = dValue;
+			
+			// Is it time to visualize?
+			if (bufferCursor == BUFFER_SIZE) {
+				visualize();
+				
+				// Reset the ring buffer
+				bufferCursor = 0;
+			}
+
+		}
+		
+		
+		
+	}
+	
+	private void visualize() {
+		// Compute an FFT
+		
+//		int N = 1024;
+//		int fs = 44100;
+//		int f = 10000;
+//		double x[] = new double[N];
+//		for(int i = 0; i < N; i++) {
+//			x[i] = 0.5 * Math.sin(2*Math.PI*f / fs * i);
+//		}
+		
+		FFT fft = new FFT(buffer, SAMPLE_RATE);
+		
+		
+		//graphMapper.drawPositiveGraph(fft.getLogMagnitudes(), 4);
+		double[] logMags = fft.getLogMagnitudes();
+		
+		// Low pass filter it, just for kicks
+		//LinearFilter filter = LinearFilter.createAveragingFilter(1);
+		LinearFilter filter = new LinearFilter(new double[]{0.25,0.5,0.25}, new double[]{0});
+		double[] filteredData = filter.filterSignal(logMags);
+		
+		graphMapper.drawPositiveLogHalfX(fft.getFrequencies(), filteredData, 15, 20000, 4);
+		//graphMapper.drawPositiveGraph(buffer, 2);
+		
+	}
+	
+	
+}
