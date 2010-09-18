@@ -49,6 +49,7 @@ public class HueRotator implements ColorGenerator {
 	public double getRed() {return r;}
 	public double getGreen() {return g;}
 	public double getBlue() {return b;}
+	public Color getColor() {return new Color((float) r, (float) g, (float) b);}
 
 	@Override
 	public void step(double val) {

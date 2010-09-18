@@ -44,6 +44,7 @@ public class RGBGradientController implements ColorGenerator{
 	public double getRed() {return r;}
 	public double getGreen() {return g;}
 	public double getBlue() {return b;}
+	public Color getColor() {return new Color((float) r, (float) g, (float) b);}
 	
 	public void step(double val) {
 		computeGradient(val, 1.0);

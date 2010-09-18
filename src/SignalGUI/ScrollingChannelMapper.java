@@ -19,18 +19,16 @@ public class ScrollingChannelMapper {
 	private BufferedImage buffer;
 	private Graphics2D outputG2D;
 	
+	
 	private int currentX = 0;
 	
-	Color[] colors;
-	
-	public ScrollingChannelMapper(Color[] colors, int screenX, int screenY, int width, int height, Graphics2D g2D) {
+	public ScrollingChannelMapper(int screenX, int screenY, int width, int height, Graphics2D g2D) {
 		this.screenX = screenX;
 		this.screenY = screenY;
 		this.width = width;
 		this.height = height;
 		outputG2D = g2D;
 		
-		this.colors = colors;
 		
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		
@@ -38,18 +36,16 @@ public class ScrollingChannelMapper {
 	
 	
 	// PRECONDITION: The number of channels is equal to the number of colors passed in earlier.
-	
-	public void updateWithNewChannelVals(double[] channelVals) {
+	public void updateWithNewChannelColors(Color[] channelColors) {
 		Graphics2D g2D = (Graphics2D) buffer.getGraphics();
 		
 				
-		int size = height / colors.length;
-		for(int i = 0; i < colors.length; i++) {
+		int size = height / channelColors.length;
+		for(int i = 0; i < channelColors.length; i++) {
 			// Set the current color
-			g2D.setColor(scaleColor(colors[i], channelVals[i]));
+			g2D.setColor(channelColors[i]);
 			g2D.drawRect(currentX, size*i, 1, size);
 		}
-		
 		
 		
 		// Increment x!
@@ -67,24 +63,11 @@ public class ScrollingChannelMapper {
 		
 	}
 	
-	
-	// Select a color based on a value between 0 and 1
-	private Color scaleColor(Color c, double normalizedVal) {
-		if (normalizedVal > 1.0) {
-			normalizedVal = 1.0;
-		} else if (normalizedVal < 0.0) {
-			normalizedVal = 0.0;
-		}
-		
-		return new Color((int) Math.round(normalizedVal * c.getRed()), (int) Math.round(normalizedVal * c.getGreen()), (int) Math.round(normalizedVal * c.getBlue()));		
-	}
-	
-	
+
 	
 	private void outputGraph() {
 		outputG2D.drawImage(buffer, screenX, screenY, null);
 	}
-	
 	
 	
 }

@@ -15,7 +15,7 @@ public class BassFinder extends FrequencyRangeFinder {
 		maxFreq = 70;
 		normalizingVal = 30.0;
 		averageHalfLife = 1.5;
-		decayRate = 1.0 / (50);
+		decayRate = 1.0 / (20);
 	}
 	
 }
