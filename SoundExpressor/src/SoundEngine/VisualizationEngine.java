@@ -224,7 +224,6 @@ public class VisualizationEngine {
 		
 		// Update LED lights
 		//ledVisuals.visualize(channels);					// Send SERIAL to the RGB's
-		//lights.updateWithNewChannelVals(channels);			// Update the lights
 		bassLight.update(bassLevel);
 		rgbLight.update(rgbController.getColor());
 		channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display

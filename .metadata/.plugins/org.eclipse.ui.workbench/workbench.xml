@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="14" version="2.0">
+<workbench progressCount="17" version="2.0">
 <workbenchAdvisor/>
-<window height="1050" width="1546" x="81" y="0">
+<window height="1050" width="1542" x="81" y="0">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="214"/>
@@ -29,88 +29,13 @@
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
-<part id="1"/>
-<part id="2"/>
-<part id="3"/>
-<part id="4"/>
-<part id="5"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="10"/>
-<part id="11"/>
-<part id="12"/>
-<part id="13"/>
-<part id="14"/>
-<part id="15"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FrequencyRangeFinder.java" partName="FrequencyRangeFinder.java" path="/home/steve/partysoft/workspace/SoundExpressor/src/SoundEngine/FrequencyRangeFinder.java" title="FrequencyRangeFinder.java" tooltip="SoundExpressor/src/SoundEngine/FrequencyRangeFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/FrequencyRangeFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="LEDVisualizer.java" partName="LEDVisualizer.java" path="/home/steve/workspace/SoundExpressor/src/Arduino/LEDVisualizer.java" title="LEDVisualizer.java" tooltip="SoundExpressor/src/Arduino/LEDVisualizer.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/Arduino/LEDVisualizer.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1809" selectionTopPixel="1016"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorChooserDemo.java" partName="ColorChooserDemo.java" path="/home/steve/workspace/SoundExpressor/src/Arduino/ColorChooserDemo.java" title="ColorChooserDemo.java" tooltip="SoundExpressor/src/Arduino/ColorChooserDemo.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/Arduino/ColorChooserDemo.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2304" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VocalsFinder.java" partName="VocalsFinder.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/VocalsFinder.java" title="VocalsFinder.java" tooltip="SoundExpressor/src/SoundEngine/VocalsFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/VocalsFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="446" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MainClass.java" partName="MainClass.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/MainClass.java" title="MainClass.java" tooltip="SoundExpressor/src/SoundEngine/MainClass.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3205" selectionTopPixel="1246"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FFTEngine.java" partName="FFTEngine.java" path="/home/steve/workspace/SoundExpressor/src/Signals/FFTEngine.java" title="FFTEngine.java" tooltip="SoundExpressor/src/Signals/FFTEngine.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/Signals/FFTEngine.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="605" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ScrollingChannel.java" partName="ScrollingChannel.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/ScrollingChannel.java" title="ScrollingChannel.java" tooltip="SoundExpressor/src/SignalGUI/ScrollingChannel.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/ScrollingChannel.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="637" selectionTopPixel="85"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ScrollingSpectrum.java" partName="ScrollingSpectrum.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/ScrollingSpectrum.java" title="ScrollingSpectrum.java" tooltip="SoundExpressor/src/SignalGUI/ScrollingSpectrum.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/ScrollingSpectrum.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="645" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HueRotator.java" partName="HueRotator.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/HueRotator.java" title="HueRotator.java" tooltip="SoundExpressor/src/SoundEngine/HueRotator.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/HueRotator.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1128" selectionTopPixel="244"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColoredLight.java" partName="ColoredLight.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/ColoredLight.java" title="ColoredLight.java" tooltip="SoundExpressor/src/SignalGUI/ColoredLight.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/ColoredLight.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1189" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RGBLight.java" partName="RGBLight.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/RGBLight.java" title="RGBLight.java" tooltip="SoundExpressor/src/SignalGUI/RGBLight.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/RGBLight.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="817" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorGenerator.java" partName="ColorGenerator.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/ColorGenerator.java" title="ColorGenerator.java" tooltip="SoundExpressor/src/SoundEngine/ColorGenerator.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/ColorGenerator.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RGBGradientController.java" partName="RGBGradientController.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/RGBGradientController.java" title="RGBGradientController.java" tooltip="SoundExpressor/src/SoundEngine/RGBGradientController.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/RGBGradientController.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="713" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RealtimePlotter.java" partName="RealtimePlotter.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/RealtimePlotter.java" title="RealtimePlotter.java" tooltip="SoundExpressor/src/SignalGUI/RealtimePlotter.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/RealtimePlotter.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2894" selectionTopPixel="1355"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GraphDisplay.java" partName="GraphDisplay.java" path="/home/steve/workspace/SoundExpressor/src/SignalGUI/GraphDisplay.java" title="GraphDisplay.java" tooltip="SoundExpressor/src/SignalGUI/GraphDisplay.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SignalGUI/GraphDisplay.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4646" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="BassFinder.java" partName="BassFinder.java" path="/home/steve/workspace/SoundExpressor/src/SoundEngine/BassFinder.java" title="BassFinder.java" tooltip="SoundExpressor/src/SoundEngine/BassFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/BassFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="359" selectionTopPixel="0"/>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngine.java" partName="VisualizationEngine.java" path="/home/steve/partysoft/MusicVisualizer/SoundExpressor/src/SoundEngine/VisualizationEngine.java" title="VisualizationEngine.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngine.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="1" selectionOffset="888" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -193,7 +118,7 @@
 <view id="org.eclipse.jdt.ui.SourceView" partName="Declaration"/>
 <view id="org.eclipse.jdt.ui.JavadocView" partName="Javadoc"/>
 </views>
-<perspectives activePart="org.eclipse.jdt.ui.CompilationUnitEditor" activePerspective="org.eclipse.jdt.ui.JavaPerspective">
+<perspectives activePart="org.eclipse.jdt.ui.PackageExplorer" activePerspective="org.eclipse.jdt.ui.JavaPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.ui.internal.ide.application.ResourcePerspective" id="org.eclipse.ui.resourcePerspective" label="Resource"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -450,34 +375,9 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/FrequencyRangeFinder.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/ClapFinder.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/FrequencyRangeFinder.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
 </editors>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2644" y="0"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2647" y="1"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2645" y="0"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2663" y="0"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2679" y="0"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="2696" y="0"/>
-</item>
-<item historyLabel="RealtimePlotter.java" index="2">
-<position info="not_deleted" x="424" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="0">
-<position info="not_deleted" x="1793" y="0"/>
-</item>
 <item historyLabel="VisualizationEngine.java" index="0">
 <position info="not_deleted" x="3891" y="0"/>
 </item>
@@ -598,7 +498,34 @@
 <item historyLabel="ClapFinder.java" index="5">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item active="true" historyLabel="FrequencyRangeFinder.java" index="6">
+<item historyLabel="FrequencyRangeFinder.java" index="6">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="MainClass.java" index="7">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="MainClass.java" index="7">
+<position info="not_deleted" x="784" y="0"/>
+</item>
+<item historyLabel="VisualizationEngine.java" index="8">
+<position info="not_deleted" x="6161" y="0"/>
+</item>
+<item historyLabel="MainClass.java" index="7">
+<position info="not_deleted" x="2855" y="0"/>
+</item>
+<item historyLabel="VisualizationEngine.java" index="8">
+<position info="not_deleted" x="8298" y="0"/>
+</item>
+<item historyLabel="MainClass.java" index="7">
+<position info="not_deleted" x="669" y="0"/>
+</item>
+<item historyLabel="VisualizationEngine.java" index="8">
+<position info="not_deleted" x="7713" y="0"/>
+</item>
+<item historyLabel="MainClass.java" index="7">
+<position info="not_deleted" x="669" y="0"/>
+</item>
+<item active="true" historyLabel="VisualizationEngine.java" index="8">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 </navigationHistory>
@@ -619,6 +546,12 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngine.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngine.java">
+<persistable path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MainClass.java" tooltip="SoundExpressor/src/SoundEngine/MainClass.java">
+<persistable path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="BassFinder.java" tooltip="SoundExpressor/src/SoundEngine/BassFinder.java">
 <persistable path="/SoundExpressor/src/SoundEngine/BassFinder.java"/>
 </file>
@@ -657,12 +590,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FFTEngine.java" tooltip="SoundExpressor/src/Signals/FFTEngine.java">
 <persistable path="/SoundExpressor/src/Signals/FFTEngine.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MainClass.java" tooltip="SoundExpressor/src/SoundEngine/MainClass.java">
-<persistable path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VocalsFinder.java" tooltip="SoundExpressor/src/SoundEngine/VocalsFinder.java">
-<persistable path="/SoundExpressor/src/SoundEngine/VocalsFinder.java"/>
 </file>
 </mruList>
 </workbench>
