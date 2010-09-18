@@ -127,7 +127,7 @@ public class VisualizationEngine {
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) gui.getGraphics());
 		bassLight = new ColoredLight(Color.RED, 75, 750, 30, 75, 100, (Graphics2D) gui.getGraphics());
 		rgbLight = new RGBLight(75, 840, 30, 75, 100, (Graphics2D) gui.getGraphics());
-		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 100.0, (Graphics2D) gui.getGraphics());
+		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 300.0, (Graphics2D) gui.getGraphics());
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
