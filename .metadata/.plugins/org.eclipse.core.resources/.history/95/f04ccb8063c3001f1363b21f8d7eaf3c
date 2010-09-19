@@ -10,9 +10,11 @@ import Arduino.LEDVisualizer;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.GUIVisualizer;
-import SignalGUI.GraphMapper;
-import SignalGUI.ScrollingChannelMapper;
-import SignalGUI.ScrollingSpectrumMapper;
+import SignalGUI.GraphDisplay;
+import SignalGUI.RGBLight;
+import SignalGUI.RealtimePlotter;
+import SignalGUI.ScrollingChannel;
+import SignalGUI.ScrollingSpectrum;
 import Signals.FFT;
 import Signals.FFTEngine;
 import Utils.TimerTicToc;
@@ -26,7 +28,7 @@ public class VisualizationEngine {
 	private double[][] buffers;
 	private int[] bufferCursors;
 	private final int BUFFER_SIZE = 1024;
-	private final int BUFFER_OVERLAP = 2;	// Must be a power of 2
+	private final int BUFFER_OVERLAP = 1;	// Must be a power of 2
 	
 	// The audio format of data being written in
 	private final int FRAME_SIZE;
@@ -40,11 +42,13 @@ public class VisualizationEngine {
 	
 	// Visualization stuff
 	GUIVisualizer gui;
-	GraphMapper graphMapper;
-	ScrollingSpectrumMapper spectrumMapper;
-	ScrollingChannelMapper channelMapper;
+	GraphDisplay graphMapper;
+	ScrollingSpectrum spectrumMapper;
+	ScrollingChannel channelMapper;
 	ChannelLights lights;
 	ColoredLight bassLight;
+	RGBLight rgbLight;
+	RealtimePlotter plotter;
 	
 	// State machines that output channel values
 	int numChannels = 4;
@@ -116,18 +120,14 @@ public class VisualizationEngine {
 		
 		// Set up the GUI
 		gui = GUIVisualizer.makeGUI();
-		graphMapper = new GraphMapper(30, 30, 700, 350, (Graphics2D) gui.getGraphics());
-		spectrumMapper = new ScrollingSpectrumMapper(30, 400, 800, 300, (Graphics2D) gui.getGraphics());
 		
-		// Select channel colors
-		Color[] channelColors = new Color[numChannels];
-		channelColors[0] = Color.RED;
-		channelColors[1] = Color.RED;
-		channelColors[2] = Color.GREEN;
-		channelColors[3] = Color.BLUE;
-		channelMapper = new ScrollingChannelMapper(30, 750, 800, 200, (Graphics2D) gui.getGraphics());
-		//lights = new ChannelLights(channelColors, 75, 750, 30, 360, 76, (Graphics2D) gui.getGraphics());
-		bassLight = new ColoredLight(Color.RED, 75, 750, 110, 75, 100, (Graphics2D) gui.getGraphics());
+		// Divide up the GUI into different useful stuff.
+		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) gui.getGraphics());
+		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, (Graphics2D) gui.getGraphics());
+		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) gui.getGraphics());
+		bassLight = new ColoredLight(Color.RED, 75, 750, 30, 75, 100, (Graphics2D) gui.getGraphics());
+		rgbLight = new RGBLight(75, 840, 30, 75, 100, (Graphics2D) gui.getGraphics());
+		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 300.0, (Graphics2D) gui.getGraphics());
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
@@ -185,19 +185,9 @@ public class VisualizationEngine {
 		}
 	}
 	
-	public double[] differenceSquared(double[] current, double[] last) {
-		double[] output = new double[current.length];
-		
-		for(int i = 0; i < current.length; i++) {
-			output[i] = (current[i] - last[i]) * (current[i] - last[i]);
-		}
-		
-		return output;
-	}
-	
+
 	
 	private void visualize(double[] buffer) {
-		
 		// Compute an FFT
 		
 		//timer.tic();
@@ -234,9 +224,10 @@ public class VisualizationEngine {
 		
 		// Update LED lights
 		//ledVisuals.visualize(channels);					// Send SERIAL to the RGB's
-		//lights.updateWithNewChannelVals(channels);			// Update the lights
 		bassLight.update(bassLevel);
-		channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbController.getColor()});	// Update the scrolling "rock band" display
+		rgbLight.update(rgbController.getColor());
+		channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
+		plotter.update(new double[] {bassFinder.getCurrentLevel(), bassFinder.getAveragedLevel()});
 		
 		// Draw a live spectrum, and a time-history version of the spectrum
 		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 200);

@@ -125,9 +125,9 @@ public class VisualizationEngine {
 		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) gui.getGraphics());
 		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, (Graphics2D) gui.getGraphics());
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) gui.getGraphics());
-		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) gui.getGraphics());
-		rgbLight = new RGBLight(150, 920, 30, 150, 150, (Graphics2D) gui.getGraphics());
-		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 150.0, (Graphics2D) gui.getGraphics());
+		bassLight = new ColoredLight(Color.RED, 75, 750, 30, 75, 100, (Graphics2D) gui.getGraphics());
+		rgbLight = new RGBLight(75, 840, 30, 75, 100, (Graphics2D) gui.getGraphics());
+		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 100.0, (Graphics2D) gui.getGraphics());
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
@@ -227,7 +227,7 @@ public class VisualizationEngine {
 		channels[3] = rgbController.getBlue();
 		
 		// Update LED lights
-		ledVisuals.visualize(channels);					// Send SERIAL to the RGB's
+		//ledVisuals.visualize(channels);					// Send SERIAL to the RGB's
 		bassLight.update(bassLevel);
 		rgbLight.update(rgbController.getColor());
 		channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
@@ -235,7 +235,7 @@ public class VisualizationEngine {
 		
 		// Draw a live spectrum, and a time-history version of the spectrum
 		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 200);
-		//spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 100);
+		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 100);
 		
 
 	}

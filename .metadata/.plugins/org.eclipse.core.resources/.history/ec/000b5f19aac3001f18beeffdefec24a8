@@ -25,7 +25,7 @@ public class BassFinder  {
 	public BassFinder(int sampleRate, int fftSize) {
 
 		// Initiate other parameters
-		minFreq = 30;
+		minFreq = 20;
 		maxFreq = 120;
 		normalizingVal = 30.0;
 		averageHalfLife = 1.0;

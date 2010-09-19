@@ -25,7 +25,7 @@ public class LEDVisualizer {
 			arduino.connect();
 		} catch (Exception e) {
 			System.out.println("Error: Couldn't connect to Arduino!");
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
