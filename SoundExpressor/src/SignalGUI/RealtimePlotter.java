@@ -31,6 +31,8 @@ public class RealtimePlotter {
 	private double[][] y_vals;
 	private Color[] colors;
 	
+	private boolean AUTO_Y_SCALE = true;
+	
 	public RealtimePlotter(Color[] colors, int screenX, int screenY, int width, int height, double maxY, Graphics2D g2D) {
 		this.screenX = screenX;
 		this.screenY = screenY;
@@ -70,15 +72,19 @@ public class RealtimePlotter {
 					y_vals[p][i] = y_vals[p][i + 1];
 				}
 			}
-			
+			 
 			for(int p = 0; p < numPlots; p++) {
 				y_vals[p][N - 1]  = y[p];
 			}
 		}
 		
-		
-		// Draw the graph!
-		drawGraph();
+		if (AUTO_Y_SCALE) {
+			for(int i = 0; i < numPlots; i++) {
+				if (maxY < y[i]) {
+					maxY = y[i];
+				}
+			}
+		}
 		
 	}
 	
@@ -117,6 +123,11 @@ public class RealtimePlotter {
 		
 		// Output this buffered graph image!
 		outputGraph();
+	}
+	
+	public void render() {
+		// Draw the graph!
+		drawGraph();
 	}
 	
 	private void outputGraph() {

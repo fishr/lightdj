@@ -60,13 +60,13 @@ public class ClapFinder extends FrequencyRangeFinder {
 		double preLowPassRetVal;
 		
 		if (fractionInExcess > 0.0) {
-			preLowPassRetVal = fractionInExcess / 0.8;
+			preLowPassRetVal = fractionInExcess / 0.75;
 		} else {
 			preLowPassRetVal = 0.0;
 		}
 		
 		// Implement a half lowpass filter, to limit the decay rate
-		double c = 0.93;
+		double c = 0.98;
 		double output;
 		if (preLowPassRetVal < c * lastOutput) {
 			output = c * lastOutput;

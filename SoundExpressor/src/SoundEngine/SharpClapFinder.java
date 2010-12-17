@@ -6,7 +6,7 @@ package SoundEngine;
  * @author steve
  *
  */
-public class BassFinder  {
+public class SharpClapFinder  {
 	
 	protected double averageHalfLife;
 	
@@ -27,14 +27,14 @@ public class BassFinder  {
 	protected double[] recentBassLevels;
 	protected int recentBassIndex;
 	
-	public BassFinder(int sampleRate, int fftSize) {
+	public SharpClapFinder(int sampleRate, int fftSize) {
 
 		// Initiate other parameters
-		minFreq = 20;
-		maxFreq = 80;
+		minFreq = 8000;
+		maxFreq = 15000;
 		normalizingVal = 30.0;
 		averageHalfLife = 1.0;
-		decayRate = 1.0 / (40);
+		decayRate = 1.0 / (25);
 		
 		// Calculate some parameters
 		updatesPerSecond = 1.0 * sampleRate / fftSize; 
@@ -75,7 +75,7 @@ public class BassFinder  {
 		// Compute a very low-passed version of the signal to use as an estimate of the overall
 		// level of this frequency range. This is the "adaptive" part that allows the frequency
 		// range finder to adjust to different volume levels
-		double threshold = averagedLevel + averagedSpread + 10.0; //* 1.25 + 5.0;
+		double threshold = averagedLevel + averagedSpread*2.0 + 0.07; //* 1.25 + 5.0;
 		this.threshold = threshold;
 		double spread = Math.abs(level - averagedLevel);
 		

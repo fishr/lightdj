@@ -1,80 +1,43 @@
 package SoundEngine;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.util.concurrent.Semaphore;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import javax.sound.sampled.AudioFormat;
 
-
-import Arduino.LEDVisualizer;
-import SignalGUI.ChannelLights;
-import SignalGUI.ColoredLight;
-import SignalGUI.GUIVisualizer;
-import SignalGUI.GraphDisplay;
-import SignalGUI.RGBLight;
-import SignalGUI.RealtimePlotter;
-import SignalGUI.ScrollingChannel;
-import SignalGUI.ScrollingSpectrum;
 import Signals.FFT;
 import Signals.FFTEngine;
-import Utils.TimerTicToc;
 
 /**
  * This class is responsible for music visualizations.
  *
  */
-public class VisualizationEngine {
-
-	private double[][] buffers;
-	private int[] bufferCursors;
-	private final int BUFFER_SIZE = 1024;
-	private final int BUFFER_OVERLAP = 1;	// Must be a power of 2
+public abstract class VisualizationEngine {
 	
-	// The audio format of data being written in
-	private final int FRAME_SIZE;
-	private final int BYTES_PER_SAMPLE;
-	private final long MAX_SAMPLE_VAL;
-	private final int SAMPLE_RATE;
+	// Audio buffers
+	protected int BUFFER_SIZE = 2048;
+	protected int BUFFER_OVERLAP = 8;	// Must be a power of 2
+	protected double[][] buffers;
+	protected int[] bufferCursors;
 	
+	// Audio format information
+	protected final int FRAME_SIZE;
+	protected final int BYTES_PER_SAMPLE;
+	protected final long MAX_SAMPLE_VAL;
+	protected final int SAMPLE_RATE;
 	
-	// For multi-channel audio (ex., stereo), only use this channel for processing
-	private final int CHANNEL_TO_PROCESS = 0;
-	
-	// Visualization stuff
-	GUIVisualizer gui;
-	GraphDisplay graphMapper;
-	ScrollingSpectrum spectrumMapper;
-	ScrollingChannel channelMapper;
-	ChannelLights lights;
-	ColoredLight bassLight;
-	RGBLight rgbLight;
-	RealtimePlotter plotter;
-	
-	// State machines that output channel values
-	int numChannels = 4;
-	BassFinder bassFinder;
-	VocalsFinder vocalsFinder;
-	ClapFinder clapFinder;
-	
-	// Color controllers
-	ColorGenerator rgbController;
-	
-	
-	// The arduino LED visualizer
-	LEDVisualizer ledVisuals;
-	
-	// Keep a helper thread so that visualization display when run in parallel with the FFT calculuations,
-	// thereby reducing overall latency through parallelization
-	VisualizerHelperThread helperThread;
-	
-	// Used for profiling and debugging
-	TimerTicToc timer;
+	// A rendering thread and timing queue to ensure that the visuals are rendered at the proper time as the audio
+	protected VisualizationEngineRenderThread renderTimingThread;
+	protected Queue<RenderFrame> timeQueue;
+	protected long frameWidth;
+	protected long startTime;
+	protected int numBuffersRendered = 0;
+	protected long videoDelayOffset;
 	
 	// The FFT engine
 	FFTEngine fftEngine;
 	
-	
-	public VisualizationEngine(AudioFormat format) {
+	public VisualizationEngine(AudioFormat format, double videoDelaySec) {
 		
 		// Remember stuff about the audio format
 		// For simplicity for now, only support 16 bit samples
@@ -91,8 +54,6 @@ public class VisualizationEngine {
 			MAX_SAMPLE_VAL = (long) Math.pow(2, 8*BYTES_PER_SAMPLE - 1);
 			SAMPLE_RATE = (int) format.getSampleRate();
 			
-			System.out.println("Audio frame size: " + format.getFrameSize());
-			
 		}
 		
 		// Set up sample buffers
@@ -102,55 +63,32 @@ public class VisualizationEngine {
 			bufferCursors[i] = i*(BUFFER_SIZE/BUFFER_OVERLAP);
 		}
 		
-		
-		
-		// Set up a profiler, for debugging use
-		timer = new TimerTicToc();
-		
 		// Start the FFT engine
 		fftEngine = new FFTEngine(BUFFER_SIZE, SAMPLE_RATE);
 		
 		// Load up the visualizations
-		initVisualizations();
+		initVisualizations();	// Done by the subclass
 		
-		
-	}
-	
-	private void initVisualizations() {
-		
-		// Set up the GUI
-		gui = GUIVisualizer.makeGUI();
-		
-		// Divide up the GUI into different useful stuff.
-		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) gui.getGraphics());
-		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, (Graphics2D) gui.getGraphics());
-		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) gui.getGraphics());
-		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) gui.getGraphics());
-		rgbLight = new RGBLight(150, 920, 30, 150, 150, (Graphics2D) gui.getGraphics());
-		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW}, 560, 400, 450, 300, 150.0, (Graphics2D) gui.getGraphics());
-		
-		// Start some state machines
-		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
-		clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);
-		vocalsFinder = new VocalsFinder(SAMPLE_RATE, BUFFER_SIZE);
-		
-		// Start an RGB controller with some colors
-		//rgbController = new RGBGradientController(Color.BLUE, Color.RED);
-		rgbController = new HueRotator(0.0, 0.373);
-		
-		try {
-			ledVisuals = new LEDVisualizer();
-		} catch (Throwable o) {
-			System.out.println("WARNING: Couldn't connect to LED's via USB!");
-		}
-		
-		
-		// Start up a helper thread
-		helperThread = new VisualizerHelperThread(this);
-		
+		// Set up timing and rendering
+		videoDelayOffset = (long) (1000000000 * videoDelaySec);
+		timeQueue = new LinkedList<RenderFrame>();
+		renderTimingThread = new VisualizationEngineRenderThread(this, timeQueue);
 		
 	}
 	
+	/**
+	 * Signifies that data will be starting soon
+	 */
+	public void start() {
+		// Record when "now" is
+		startTime = System.nanoTime();
+		
+		// Start the rendering thread
+		Thread renderThread = new Thread(renderTimingThread);
+		renderThread.start();
+		renderTimingThread.startTime = startTime;
+		
+	}
 	
 	/**
 	 * Write data into the buffer, and visualize when appropriate.
@@ -162,6 +100,7 @@ public class VisualizationEngine {
 		double dValue;
 		
 		for(int dataCursor = offset; dataCursor < length + offset; dataCursor += FRAME_SIZE) {
+			
 			// Read in one sample
 			lValue = 0;
 			if (BYTES_PER_SAMPLE == 2) {
@@ -178,142 +117,116 @@ public class VisualizationEngine {
 				
 				// Is it time to visualize?
 				if (bufferCursors[i] == BUFFER_SIZE) {
-					visualize(buffers[i]);
+					
+					// Compute the synchronization timing parameters for the music
+					long frameWidth = (long) ((1.0 * BUFFER_SIZE / SAMPLE_RATE / BUFFER_OVERLAP) * 1000000000.0);
+					long timestamp = startTime + numBuffersRendered * frameWidth + videoDelayOffset;
+					
+					visualize(buffers[i], timestamp, frameWidth);
+					numBuffersRendered++;
 					
 					// Reset the ring buffer
 					bufferCursors[i] = 0;
 				}
-				
 			}
-
 		}
 	}
 	
-
-	
-	private void visualize(double[] buffer) {
+	protected void visualize(double[] buffer, long timestamp, long timewidth) {
+		
 		// Compute an FFT
-		
-		//timer.tic();
 		FFT fft = fftEngine.computeFFT(buffer);  //new FFT(buffer, SAMPLE_RATE);
-		//timer.toc();
-		//System.out.println(timer.getAverageTime());
 		
-		// Update the render helper thread
-		helperThread.updateFFT(fft);
-	
+		// Compute a rendering - light colors, graphs, etc.
+		RenderFrame renderFrame = computeVisualsRendering(fft);
+		renderFrame.timestamp = timestamp;
+		renderFrame.frameTimeWidth = timewidth;
+		
+		// Now, add this rendered frame to the render queue to be rendered!
+		synchronized(timeQueue) {
+			timeQueue.add(renderFrame);
+		}
+		
 	}
 	
 	
-	public void updateVisuals(FFT fft) {
-		
-		// Obtain the frequencies and corresponding magnitudes of the FFT
-		double[] frequencies = fft.getFrequencies();
-		double[] magnitudes = fft.getMagnitudes();
-		
-		// Compute useful values from the FFT data
-		double bassLevel = bassFinder.getFreqs(frequencies, magnitudes);
-		double vocalsLevel = vocalsFinder.getFreqs(frequencies, magnitudes);
-		double clapLevel = clapFinder.getFreqs(frequencies, magnitudes);
-		
-		// Compute the color to use for the RGB lights
-		rgbController.step(clapLevel);
-		
-		// Compute some channel values
-		double[] channels = new double[numChannels];
-		channels[0] = bassLevel;
-		channels[1] = rgbController.getRed();
-		channels[2] = rgbController.getGreen();
-		channels[3] = rgbController.getBlue();
-		
-		// Update LED lights
-		ledVisuals.visualize(channels);					// Send SERIAL to the RGB's
-		bassLight.update(bassLevel);
-		rgbLight.update(rgbController.getColor());
-		channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
-		plotter.update(new double[] {bassFinder.getCurrentLevel(), bassFinder.getAveragedLevel()});
-		
-		// Draw a live spectrum, and a time-history version of the spectrum
-		graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 200);
-		//spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 100);
-		
+	// Abstract methods - to be defined by the subclass
+	protected abstract void initVisualizations();
+	protected abstract RenderFrame computeVisualsRendering(FFT fft);
+	protected abstract void renderVisuals(RenderFrame renderFrame);
 
-	}
-
-	
 }
 
 
-// A separate thread that does rendering, so as to not slow down the FFT-calculations too much while 
-// we render the visuals
-class VisualizerHelperThread implements Runnable {
+
+class VisualizationEngineRenderThread implements Runnable {
 	
-	private FFT recentFFT;
+	private Queue<RenderFrame> timeQueue;
 	private VisualizationEngine engine;
-	private boolean isRunning;
-	private Semaphore semaphore;
+	public long startTime;
 	
-	public VisualizerHelperThread(VisualizationEngine engine) {
-		isRunning = false;
+	public VisualizationEngineRenderThread(VisualizationEngine engine, Queue<RenderFrame> timeQueue) {
 		this.engine = engine;
-		
-		// Set up a semaphore so that we only renderer (consumer) only works
-		// when we have an FFT (from the producer)
-		semaphore = new Semaphore(1);
-		
+		this.timeQueue = timeQueue;
 	}
 	
-	// Update the FFT being used
-	public void updateFFT(FFT fft) {
-		
-		// Cache a reference to this FFT
-		if (recentFFT != null) {
-			synchronized(recentFFT) {
-				recentFFT = fft;
-				// Up the semaphore if necessary
-				if (semaphore.availablePermits() == 0) {
-					semaphore.release();
-				}
-			}
-		} else {
-			recentFFT = fft;
-			// Up the semaphore if necessary
-			if (semaphore.availablePermits() == 0) {
-				semaphore.release();
-			}
-		}
-	
-		// Spawn a new thread if we haven't already!
-		if (!isRunning) {
-			isRunning = true;
-			Thread t = new Thread(this);
-			t.start();
-		}
-		
-	}
-	
-	// Run stuff!
+	// Precondition: timeQueue is in order
 	public void run() {
 		
-		FFT fft;
-		
-		while (true) {
+		// Continually see if it's time to render one of the render frames.
+		RenderFrame frameToRender = null;
+		while(true) {
+			long now = System.nanoTime();
 			
-			// Wait until we have data!
-			semaphore.acquireUninterruptibly();
-			
-			// Store a local reference to the FFT, so that way if it
-			// gets updated later, we can still operate on the old one.
-			synchronized(recentFFT) {
-				fft = recentFFT;
+			//System.out.println("*** (" + ((double) (now - startTime) / 1000000)+ ")");
+			frameToRender = null;
+			synchronized(timeQueue) {// Must synchronize, since this is the consumer or a producer-consumer process
+				while(!timeQueue.isEmpty()) {
+					RenderFrame frame = timeQueue.peek();
+					if (frame.timestamp + frame.frameTimeWidth < now) {
+						// This frame occurred in the past; we're running too slowly. 
+						// Just drop this rendering and move on to the next.
+						//System.out.println("D: " + ((double) (frame.timestamp + frame.frameTimeWidth - startTime) / 1000000));
+						timeQueue.remove();
+						
+					} else if (frame.timestamp <= now) {
+						// It is time to render this frame!
+						frameToRender = frame;
+						timeQueue.remove();
+						//System.out.println("R");
+						break;
+						
+					} else {
+						// This frame must be in the future, so wait.
+						//System.out.println("F");
+						break;
+					}
+				}
 			}
 			
-			// Process this FFT
-			engine.updateVisuals(fft);
+			// If necessary, render!
+			if (frameToRender != null) {
+				engine.renderVisuals(frameToRender);
+			}
+			
+			// Wait a small amount of time
+			try {
+				Thread.sleep(0, 100000); // 100 uS	
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			
 		}
 	}
 	
+	
+}
 
+class RenderFrame {
+	// Timing information
+	public long timestamp;			// When this frame should start to be rendered - absolute time in nanoseconds
+	public long frameTimeWidth;		// How wide this frame is, in nanoseconds
+
+	// Other fields to be defined by the subclass that actually contain the rendering information!
 	
 }

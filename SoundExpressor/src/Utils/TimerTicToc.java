@@ -12,6 +12,9 @@ public class TimerTicToc {
 	int n;
 	int index;
 	
+	long bornTime;
+	long numCalls;
+	
 	long startTime;
 	long endTime;
 	
@@ -19,10 +22,14 @@ public class TimerTicToc {
 		times = new long[N];
 		n = 0;
 		index = 0;
+	
+		bornTime = System.nanoTime();
+		numCalls = 0;
 	}
 	
 	public void tic() {
 		startTime = System.nanoTime();
+		numCalls++;
 	}
 	
 	public void toc() {
@@ -46,6 +53,15 @@ public class TimerTicToc {
 		
 		return ((double) sum) / n / 1000000.0;
 		
+	}
+	
+	public double getNumCallsPerSecond() {
+		long now = System.nanoTime();
+		return ((double) numCalls) / ((now - bornTime) / 1000000000.0);
+	}
+	
+	public long getTotalNumCalls() {
+		return numCalls;
 	}
 	
 }
