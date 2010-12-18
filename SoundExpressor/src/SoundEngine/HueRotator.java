@@ -30,7 +30,7 @@ public class HueRotator implements ColorGenerator {
 			val = 0.0;
 		}
 		
-		if (val > 0.85 && !colorUp) {
+		if (val > 0.9 && !colorUp) {
 			colorUp = true;
 			step = Math.random();
 			hue = (hue + step) % 1.0f;

@@ -68,13 +68,15 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 	// Color controllers
 	ColorGenerator rgbController;
 	
-	
 	// The arduino LED visualizer
 	LEDVisualizer ledVisuals;
-	//RelayVisuals ledVisuals;
+	
+	TimerTicToc tictoc;
+	
 
 	public VisualizationEngineLEDs(AudioFormat format, double videoDelaySec) {
 		super(format, videoDelaySec);
+		tictoc = new TimerTicToc();
 	}
 	
 	@Override
@@ -183,7 +185,7 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 		channels[3] = rgbController.getBlue();
 		
 		//plotter.update(new double[] {bassFinder.getCurrentLevel(), bassFinder.getAveragedLevel(), bassFinder.getAveragedLevel() + bassFinder.getAveragedSpread(), bassFinder.getAveragedLevel() - bassFinder.getAveragedSpread(), bassFinder.getBassDelta()});
-		plotter.update(new double[] {bassFinder.getCurrentLevel(), 100.0 * sharpClapLevel});
+		plotter.update(new double[] {bassFinder.getCurrentLevel(), 30.0 * sharpClapFinder.getCurrentLevel()});
 		
 		
 		RenderFrameLEDs renderFrame = new RenderFrameLEDs();
@@ -196,6 +198,9 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 
 	@Override
 	protected void renderVisuals(RenderFrame rf) {
+		//tictoc.tic();
+		
+		
 		RenderFrameLEDs renderFrame = (RenderFrameLEDs) rf;
 
 		
@@ -238,7 +243,8 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 		//graphMapper.drawPositiveLogHalfX(frequencies, magnitudes, null, 30, 20000, 300);
 		//spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes, 30, 20000, 100);
 		
-		
+		//tictoc.toc();
+		//System.out.println("Render rate: " + tictoc.getNumCallsPerSecond() + ", time: " + tictoc.getAverageTime());
 	}
 	
 	

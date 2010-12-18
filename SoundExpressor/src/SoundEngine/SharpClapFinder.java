@@ -30,8 +30,8 @@ public class SharpClapFinder  {
 	public SharpClapFinder(int sampleRate, int fftSize) {
 
 		// Initiate other parameters
-		minFreq = 8000;
-		maxFreq = 15000;
+		minFreq = 5000;
+		maxFreq = 8000;
 		normalizingVal = 30.0;
 		averageHalfLife = 1.0;
 		decayRate = 1.0 / (25);
