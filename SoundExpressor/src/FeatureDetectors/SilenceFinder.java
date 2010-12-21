@@ -1,4 +1,4 @@
-package SoundEngine;
+package FeatureDetectors;
 
 /**
  * A simple state machine that takes in the current level data, and looks for silents. Outputs

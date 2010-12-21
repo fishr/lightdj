@@ -5,6 +5,11 @@ import java.awt.Graphics2D;
 
 import javax.sound.sampled.AudioFormat;
 
+import FeatureDetectors.BassFinder;
+import FeatureDetectors.ClapFinder;
+import FeatureDetectors.FrequencyRangeFinder;
+import FeatureDetectors.LevelMeter;
+import FeatureDetectors.VocalsFinder;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.DistributionPlotter;
@@ -16,12 +21,7 @@ import SignalGUI.ScrollingChannel;
 import SignalGUI.ScrollingSpectrum;
 import Signals.FFT;
 import Signals.FFTEngine;
-import SoundEngine.BassFinder;
-import SoundEngine.ClapFinder;
-import SoundEngine.FrequencyRangeFinder;
-import SoundEngine.LevelMeter;
 import SoundEngine.RhythmMeter;
-import SoundEngine.VocalsFinder;
 import Utils.TimerTicToc;
 
 /**

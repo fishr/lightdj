@@ -1,4 +1,5 @@
-package SoundEngine;
+package FeatureDetectors;
+
 
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.

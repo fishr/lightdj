@@ -1,4 +1,4 @@
-package SoundEngine;
+package FeatureDetectors;
 
 /**
  * Measures the overall level of the music, like a VU meter. Gently lowpasses the output.

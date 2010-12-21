@@ -14,6 +14,9 @@ import javax.sound.sampled.AudioFormat;
 
 import Arduino.LEDVisualizer;
 import Arduino.RelayVisuals;
+import FeatureDetectors.BassFinder;
+import FeatureDetectors.SharpClapFinder;
+import FeatureDetectors.SilenceFinder;
 import GenreClassifier.NaiveBayesClassifier;
 import GenreClassifier.SongFeatureVector;
 import SignalGUI.ChannelLights;
