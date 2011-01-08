@@ -3,7 +3,7 @@ package SoundEngine;
 /** Measures the time difference between bass beats.
  * By examining the distribution of this, it is possible to detect the tempo, and perhaps even the
  * "feel" of the music in the bass.
- * @author Steve
+ * @author Steve Levine
  *
  */
 public class RhythmMeter  {

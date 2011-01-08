@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Represents a scrolling display used for displaying different channel values
- * @author steve
+ * @author Steve Levine
  *
  */
 public class ChannelLights {

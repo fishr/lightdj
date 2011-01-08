@@ -32,10 +32,12 @@ import SignalGUI.TextLight;
 import Signals.FFT;
 import Signals.FFTEngine;
 import Utils.TimerTicToc;
+import Visualizors.ColorGenerator;
+import Visualizors.HueRotator;
 
 /**
- * This class is responsible for music visualizations.
- *
+ * This class is responsible for helping to classify music.
+ * @author Steve Levine
  */
 public class VisualizationEngineClassifier extends VisualizationEngine {	
 	
@@ -97,7 +99,7 @@ public class VisualizationEngineClassifier extends VisualizationEngine {
 		
 		// Divide up the GUI into different useful stuff.
 		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) g2D);
-		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D);
+		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D, 30, 20000, 100, BUFFER_SIZE,  SAMPLE_RATE);
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) g2D);
 		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) g2D);
 		rgbLight = new RGBLight(150, 920, 30, 150, 150, (Graphics2D) g2D);
@@ -110,8 +112,8 @@ public class VisualizationEngineClassifier extends VisualizationEngine {
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
 		clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);
 		//vocalsFinder = new VocalsFinder(SAMPLE_RATE, BUFFER_SIZE);
-		midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
-		highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
+		//midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
+		//highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
 		levelMeter = new LevelMeter(SAMPLE_RATE, BUFFER_SIZE);
 		rhythmMeter = new RhythmMeter(SAMPLE_RATE, BUFFER_SIZE);
 		silenceFinder = new SilenceFinder(Math.round(0.5 * SAMPLE_RATE * BUFFER_OVERLAP / BUFFER_SIZE));

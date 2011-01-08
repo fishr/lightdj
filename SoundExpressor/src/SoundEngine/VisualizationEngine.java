@@ -9,7 +9,10 @@ import Signals.FFT;
 import Signals.FFTEngine;
 
 /**
- * This class is responsible for music visualizations.
+ * An abstract class representing the visuals to be synchronized for music. Takes care of
+ * timing parameters, and making sure that everything is synced properly.
+ * 
+ * @author Steve Levine 
  *
  */
 public abstract class VisualizationEngine {

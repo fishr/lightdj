@@ -1,5 +1,10 @@
 package GenreClassifier;
 
+/**
+ * Represents information about a song file
+ * @author Steve Levine
+ *
+ */
 public class SongFileInfo {
 	public String title;
 	public String filename;

@@ -3,7 +3,7 @@ package FeatureDetectors;
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
  * Attempts to auto-adapt to changing volume.
- * @author steve
+ * @author Steve Levine
  *
  */
 public class SharpClapFinder  {

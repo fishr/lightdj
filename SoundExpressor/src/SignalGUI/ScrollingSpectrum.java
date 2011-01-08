@@ -6,33 +6,65 @@ import java.awt.image.BufferedImage;
 
 /**
  * Represents a scrolling spectrum, showing the past spectrums as a function of time!
- * @author Steve
+ * @author Steve Levine
  *
  */
 public class ScrollingSpectrum {
-	private int screenX;
-	private int screenY;
-	private int width;
-	private int height;
+	protected int screenX;
+	protected int screenY;
+	protected int width;
+	protected int height;
 	
-	private BufferedImage buffer;
-	private Graphics2D outputG2D;
+	protected BufferedImage buffer;
+	protected Graphics2D outputG2D;
 	
-	private int currentX = 0;
+	protected int currentX = 0;
 	
-	public ScrollingSpectrum(int screenX, int screenY, int width, int height, Graphics2D g2D) {
+	protected double minFreq;
+	protected double maxFreq;
+	protected double max_val;
+	protected double fftMaxFreq;
+	protected int fftSize;
+	
+	protected int[] interpolationIndices;
+	protected double[] interpolationBlends;
+	
+	public ScrollingSpectrum(int screenX, int screenY, int width, int height, Graphics2D g2D, double minFreq, double maxFreq, double max_val, int fftSize, double fftMaxFreq) {
 		this.screenX = screenX;
 		this.screenY = screenY;
 		this.width = width;
 		this.height = height;
 		outputG2D = g2D;
+		this.minFreq = minFreq;
+		this.maxFreq = maxFreq;
+		this.max_val = max_val;
+		this.fftSize = fftSize;
+		this.fftMaxFreq = fftMaxFreq;
 		
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	
+		// Precompute the indices and blending for interpolations, so that this won't have to happen later.
+		interpolationIndices = new int[height];
+		interpolationBlends = new double[height];
+		
+		double logMinFreq = Math.log10(minFreq);
+		double logMaxFreq = Math.log10(maxFreq);
+		for(int yPixelIndex = 0; yPixelIndex < height; yPixelIndex++) {
+			double frequency = Math.pow(10.0,  ((logMaxFreq - logMinFreq) / height * yPixelIndex + logMinFreq));
+			
+			int index = (int) Math.floor(frequency * fftSize / fftMaxFreq); 
+			double xPrevious = fftMaxFreq / fftSize * index;
+			double xNext = fftMaxFreq / fftSize * (index + 1);
+			double alpha = (frequency - xPrevious) / (xNext - xPrevious);
+			
+			interpolationIndices[yPixelIndex] = index;
+			interpolationBlends[yPixelIndex] = alpha;
+		}	
 		
 	}
 	
 	
-	public void updateWithNewSpectrum(double[] frequencies, double magnitudes[], double minFreq, double maxFreq, double max_val) {
+	public void updateWithNewSpectrum(double[] frequencies, double magnitudes[]) {
 		Graphics2D g2D = (Graphics2D) buffer.getGraphics();
 		
 		// Draw this spectrum, linearly interpolating between frequencies
@@ -40,25 +72,18 @@ public class ScrollingSpectrum {
 		
 		double logMinFreq = Math.log10(minFreq);
 		double logMaxFreq = Math.log10(maxFreq);
-		double logFreqScale = (maxFreq - minFreq) / (logMaxFreq - logMinFreq);
 		
-		int freqIndex = 0;
-		double lastFreq = frequencies[freqIndex];
-		double lastMag = magnitudes[freqIndex];
+		
 		for(int yPixelIndex = 0; yPixelIndex < height; yPixelIndex++) {
+			double alpha = interpolationBlends[yPixelIndex];
+			int index = interpolationIndices[yPixelIndex];
 			
-			// Compute the desired frequency corresponding to this pixel
-			//double frequency = (maxFreq - minFreq) / height * yPixelIndex + minFreq;
-			double frequency = Math.pow(10.0,  ((logMaxFreq - logMinFreq) / height * yPixelIndex + logMinFreq));
+			double magnitude = (1 - alpha) * magnitudes[index] + alpha * magnitudes[index + 1];
 			
-			// Interpolate to compute the approximate magnitude at this frequency
-			double magnitude = interpolateVal(magnitudes, largestFreq, frequency);
-			
-			
-			double freqVal = magnitude / max_val;
-			g2D.setColor(getColor(freqVal));
+			g2D.setColor(getColor(magnitude / max_val));
 			g2D.drawRect(currentX, height - yPixelIndex - 1, 1, 1);
 		}
+		
 		
 		// Increment x!
 		if (currentX++ > width) {
@@ -69,9 +94,6 @@ public class ScrollingSpectrum {
 		// Draw a green cursor line 
 		g2D.setColor(Color.GREEN);
 		g2D.drawLine(currentX, 0, currentX, height);
-		
-		// Output!
-		outputGraph();
 		
 	}
 	
@@ -103,7 +125,10 @@ public class ScrollingSpectrum {
 		
 	}
 	
-	
+	public void render() {
+		// Output!
+		outputGraph();
+	}
 	
 	private void outputGraph() {
 		outputG2D.drawImage(buffer, screenX, screenY, null);

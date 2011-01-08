@@ -2,7 +2,7 @@ package Utils;
 
 /** 
  * Helps profile code and tells you how fast it's running
- * @author steve
+ * @author Steve Levine
  *
  */
 public class TimerTicToc {

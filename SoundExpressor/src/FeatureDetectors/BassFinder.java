@@ -1,13 +1,16 @@
 package FeatureDetectors;
 
+import Common.FeatureList;
+import Common.FrequencyRangeControl;
+
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
  * Attempts to auto-adapt to changing volume.
- * @author steve
+ * @author Steve Levine
  *
  */
-public class BassFinder  {
-	
+public class BassFinder extends FeatureDetector {
+
 	protected double averageHalfLife;
 	
 	protected double updatesPerSecond;
@@ -27,24 +30,43 @@ public class BassFinder  {
 	protected double[] recentBassLevels;
 	protected int recentBassIndex;
 	
-	public BassFinder(int sampleRate, int fftSize) {
-
-		// Initiate other parameters
+	public BassFinder(int fftSize, double updatesPerSecond) {
+		super(fftSize, updatesPerSecond);
+	}
+	
+	@Override
+	public void init() {
+		// Initialize some parameters
 		minFreq = 20;
 		maxFreq = 80;
 		normalizingVal = 30.0;
-		averageHalfLife = 1.0;
-		decayRate = 1.0 / (40);
-		
-		// Calculate some parameters
-		updatesPerSecond = 1.0 * sampleRate / fftSize; 
-		phi = Math.pow(0.5, 1/(averageHalfLife * updatesPerSecond));
-		
+		averageHalfLife = 0.125;
+		decayRate = 1.0 / (50);
+		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		recentBassIndex = 0;
 		recentBassLevels = new double[NUM_RECENT_BASS_VALS];
 		
+		// Request some controls
+		FrequencyRangeControl freqRangeControl = new FrequencyRangeControl(minFreq, maxFreq);
+		requestUserControl(freqRangeControl);
+		
 	}
 	
+	@Override
+	public void computeFeatures(double[] frequencies, double[] magnitudes, FeatureList featureList) {
+		// Compute the level of bass
+		double bassLevel = getFreqs(frequencies, magnitudes);
+		
+		// Create a feature of this, and add it to the featureList.
+		featureList.addFeature("BASS_LEVEL", bassLevel);
+	}
+
+	
+	
+	/**
+	 * Does the computation behind actually measuring the bass.
+	 * @return The nice bass level, smoothed out etc.
+	 */
 	public double getFreqs(double[] frequencies, double[] magnitudes) {
 
 		
@@ -64,12 +86,8 @@ public class BassFinder  {
 		
 		double level = sum / n;
 		currentBassLevel = level;
-		
 		recentBassLevels[recentBassIndex] = level;
 		recentBassIndex = (recentBassIndex + 1) % NUM_RECENT_BASS_VALS;
-		
-		
-		//level = getBassDelta();
 		
 		
 		// Compute a very low-passed version of the signal to use as an estimate of the overall
@@ -94,13 +112,6 @@ public class BassFinder  {
 		
 		double actualOutput;
 		
-//		// Limit how fast the output can fal, in an attempt to minimize flicker
-//		if (outputVal < decayRate * lastOutput) {
-//			actualOutput = decayRate * lastOutput;
-//		} else {
-//			actualOutput = outputVal;
-//		}
-		
 		// Limit how fast the output can fal, in an attempt to minimize flicker
 		if (outputVal < lastOutput - decayRate) {
 			actualOutput = lastOutput - decayRate;
@@ -108,22 +119,12 @@ public class BassFinder  {
 			actualOutput = outputVal;
 		}
 		
-		//actualOutput = Math.log(actualOutput + 1.0) / Math.log(2);
-		
-		
-		
-//		if (actualOutput > 0.5) {
-//			actualOutput = actualOutput;
-//		} else {
-//			actualOutput = 0;
-//		}
-		
-		
-		
+		// Output
 		lastOutput = actualOutput;
 		return actualOutput;
 		
 	}
+
 	
 	public double getCurrentLevel() {
 		return currentBassLevel;
@@ -157,5 +158,6 @@ public class BassFinder  {
 			return 0;
 		}
 	}
+
 	
 }

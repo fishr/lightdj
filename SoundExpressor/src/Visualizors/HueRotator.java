@@ -1,10 +1,11 @@
-package SoundEngine;
+package Visualizors;
 
 import java.awt.Color;
 
+
 /**
  * Varies between two colors C0 and C1, based on a double value between 0 and 1 inclusive.
- * @author steve
+ * @author Steve Levine
  *
  */
 public class HueRotator implements ColorGenerator {

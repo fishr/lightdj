@@ -1,41 +1,52 @@
 package FeatureDetectors;
 
+import Common.FeatureList;
+
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
  * Attempts to auto-adapt to changing volume levels.
- * @author steve
+ * @author Steve Levine
  *
  */
-public class FrequencyRangeFinder {
+public class FrequencyRangeFinder extends FeatureDetector {
 	
-	protected double averageHalfLife = 0.5;
-	
-	protected double updatesPerSecond;
+	protected double averageHalfLife = 0.125;
 	protected double phi;
 	protected double averagedLevel = 0;
 	protected double lastOutput = 0;
 	protected double decayRate = 0.75;
-	
 	protected double normalizingVal = 1.0;
-	
-	
 	protected double regular = 0;
+	protected double minFreq = 1000;
+	protected double maxFreq = 1200;
 	
-	protected double minFreq = 0;
-	protected double maxFreq = 20000;
-	
-	public FrequencyRangeFinder(int sampleRate, int fftSize) {
-		updatesPerSecond = 1.0 * sampleRate / fftSize; 
-		
-		phi = Math.pow(0.5, 1/(averageHalfLife * updatesPerSecond));
-		
+	public FrequencyRangeFinder(int fftSize, double updatesPerSecond) {
+		super(fftSize, updatesPerSecond);
 	}
 	
-	public FrequencyRangeFinder(int sampleRate, int fftSize, double minFreq, double maxFreq) {
-		this(sampleRate, fftSize);
-		this.minFreq = minFreq;
-		this.maxFreq = maxFreq;
+	
+	@Override
+	public void init() {
+
+		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 	}
+	
+	@Override
+	public void computeFeatures(double[] frequencies, double[] magnitudes, FeatureList featureList) {
+		// Compute the level of bass
+		double freqLevel = getFreqs(frequencies, magnitudes);
+		
+		// Create a feature of this, and add it to the featureList.
+		featureList.addFeature("FREQ_RANGE_CUSTOM", freqLevel);
+		
+	}
+
+	
+//	public FrequencyRangeFinder(int sampleRate, int fftSize, double minFreq, double maxFreq) {
+//		this(sampleRate, fftSize);
+//		this.minFreq = minFreq;
+//		this.maxFreq = maxFreq;
+//	}
 	
 	// Estimate the bass, given an FFT.
 	public double getFreqs(double[] frequencies, double[] magnitudes) {
@@ -59,56 +70,8 @@ public class FrequencyRangeFinder {
 		
 		
 		return level;
-//		// Compute a very low-passed version of the signal to use as an estimate of the overall
-//		// level of this frequency range. This is the "adaptive" part that allows the frequency
-//		// range finder to adjust to different volume levels
-//		double threshold = averagedLevel * 1.25 + 5.0;
-//		if (level > threshold) { 
-//			outputVal =  (level - threshold) / normalizingVal;
-//		} else {
-//			outputVal = 0.0;
-//		}
-//		if (outputVal > 1.0) {
-//			outputVal = 1.0;
-//		}
-//		
-//		
-//		averagedLevel = averagedLevel * phi + level*(1 - phi);
-//		
-//		double actualOutput;
-//		
-////		// Limit how fast the output can fal, in an attempt to minimize flicker
-////		if (outputVal < decayRate * lastOutput) {
-////			actualOutput = decayRate * lastOutput;
-////		} else {
-////			actualOutput = outputVal;
-////		}
-//		
-//		// Limit how fast the output can fal, in an attempt to minimize flicker
-//		if (outputVal < lastOutput - decayRate) {
-//			actualOutput = lastOutput - decayRate;
-//		} else {
-//			actualOutput = outputVal;
-//		}
-//		
-//		//actualOutput = Math.log(actualOutput + 1.0) / Math.log(2);
-//		
-//		
-//		
-////		if (actualOutput > 0.5) {
-////			actualOutput = actualOutput;
-////		} else {
-////			actualOutput = 0;
-////		}
-//		
-//		
-//		
-//		
-//		lastOutput = actualOutput;
-//		return actualOutput;
 		
 	}
-	
 	
 	double getAveragedLevel() {
 		return averagedLevel;

@@ -1,5 +1,8 @@
 package GenreClassifier;
 
+/**
+ * @author Steve Levine
+ */
 import java.util.HashMap;
 import java.util.Map;
 

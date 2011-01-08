@@ -26,7 +26,7 @@ import Utils.TimerTicToc;
 
 /**
  * This class is responsible for music visualizations.
- *
+ * @author Steve Levine
  */
 public class SoundProcessingEngine {
 
@@ -132,8 +132,8 @@ public class SoundProcessingEngine {
 		
 		// Start some state machines
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
-		midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
-		highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
+		//midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
+		//highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
 		levelMeter = new LevelMeter(SAMPLE_RATE, BUFFER_SIZE);
 		rhythmMeter = new RhythmMeter(SAMPLE_RATE, BUFFER_SIZE);
 		//clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);

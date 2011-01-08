@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 /**
  * A class that maps mathematical coordinates to screen coordinates for use with graphing a spectrum.
- * @author steve
+ * @author Steve Levine
  *
  */
 public class GraphDisplay {

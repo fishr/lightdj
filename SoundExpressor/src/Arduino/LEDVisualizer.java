@@ -2,6 +2,8 @@ package Arduino;
 
 import java.io.UnsupportedEncodingException;
 
+import Common.ColorOutput;
+
 /**
  * A visualizer for LED's.
  * @author steve
@@ -27,6 +29,20 @@ public class LEDVisualizer {
 			System.out.println("Error: Couldn't connect to Arduino!");
 			//e.printStackTrace();
 		}
+	}
+	
+	public void visualize(ColorOutput colors) {
+		// Just look at the first two colors
+		double[] channels = new double[4];
+		
+		channels[0] = colors.rgbLights[0].getRed() / 255.0;
+		channels[1] = colors.rgbLights[1].getRed() / 255.0;
+		channels[2] = colors.rgbLights[1].getGreen() / 255.0;
+		channels[3] = colors.rgbLights[1].getBlue() / 255.0;
+		
+		// Call the original visualizer
+		visualize(channels);
+		
 	}
 	
 	public void visualize(double[] vals)  {

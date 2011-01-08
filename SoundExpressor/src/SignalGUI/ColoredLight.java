@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Represents a single, colored light of a specific color.
- * @author Steve
+ * @author Steve Levine
  *
  */
 public class ColoredLight {

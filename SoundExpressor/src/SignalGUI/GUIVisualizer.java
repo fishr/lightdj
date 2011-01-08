@@ -3,6 +3,11 @@ package SignalGUI;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * A form for displaying visualizations.
+ * @author Steve Levine
+ *
+ */
 public class GUIVisualizer extends JPanel {
 	
 	

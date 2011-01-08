@@ -1,5 +1,11 @@
 package SoundEngine;
 
+/**
+ * Multiplexes signals
+ * @author Steve Levine
+ *
+ */
+
 public class SignalMultiplexer {
 
 	protected int numChannels;

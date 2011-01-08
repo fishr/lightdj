@@ -2,7 +2,7 @@ package Signals;
 
 /**
  * This class contains a computed Fast Fourier Transforms (FFT's)
- * @author steve
+ * @author Steve Levine
  *
  */
 public class FFT {

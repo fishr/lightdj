@@ -1,7 +1,12 @@
-package SoundEngine;
+package Visualizors;
 
 import java.awt.Color;
 
+/**
+ * 
+ * @author Steve Levine
+ *
+ */
 public interface ColorGenerator {
 	// Get the current color
 	public double getRed();

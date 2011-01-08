@@ -2,7 +2,7 @@ package GenreClassifier;
 
 /**
  * Represents a feature vector that will be used for machine learning of song genre!
- * @author Steve
+ * @author Steve Levine
  *
  */
 public class SongFeatureVector {

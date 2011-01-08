@@ -7,6 +7,11 @@ import javax.sound.sampled.*;
 
 import Utils.TimerTicToc;
 
+/**
+ * Starts everything
+ * @author Steve Levine
+ *
+ */
 
 public class MainClass {
 
@@ -18,7 +23,7 @@ public class MainClass {
 	private static final boolean USE_CAPTURED_AUDIO = true;
 	private static final boolean AUDIO_PASS_THRU = true;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.050;
+	private static final double INITIAL_VIDEO_DELAY = 0.055;
 
 	
 	public static void main(String[] args) {

@@ -2,7 +2,7 @@ package GenreClassifier;
 
 /**
  * Represents a Gaussian PDF
- * @author steve
+ * @author Steve Levine
  *
  */
 public class GaussianPDF {

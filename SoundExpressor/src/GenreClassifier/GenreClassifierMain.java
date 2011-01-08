@@ -1,6 +1,8 @@
 package GenreClassifier;
 
-
+/**
+ * @author Steve Levine
+ */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;

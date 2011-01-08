@@ -32,10 +32,12 @@ import SignalGUI.TextLight;
 import Signals.FFT;
 import Signals.FFTEngine;
 import Utils.TimerTicToc;
+import Visualizors.ColorGenerator;
+import Visualizors.HueRotator;
 
 /**
- * This class is responsible for music visualizations.
- *
+ * This class is responsible for music visualizations for Steve's LED's.
+ * @author Steve Levine
  */
 public class VisualizationEngineLEDs extends VisualizationEngine {
 
@@ -95,7 +97,7 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 		
 		// Divide up the GUI into different useful stuff.
 		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) g2D);
-		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D);
+		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D, 30, 20000, 100.0, BUFFER_SIZE, SAMPLE_RATE);
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) g2D);
 		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) g2D);
 		rgbLight = new RGBLight(150, 920, 30, 150, 150, (Graphics2D) g2D);
@@ -108,8 +110,8 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
 		clapFinder = new ClapFinder(SAMPLE_RATE, BUFFER_SIZE);
 		//vocalsFinder = new VocalsFinder(SAMPLE_RATE, BUFFER_SIZE);
-		midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
-		highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
+		//midsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 200.0, 2000.0);
+		//highsFinder = new FrequencyRangeFinder(SAMPLE_RATE, BUFFER_SIZE, 6000.0, 20000.0);
 		levelMeter = new LevelMeter(SAMPLE_RATE, BUFFER_SIZE);
 		rhythmMeter = new RhythmMeter(SAMPLE_RATE, BUFFER_SIZE);
 		silenceFinder = new SilenceFinder(Math.round(0.5 * SAMPLE_RATE * BUFFER_OVERLAP / BUFFER_SIZE));
@@ -194,6 +196,12 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 		//plotter.update(new double[] {bassFinder.getCurrentLevel(), bassFinder.getAveragedLevel(), bassFinder.getAveragedLevel() + bassFinder.getAveragedSpread(), bassFinder.getAveragedLevel() - bassFinder.getAveragedSpread(), bassFinder.getBassDelta()});
 		plotter.update(new double[] {bassFinder.getCurrentLevel(), 30.0 * sharpClapFinder.getCurrentLevel()});
 		
+		tictoc.tic();
+		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes);
+		tictoc.toc();
+		
+		//System.out.println("Spectrum: " + tictoc.getAverageTime() + "ms, " + tictoc.getNumCallsPerSecond() + "calls/s");
+		
 		
 		RenderFrameLEDs renderFrame = new RenderFrameLEDs();
 		renderFrame.channels = channels;
@@ -215,11 +223,12 @@ public class VisualizationEngineLEDs extends VisualizationEngine {
 
 		
 		// Update LED lights	
-		//ledVisuals.visualize(renderFrame.channels);	// Send SERIAL to the RGB's
+		ledVisuals.visualize(renderFrame.channels);	// Send SERIAL to the RGB's
 		bassLight.update(renderFrame.channels[0]);
 		rgbLight.update(renderFrame.rgb);
 		//channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
 		plotter.render();
+		spectrumMapper.render();
 		//plotter.update(new double[] {bassFinder.getCurrentLevel(), 100.0 * bassLevel});
 		//plotter.update(new double[] {100.0*bassLevel, 100.0 * clapLevel});
 		//plotter.update(new double[]{level});

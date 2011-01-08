@@ -34,8 +34,8 @@ import Signals.FFTEngine;
 import Utils.TimerTicToc;
 
 /**
- * This class is responsible for music visualizations.
- *
+ * This class is responsible for music visualizations for AC relays.
+ * @author Steve Levine
  */
 public class VisualizationEngineAC extends VisualizationEngine {
 	
@@ -78,7 +78,7 @@ public class VisualizationEngineAC extends VisualizationEngine {
 		
 		// Divide up the GUI into different useful stuff.
 		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) g2D);
-		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D);
+		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D, 30, 20000, 100, BUFFER_SIZE,  SAMPLE_RATE);
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) g2D);
 		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) g2D);
 		highsLight = new ColoredLight(Color.GREEN, 150, 920, 30, 150, 150, (Graphics2D) g2D);

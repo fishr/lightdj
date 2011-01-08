@@ -10,6 +10,12 @@ import SignalGUI.GUIVisualizer;
 import SignalGUI.GraphDisplay;
 import Utils.TimerTicToc;
 
+/**
+ * Maintains the audio and visuals, especially the sync.
+ * @author Steve Levine
+ *
+ */
+
 public class SoundVisualizer {
 
 	// Constants
@@ -71,16 +77,16 @@ public class SoundVisualizer {
 	
 			// so that we can effectively adjust the initial delay of the audio. This will help
 			// to sync the music to the lights.
-			for(int i = bufferReadPointer; i < bufferWritePointer; i++) {
-				audioBuffer[i] = (byte) (8.0 * Math.random() -128);
-			}
+			//for(int i = bufferReadPointer; i < bufferWritePointer; i++) {
+			//	audioBuffer[i] = (byte) (8.0 * Math.random() -128);
+			//}
 			
 		}
 		audioWorking = true;
 		
 		// Set up video
 		// Set up a visualization engine
-		visuals = new VisualizationEngineLEDs(format, initialVideoDelaySec);
+		visuals = new VisualizationEngineParty(format, initialVideoDelaySec);
 
 	}
 	

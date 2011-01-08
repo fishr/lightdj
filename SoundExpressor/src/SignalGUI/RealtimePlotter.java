@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 /**
  * Plots data as a function of time, and scrolls. Meant for debugging purposes, and to be
  * helpful with designing new algorithms!
- *
+ * @author Steve Levine
  */
 public class RealtimePlotter {
 
