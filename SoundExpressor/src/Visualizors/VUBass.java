@@ -11,23 +11,22 @@ import Common.FeatureList;
  * @author Steve Levine0
  *
  */
-public class RedBassColoredClapVisualizer extends Visualizer {
+public class VUBass extends Visualizer {
 
 	protected ColorGenerator rgbController;
 	
 	@Override
 	public String getName() {
-		return "Red Bass, Colored Claps";
+		return "Scott's Awesome VU Meter!!!one!";
 	}
 	
-	public RedBassColoredClapVisualizer(int fftSize, double updatesPerSecond) {
+	public VUBass(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
 	
 	@Override
 	public void init() {
 		// Initialize some parameters
-		rgbController = new HueRotator(0.0, 0.373);
 		
 		// We don't need to request any user controls for this visualization plugin
 		
@@ -37,19 +36,25 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 	public ColorOutput visualize(FeatureList featureList) {
 		
 		// Retreive any necessary parameters from the FeatureList
-		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
+		double bassLevel = (Double) featureList.getFeature("CLAP_LEVEL");
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
 		
 		// Compute a new set of colorings, and store them.
 		ColorOutput colorOutput = new ColorOutput();
-		rgbController.step(bassLevel);
-		
-		// Make the first light red in proprotion to the bass
-		colorOutput.rgbLights[1] = new Color((float) bassLevel, 0.0f, 0.0f);
 		
 		// Make the second color a randomized hue, with brightness determined by the clap level.
-		//colorOutput.rgbLights[0] = rgbController.getColor();
-		colorOutput.rgbLights[0] = Color.getHSBColor((float) bassLevel / 3, (float) clapLevel, (float) bassLevel);
+		
+		float brightness = (float)bassLevel * 2;
+		if (brightness > 1) brightness = 1;
+		
+		float hue = 0.666f - (float)(bassLevel)*0.666f;
+		if (hue > 0.333) hue = 0.333f;
+		
+		Color c = Color.getHSBColor(hue, (float) 1.0, brightness);
+		//System.out.println(c);
+		colorOutput.rgbLights[0] = c;
+		
+		
 		
 		// Return the result
 		return colorOutput;

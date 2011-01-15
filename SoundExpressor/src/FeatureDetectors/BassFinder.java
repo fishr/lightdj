@@ -59,6 +59,7 @@ public class BassFinder extends FeatureDetector {
 		
 		// Create a feature of this, and add it to the featureList.
 		featureList.addFeature("BASS_LEVEL", bassLevel);
+		featureList.addFeature("BASS_RAW", currentBassLevel);
 	}
 
 	

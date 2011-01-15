@@ -19,6 +19,7 @@ import FeatureDetectors.SilenceFinder;
 import FeatureDetectors.VocalsFinder;
 import GenreClassifier.NaiveBayesClassifier;
 import GenreClassifier.SongFeatureVector;
+import LightDJGUI.ScrollingSpectrum;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.DistributionPlotter;
@@ -27,7 +28,6 @@ import SignalGUI.GraphDisplay;
 import SignalGUI.RGBLight;
 import SignalGUI.RealtimePlotter;
 import SignalGUI.ScrollingChannel;
-import SignalGUI.ScrollingSpectrum;
 import SignalGUI.TextLight;
 import Signals.FFT;
 import Signals.FFTEngine;
@@ -167,7 +167,7 @@ public class VisualizationEngineClassifier extends VisualizationEngine {
 		double sharpClapLevel = sharpClapFinder.getFreqs(frequencies, magnitudes);
 		double level = levelMeter.getLevel(frequencies, magnitudes);
 		boolean bassTimeDeltaReady = rhythmMeter.update(bassLevel);
-		boolean silent = silenceFinder.update(level);
+		boolean silent = false;//silenceFinder.update(level);
 		
 		// If necessary, reset the distributions
 		if (silent) {

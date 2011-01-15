@@ -21,9 +21,9 @@ public class MainClass {
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
 	private static final int AUDIO_READ_BUFFER_SIZE = 8192;
 	private static final boolean USE_CAPTURED_AUDIO = true;
-	private static final boolean AUDIO_PASS_THRU = true;
+	private static final boolean AUDIO_PASS_THRU = false;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.055;
+	private static final double INITIAL_VIDEO_DELAY = 0.000;
 
 	
 	public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package SignalGUI;
+package LightDJGUI;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,6 +29,7 @@ public class ScrollingSpectrum {
 	protected int[] interpolationIndices;
 	protected double[] interpolationBlends;
 	
+	
 	public ScrollingSpectrum(int screenX, int screenY, int width, int height, Graphics2D g2D, double minFreq, double maxFreq, double max_val, int fftSize, double fftMaxFreq) {
 		this.screenX = screenX;
 		this.screenY = screenY;
@@ -40,12 +41,19 @@ public class ScrollingSpectrum {
 		this.max_val = max_val;
 		this.fftSize = fftSize;
 		this.fftMaxFreq = fftMaxFreq;
+
+		setSize(width, height);
+		
+	}
+	
+	
+	private void setSize(int w, int h) {
 		
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-	
+		
 		// Precompute the indices and blending for interpolations, so that this won't have to happen later.
-		interpolationIndices = new int[height];
-		interpolationBlends = new double[height];
+		interpolationIndices = new int[h];
+		interpolationBlends = new double[h];
 		
 		double logMinFreq = Math.log10(minFreq);
 		double logMaxFreq = Math.log10(maxFreq);
@@ -60,9 +68,7 @@ public class ScrollingSpectrum {
 			interpolationIndices[yPixelIndex] = index;
 			interpolationBlends[yPixelIndex] = alpha;
 		}	
-		
 	}
-	
 	
 	public void updateWithNewSpectrum(double[] frequencies, double magnitudes[]) {
 		Graphics2D g2D = (Graphics2D) buffer.getGraphics();
@@ -134,6 +140,19 @@ public class ScrollingSpectrum {
 		outputG2D.drawImage(buffer, screenX, screenY, null);
 	}
 	
-	
+	/**
+	 * Reset the location and size parameters to move the spectrum.
+	 */
+	public void move(int x, int y, int width, int height) {
+		screenX = x;
+		screenY = y;
+		this.width = width;
+		this.height = height;
+		currentX = 0;
+		
+		setSize(width, height);
+		
+		
+	}
 	
 }

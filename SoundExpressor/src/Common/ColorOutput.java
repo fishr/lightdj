@@ -10,13 +10,14 @@ import java.awt.Color;
 public class ColorOutput {
 	
 	// Change these to match the number of lights in the system
-	public static final int NUM_RGB_LIGHTS = 2;
+	public static final int NUM_RGB_LIGHTS = 4;
 	public static final int NUM_STROBE_LIGHTS = 0;
+	public static final int NUM_UV_LIGHTS = 0;
 	
 	
 	public Color[] rgbLights;
 	public double[] strobeLights;
-	public double uvLight;
+	public double[] uvLights;
 	
 	// Initialize everything to black
 	public ColorOutput() {
@@ -30,7 +31,10 @@ public class ColorOutput {
 			strobeLights[i] = 0.0;
 		}
 		
-		uvLight = 0.0;
+		uvLights = new double[NUM_UV_LIGHTS];
+		for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+			uvLights[i] = 0.0;
+		}
 		
 	}
 	

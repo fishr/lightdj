@@ -25,6 +25,9 @@ import FeatureDetectors.SilenceFinder;
 import FeatureDetectors.VocalsFinder;
 import GenreClassifier.NaiveBayesClassifier;
 import GenreClassifier.SongFeatureVector;
+import LightDJGUI.LightDJGUI;
+import LightDJGUI.ScrollingSpectrum;
+import PartyLightsController.PartyLightsController;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.DistributionPlotter;
@@ -33,14 +36,15 @@ import SignalGUI.GraphDisplay;
 import SignalGUI.RGBLight;
 import SignalGUI.RealtimePlotter;
 import SignalGUI.ScrollingChannel;
-import SignalGUI.ScrollingSpectrum;
 import SignalGUI.TextLight;
 import Signals.FFT;
 import Signals.FFTEngine;
 import Utils.TimerTicToc;
 import Visualizors.ColorGenerator;
+import Visualizors.CrazyStrobe;
 import Visualizors.HueRotator;
 import Visualizors.RedBassColoredClapVisualizer;
+import Visualizors.VUBass;
 import Visualizors.Visualizer;
 
 /**
@@ -50,9 +54,8 @@ import Visualizors.Visualizer;
 public class VisualizationEngineParty extends VisualizationEngine {
 
 	// Visualization stuff
-	GUIVisualizer gui;
+	LightDJGUI gui;
 	GraphDisplay graphMapper;
-	ScrollingSpectrum spectrumMapper;
 	ScrollingChannel channelMapper;
 	ChannelLights lights;
 	ColoredLight bassLight;
@@ -68,7 +71,8 @@ public class VisualizationEngineParty extends VisualizationEngine {
 	
 	
 	// The arduino LED visualizer
-	LEDVisualizer ledVisuals;
+	//LEDVisualizer ledVisuals;
+	PartyLightsController ledVisuals;
 	
 	TimerTicToc tictoc;
 	
@@ -102,7 +106,8 @@ public class VisualizationEngineParty extends VisualizationEngine {
 		
 		
 		try {
-			ledVisuals = new LEDVisualizer();
+			//ledVisuals = new LEDVisualizer();
+			ledVisuals = new PartyLightsController();
 		} catch (Throwable o) {
 			System.out.println("WARNING: Couldn't connect to LED's via USB!");
 		}
@@ -110,12 +115,11 @@ public class VisualizationEngineParty extends VisualizationEngine {
 		
 		
 		// Set up the GUI
-		gui = GUIVisualizer.makeGUI();
+		gui = LightDJGUI.startGUI(BUFFER_SIZE, SAMPLE_RATE);
 		Graphics2D g2D = (Graphics2D) gui.getGraphics(); 
 		
 		// Divide up the GUI into different useful stuff.
 		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) g2D);
-		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D, 30, 20000, 100.0, BUFFER_SIZE, SAMPLE_RATE);
 		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) g2D);
 		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) g2D);
 		rgbLight = new RGBLight(150, 920, 30, 150, 150, (Graphics2D) g2D);
@@ -161,8 +165,9 @@ public class VisualizationEngineParty extends VisualizationEngine {
 		double UPDATES_PER_SECOND = 1.0 * SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
 		
 		// Add the detectors here
-		visualizers.add(new RedBassColoredClapVisualizer(FFT_SIZE, UPDATES_PER_SECOND));
-		
+		//visualizers.add(new VUBass(FFT_SIZE, UPDATES_PER_SECOND));
+		//visualizers.add(new RedBassColoredClapVisualizer(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;
 		
@@ -195,6 +200,13 @@ public class VisualizationEngineParty extends VisualizationEngine {
 		RenderFrameParty renderFrame = new RenderFrameParty();
 		renderFrame.colorOutputs = colorOutputs;
 		
+		
+		
+		//plotter.update(new double[] {100.0*((Double) featureList.getFeature("BASS_RAW")), 0.0});
+		
+		
+		//plotter.render();
+		
 		return renderFrame;
 	}
 
@@ -206,12 +218,14 @@ public class VisualizationEngineParty extends VisualizationEngine {
 		
 		
 		// Update LED lights
-		ledVisuals.visualize(renderFrame.colorOutputs[0]);	// Send SERIAL to the RGB's
+		//System.out.println(renderFrame.colorOutputs[0].rgbLights[0]);
+		
+		//ledVisuals.visualize(renderFrame.colorOutputs[0]);	// Send SERIAL to the RGB's
 		bassLight.update(renderFrame.colorOutputs[0].rgbLights[0].getRed() / 255.0);
 		rgbLight.update(renderFrame.colorOutputs[0].rgbLights[1]);
 		//channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
 		plotter.render();
-		spectrumMapper.render();
+		
 	
 	}
 	
