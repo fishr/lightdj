@@ -16,22 +16,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
-import javax.xml.ws.handler.MessageContext.Scope;
 
-
-import Arduino.LEDVisualizer;
-import Arduino.RelayVisuals;
 import Common.ColorOutput;
 import Common.FeatureList;
 import FeatureDetectors.BassFinder;
@@ -39,14 +32,8 @@ import FeatureDetectors.ClapFinder;
 import FeatureDetectors.FeatureDetector;
 import FeatureDetectors.FrequencyRangeFinder;
 import FeatureDetectors.LevelMeter;
-import FeatureDetectors.SharpClapFinder;
-import FeatureDetectors.SilenceFinder;
-import FeatureDetectors.VocalsFinder;
-import GenreClassifier.NaiveBayesClassifier;
-import GenreClassifier.SongFeatureVector;
 import LightDJGUI.ColorOutputDisplayer;
 import LightDJGUI.ColorOutputDisplayerPanel;
-import LightDJGUI.ColorOutputDisplayerTwoLEDs;
 import LightDJGUI.CrossfaderKnob;
 import LightDJGUI.LightDJGUI;
 import LightDJGUI.MouseAcceptorPanel;
@@ -55,19 +42,13 @@ import LightDJGUI.VisualizerChooser;
 import PartyLightsController.PartyLightsController;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
-import SignalGUI.DistributionPlotter;
-import SignalGUI.GUIVisualizer;
 import SignalGUI.GraphDisplay;
 import SignalGUI.RGBLight;
 import SignalGUI.RealtimePlotter;
 import SignalGUI.ScrollingChannel;
 import SignalGUI.TextLight;
 import Signals.FFT;
-import Signals.FFTEngine;
 import Utils.TimerTicToc;
-import Visualizors.ColorGenerator;
-import Visualizors.CrazyStrobe;
-import Visualizors.HueRotator;
 import Visualizors.RainbowSlider;
 import Visualizors.RedBassColoredClapVisualizer;
 import Visualizors.VUBass;
@@ -235,17 +216,15 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		RenderFrameParty renderFrame = (RenderFrameParty) rf;
 
+		// Mix the colors as requested by the LightDJ
+		ColorOutput colorOutput = mixColors(renderFrame);
 		
+		// Apply any necessary post-processing
+		applyPostProcessing(colorOutput);
 		
-		// Update LED lights
-		//System.out.println(renderFrame.colorOutputs[0].rgbLights[0]);
+		// Send the command to the LED's
+		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
 		
-		ledVisuals.visualize(mixColors(renderFrame));	// Send SERIAL to the RGB's
-		
-		//bassLight.update(renderFrame.colorOutputs[0].rgbLights[0].getRed() / 255.0);
-		//rgbLight.update(renderFrame.colorOutputs[0].rgbLights[1]);
-		// channelMapper.updateWithNewChannelColors(new Color[]{bassLight.getCurrentColor(), rgbLight.getCurrentColor()});	// Update the scrolling "rock band" display
-		// plotter.render();
 		
 		
 		// Store the last frame so that it can be rendered appropriately!
@@ -253,6 +232,50 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			lastFrame = renderFrame;
 		}
 	
+	}
+	
+	protected void applyPostProcessing(ColorOutput colorOutput) {
+		switch(lightDJPostProcessing) {
+		case POST_PROCESSING_NONE:
+			// Do nothing!
+			break;
+			
+		case POST_PROCESSING_EMERGENCY_LIGHTING:
+			colorOutput.emergencyLighting();
+			break;
+			
+		case POST_PROCESSING_ALL_OFF:
+			colorOutput.allOff();
+			break;
+			
+		case POST_PROCESSING_WHITE_STROBE:
+			whiteStrobe(colorOutput);
+			break;
+			
+		case POST_PROCESSING_UV_STROBE:
+			uvStrobe(colorOutput);
+			break;
+			
+		}
+	}
+	
+	protected void whiteStrobe(ColorOutput colorOutput) {
+		if (strobeFrame == 0) {
+			colorOutput.setWhiteStrobe();
+		} else {
+			colorOutput.allOff();
+		}
+		strobeFrame = (strobeFrame + 1) % strobeFrameLength;
+	}
+	
+	
+	protected void uvStrobe(ColorOutput colorOutput) {
+		if (strobeFrame == 0) {
+			colorOutput.setUVStrobe();
+		} else {
+			colorOutput.allOff();
+		}
+		strobeFrame = (strobeFrame + 1) % strobeFrameLength;
 	}
 	
 	/**
@@ -346,6 +369,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static int visualizerRightIndex = 1;
 	protected static int activePlugin = 1;	// 0 => Left is selected, 1 => Right is selected
 	protected static double alpha;	// The mixing between the two.
+	protected static boolean controlKeyPressed = false;
+	protected static boolean altKeyPressed = false;
 	
 	// Store the state of the LightDJ
 	public enum LightDJState {
@@ -354,6 +379,29 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	protected LightDJState lightDJState;
 	
+	// Allow for automated cross-fade effects
+	public enum CrossfadeAutomator {
+		CROSSFADE_MANUAL,
+		CROSSFADE_AUTO
+	}
+	protected CrossfadeAutomator crossfadeAutomator;
+	protected double crossfadeSpeed = 0.0;
+	protected static double CROSSFADE_SPEED_SLOW = 0.015;
+	protected static double CROSSFADE_SPEED_FAST = 0.04;
+	
+	// Keep track of available post-processings
+	public enum LightDJPostProcessing {
+		POST_PROCESSING_NONE,	// Send the mixed color-data as is
+		POST_PROCESSING_WHITE_STROBE,	// Ignore the color data and instead white strobe
+		POST_PROCESSING_UV_STROBE,	// Ignore the color data and instead UV strobe
+		POST_PROCESSING_ALL_OFF,	// Turn all lights off temporarily
+		POST_PROCESSING_EMERGENCY_LIGHTING	// Turn on all lights to white
+	}
+	protected LightDJPostProcessing lightDJPostProcessing;
+	
+	// Keep track of strobing!
+	protected int strobeFrame = 0;
+	protected int strobeFrameLength = 13;
 	
 	public void startGUI() {
 		gui = new LightDJGUI(this);
@@ -383,8 +431,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		THICK_STROKE = new BasicStroke(3.0f);
 		alpha = 0.0;
 		
-		// Set the default state
+		// Set the default states
 		lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
+		lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
 		
 		// Set up some other GUI elements
 		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 30, 20000, 100.0, BUFFER_SIZE, SAMPLE_RATE);
@@ -541,6 +591,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	
 	public void setMixerAlpha(double a) {
+		
+		// Disable any automated cross-fading
+		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
+		
 		// Set the mixer!
 		if (a < 0.0) {
 			alpha = 0.0;
@@ -549,6 +603,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		} else {
 			alpha = a;
 		}
+		
 	}
 	
 	/**
@@ -689,7 +744,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		ColorOutput leftColors = renderFrame.colorOutputs[visualizerLeftIndex];
 		ColorOutput rightColors = renderFrame.colorOutputs[visualizerRightIndex];
 		
-		colorOutputDisplayer.render(mixedColors, g2D, SIDEBAR_WIDTH + BORDER_SIZE, BORDER_SIZE, gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, LIGHTBAR_HEIGHT);
+		colorOutputDisplayer.render(mixedColors, g2D, SIDEBAR_WIDTH + BORDER_SIZE, BORDER_SIZE, width - SIDEBAR_WIDTH - 2*BORDER_SIZE, LIGHTBAR_HEIGHT);
 		colorOutputDisplayer.render(leftColors, g2D, RECORD_BOX_LEFT_X + BORDER_SIZE, RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		colorOutputDisplayer.render(rightColors, g2D, RECORD_BOX_RIGHT_X + BORDER_SIZE, RECORD_BOX_RIGHT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		
@@ -782,13 +837,65 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	 * Keyboard stuff
 	 */
 	public void keyDown(int keyCode) {
-		switch(lightDJState) {
 		
+		// Is it a special key?
+		if (keyCode == KeyEvent.VK_CONTROL) {
+			controlKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_ALT) {
+			altKeyPressed = true;
+		}
+		
+		// Emergency lighting?
+		if (keyCode == KeyEvent.VK_ESCAPE) {
+			
+		}
+		
+		
+		// Switch based on the current LightDJ state
+		switch(lightDJState) {
+
 		case LIGHTDJ_STATE_NORMAL:
 			if (keyCode == KeyEvent.VK_SPACE) {
-					activeLayer = true;
-					lightDJState = LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER;
-			} 
+				activeLayer = true;
+				lightDJState = LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER;
+			} else if (keyCode == KeyEvent.VK_LEFT) {
+				if (controlKeyPressed) {
+					startAutoCrossfade(-CROSSFADE_SPEED_SLOW);
+				} else if (altKeyPressed) {
+					startAutoCrossfade(-CROSSFADE_SPEED_FAST);
+				} else {
+					// Left arrow - cross-fade all the way to the left if not automated
+					alpha = 0.0;
+					paintCrossfader(false);
+				}
+				
+			} else if (keyCode == KeyEvent.VK_RIGHT) {
+				if (controlKeyPressed) {
+					startAutoCrossfade(CROSSFADE_SPEED_SLOW);
+				} else if (altKeyPressed) {
+					startAutoCrossfade(CROSSFADE_SPEED_FAST);
+				} else {
+					// Right arrow - cross-fade all the way to the right if not automated
+					alpha = 1.0;
+					paintCrossfader(false);
+				}
+			} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+				 // This is a trigger for all off - turn off all lights!
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_ALL_OFF;
+				
+			} else if (keyCode == KeyEvent.VK_F12) {
+				// This is a trigger for white-strobing!
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE;
+			} else if (keyCode == KeyEvent.VK_ESCAPE) {
+				// Turn emergency lighting on/off
+				if (lightDJPostProcessing == LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING) {
+					lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+				} else {
+					lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING;
+				}
+				
+				
+			}
 			
 			break;
 			
@@ -815,12 +922,81 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			break;
 		
 		}
-		
-	
 	}
 	
 	public void keyUp(int keyCode) {
+		// Is it a special key?
+		if (keyCode == KeyEvent.VK_CONTROL) {
+			controlKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_ALT) {
+			altKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+			// This was a trigger for all-off. Now turn stuff back on again.
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		} else if (keyCode == KeyEvent.VK_F12) {
+			// This was a trigger for white-strobing.
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		}
+		
+	}
 
+	
+	/**
+	 * Automated cross-fade effects
+	 */
+	public void startAutoCrossfade(final double speed) {
+		crossfadeSpeed = speed;
+		if (crossfadeAutomator == CrossfadeAutomator.CROSSFADE_AUTO) {
+			// Already cross-fading don't start a new thread!
+			System.out.println("Already cross-fading!");
+			return;
+		}
+		
+		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_AUTO;
+		
+		(new Thread(new Runnable() {
+			public void run() {
+				while(crossfadeAutomator == CrossfadeAutomator.CROSSFADE_AUTO) {
+					automateCrossfades();
+			
+					// Wait a little bit
+					try {
+						Thread.sleep(30);
+					} catch (Exception e) {
+						// Couldn't sleep
+						e.printStackTrace();
+					}
+				}
+				System.out.println("Done with automatic crossfade.");
+			}
+		})).start();
+	}
+	
+	
+	public void automateCrossfades() {
+		switch (crossfadeAutomator) {
+		case CROSSFADE_MANUAL:
+			// Don't do anything!
+			break;
+			
+		case CROSSFADE_AUTO:
+			// Move over to the left.
+			alpha += crossfadeSpeed;
+			if (alpha < 0.0) {
+				alpha = 0.0;
+				crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
+				paintCrossfader(false);
+			} else if (alpha > 1.0) {
+				alpha = 1.0;
+				crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
+				paintCrossfader(false);
+			} else {
+				paintCrossfader(true);
+			}
+			break;
+			
+			
+		}
 	}
 	
 	

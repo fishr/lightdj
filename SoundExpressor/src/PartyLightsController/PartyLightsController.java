@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import Common.ColorOutput;
+import Common.ColorOutput.OverallOutputCompression;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -31,9 +32,13 @@ public class PartyLightsController {
 
 	
 	protected static final int NUM_RGB_BOARDS = 1;
-	protected static final int NUM_UV_STROBE_BOARDS = 0;
+	protected static final int NUM_UV_STROBE_BOARDS = 1;
 	
 	protected static final int LENGTH_RGB_PACKET = 2 + 12;
+	protected static final int LENGTH_WHITE_STROBE_PACKET = 12;
+	protected static final int LENGTH_UV_STROBE_PACKET = 2;
+	protected static final int LENGTH_ALL_OFF_PACKET = 2;
+	protected static final int LENGTH_EMERGENCY_LIGHTING_PACKET = 2;
 	
 	
 	public PartyLightsController() {
@@ -56,7 +61,7 @@ public class PartyLightsController {
 	 * Attempts to connect to the serial port, returning true on success.
 	 * If there's an error, it is thrown.
 	 */
-	private void connect() throws Exception {
+	protected void connect() throws Exception {
 		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPortName);
 		if (portIdentifier.isCurrentlyOwned()) {
 			throw new RuntimeException("Error: The serial port " + serialPortName + " is already owned!");
@@ -86,7 +91,7 @@ public class PartyLightsController {
 	/**
 	 * Writes data to the port
 	 */
-	private void write(byte[] data) throws IOException {
+	protected void write(byte[] data) throws IOException {
 		if (isConnected) {
 			outStream.write(data);
 			outStream.flush();
@@ -97,10 +102,35 @@ public class PartyLightsController {
 	 * Write color output data!
 	 */
 	public void visualize(ColorOutput colorOutput) {
+		
+		// Apply any overall compression!
+		switch(colorOutput.overallOutputCompression) {
+		case OVERALL_COMPRESSION_EMERGENCY_LIGHTING:
+			sendEmergencyLighting();
+			break;
 			
+		case OVERALL_COMPRESSION_ALL_OFF:
+			sendAllOff();
+			break;
+			
+		case OVERALL_COMPRESSION_WHITE_STROBE:
+			sendWhiteStrobe();
+			break;
+			
+		case OVERALL_COMPRESSION_UV_STROBE:
+			sendUVStrobe();
+			break;
+			
+		case OVERALL_COMPRESSION_NONE:
+			sendRGBPanel(colorOutput);
+			break;
+		
+		}
+			
+	}
+	
+	protected void sendRGBPanel(ColorOutput colorOutput) {
 		byte[] output = new byte[NUM_RGB_BOARDS * LENGTH_RGB_PACKET];
-		
-		
 		// For now don't implement any compression to send the smallest command.
 		int cursor = 0;
 		for(int board = 0; board < NUM_RGB_BOARDS; board++) {
@@ -110,37 +140,83 @@ public class PartyLightsController {
 			
 		}
 		
+		// debugPrint(output);
+		try {
+			write(output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		
-		
+		// Wait a bit to let the board catch up - other wise we're slamming it with data!
 		try {
 			Thread.sleep(30);
 		} catch (Exception e) {
 			
 		}
 		
+	}
+	
+	protected void sendWhiteStrobe() {
+		byte[] output = new byte[LENGTH_WHITE_STROBE_PACKET];
+		output[0] = (byte) 255;
+		output[1] = (byte) 248;
 		
-		
-		
-		
-		
-		debugPrint(output);
+		// Try to write to output
 		try {
 			write(output);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-			
 	}
 	
-	private void debugPrint(byte[] data) {
+	protected void sendUVStrobe() {
+		byte[] output = new byte[LENGTH_UV_STROBE_PACKET];
+		output[0] = (byte) 255;
+		output[1] = (byte) 245;
+		
+		// Try to write to output
+		try {
+			write(output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void sendEmergencyLighting() {
+		byte[] output = new byte[LENGTH_EMERGENCY_LIGHTING_PACKET];
+		output[0] = (byte) 255;
+		output[1] = (byte) 254;
+		
+		// Try to write to output
+		try {
+			write(output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void sendAllOff() {
+		byte[] output = new byte[LENGTH_ALL_OFF_PACKET];
+		output[0] = (byte) 255;
+		output[1] = (byte) 253;
+		
+		// Try to write to output
+		try {
+			write(output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	protected void debugPrint(byte[] data) {
 		System.out.println("*****");
 		for(int i = 0; i < data.length; i++) {
 			System.out.println(convertSignedByteToUnsignedInt(data[i]));
 		}
 	}
 	
-	private int convertSignedByteToUnsignedInt(byte b) {
+	protected int convertSignedByteToUnsignedInt(byte b) {
 		if (b >= 0) {
 			return (int) b;
 		} else {
@@ -148,7 +224,7 @@ public class PartyLightsController {
 		}
 	}
 	
-	private void generateRGBPanelPacket(byte[] data, int cursor, ColorOutput colorOutput, int board) {
+	protected void generateRGBPanelPacket(byte[] data, int cursor, ColorOutput colorOutput, int board) {
 		Color c;
 		
 		data[cursor] = (byte) 255;
@@ -176,7 +252,7 @@ public class PartyLightsController {
 		
 	}
 	
-	private byte limit(int val) {
+	protected byte limit(int val) {
 		if (val > 254) {
 			return (byte) 254;
 		} else {
@@ -184,7 +260,7 @@ public class PartyLightsController {
 		}
 	}
 	
-	private int getLightIndexFromBoard(int board, int light) {
+	protected int getLightIndexFromBoard(int board, int light) {
 		return 4*board + light;
 	}
 	

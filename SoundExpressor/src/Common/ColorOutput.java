@@ -35,7 +35,9 @@ public class ColorOutput {
 	public enum OverallOutputCompression {
 		OVERALL_COMPRESSION_NONE,
 		OVERALL_COMPRESSION_EMERGENCY_LIGHTING,
-		OVERALL_COMPRESSION_ALL_OFF
+		OVERALL_COMPRESSION_ALL_OFF, 
+		OVERALL_COMPRESSION_WHITE_STROBE,
+		OVERALL_COMPRESSION_UV_STROBE
 	}
 	public enum RGBFrontColorOutputCompression {
 		RGB_FRONT_COMPRESSION_DIFF,
@@ -241,6 +243,42 @@ public class ColorOutput {
 		
 		rgbLights[4*NUM_FRONT_RGB_PANELS + i] = c; 
 		
+	}
+	
+	public void setWhiteStrobe() {
+		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_WHITE_STROBE;
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
+			rgbLights[i] = Color.BLACK;
+		}
+		
+		whiteLights = new double[NUM_STROBE_LIGHTS];
+		for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+			whiteLights[i] = 0.0;
+		}
+		
+		uvLights = new double[NUM_UV_LIGHTS];
+		for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+			uvLights[i] = 0.0;
+		}
+	}
+	
+	public void setUVStrobe() {
+		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_UV_STROBE;
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
+			rgbLights[i] = Color.BLACK;
+		}
+		
+		whiteLights = new double[NUM_STROBE_LIGHTS];
+		for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+			whiteLights[i] = 0.0;
+		}
+		
+		uvLights = new double[NUM_UV_LIGHTS];
+		for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+			uvLights[i] = 0.0;
+		}
 	}
 	
 	

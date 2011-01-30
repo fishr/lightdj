@@ -13,7 +13,7 @@ import Common.FeatureList;
  */
 public class RainbowSlider extends Visualizer {
 
-	protected static double phaseOffsetBase = 0.04;
+	protected static double phaseOffsetBase = 0.06;
 	protected static double deltaOmega = -0.002;
 	protected static double theta;
 	
@@ -46,8 +46,8 @@ public class RainbowSlider extends Visualizer {
 		
 		ColorOutput colorOutput = new ColorOutput();
 		
-		double phaseOffset = phaseOffsetBase * (1 - bassLevel);
-		float brightness = (float) (0.75 + 0.25 * bassLevel);
+		double phaseOffset = phaseOffsetBase;// * (1 - bassLevel);
+		float brightness = (float) (1 - bassLevel); //1.0f; //(float) (0.75 + 0.25 * bassLevel);
 		float saturation = 1.0f; //(float) (1.0 - 0.5 * bassLevel);
 		
 		// Make the first light red in proprotion to the bass
