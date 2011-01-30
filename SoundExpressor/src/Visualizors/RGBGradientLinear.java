@@ -8,7 +8,7 @@ import java.awt.Color;
  * @author Steve Levine
  *
  */
-public class RGBGradientController implements ColorGenerator{
+public class RGBGradientLinear implements ColorGenerator{
 
 	public Color c0;
 	public Color c1;
@@ -17,12 +17,12 @@ public class RGBGradientController implements ColorGenerator{
 	public double g = 0;
 	public double b = 0;
 	
-	public RGBGradientController(Color c0, Color c1) {
+	public RGBGradientLinear(Color c0, Color c1) {
 		this.c0 = c0;
 		this.c1 = c1;
 	}
 	
-	public void computeGradient(double val, double brightness) {
+	public Color computeGradient(double val, double brightness) {
 		// Constrain the value to be in [0, 1]
 		if (val > 1.0) {
 			val = 1.0;
@@ -39,6 +39,8 @@ public class RGBGradientController implements ColorGenerator{
 		r = brightness * (val * c1.getRed() + (1 - val) * c0.getRed()) / 255.0;
 		g = brightness * (val * c1.getGreen() + (1 - val) * c0.getGreen()) / 255.0;
 		b = brightness * (val * c1.getBlue() + (1 - val) * c0.getBlue()) / 255.0;
+		
+		return getColor();
 	}
 	
 	public double getRed() {return r;}
@@ -52,6 +54,21 @@ public class RGBGradientController implements ColorGenerator{
 	
 	public void step(double val1, double val2) {
 		computeGradient(val1, val2);
+	}
+	
+	public static Color linearGradient(Color c1, Color c2, double alpha) {
+		// Constrain the value to be in [0, 1]
+		if (alpha > 1.0) {
+			alpha = 1.0;
+		} else if (alpha < 0.0) {
+			alpha = 0.0;
+		}
+		
+		float r = (float) ((alpha * c2.getRed() + (1 - alpha) * c1.getRed()) / 255.0);
+		float g = (float) ((alpha * c2.getGreen() + (1 - alpha) * c1.getGreen()) / 255.0);
+		float b = (float) ((alpha * c2.getBlue() + (1 - alpha) * c1.getBlue()) / 255.0);
+		
+		return new Color(r, g, b);
 	}
 	
 }

@@ -11,23 +11,25 @@ import Common.FeatureList;
  * @author Steve Levine0
  *
  */
-public class RedBassColoredClapVisualizer extends Visualizer {
+public class RainbowSlider extends Visualizer {
 
-	protected ColorGenerator rgbController;
+	protected static double phaseOffsetBase = 0.04;
+	protected static double deltaOmega = -0.002;
+	protected static double theta;
 	
 	@Override
 	public String getName() {
-		return "Original";
+		return "Rainbow Slider";
 	}
 	
-	public RedBassColoredClapVisualizer(int fftSize, double updatesPerSecond) {
+	public RainbowSlider(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
 	
 	@Override
 	public void init() {
 		// Initialize some parameters
-		rgbController = new HueRotator(0.0, 0.373);
+
 		
 		// We don't need to request any user controls for this visualization plugin
 		
@@ -41,19 +43,21 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
 		
 		// Compute a new set of colorings, and store them.
-		ColorOutput colorOutput = new ColorOutput();
-		rgbController.step(clapLevel);
 		
-		//Color g = new Color(128, 0, 64);
+		ColorOutput colorOutput = new ColorOutput();
+		
+		double phaseOffset = phaseOffsetBase * (1 - bassLevel);
+		float brightness = (float) (0.75 + 0.25 * bassLevel);
+		float saturation = 1.0f; //(float) (1.0 - 0.5 * bassLevel);
 		
 		// Make the first light red in proprotion to the bass
-		colorOutput.rgbLights[0] = new Color((float) bassLevel, 0.0f, 0.0f);
+		colorOutput.rgbLights[0] = Color.getHSBColor((float) (theta - 1.5 * phaseOffset), saturation, brightness);
+		colorOutput.rgbLights[1] = Color.getHSBColor((float) (theta - 0.5 * phaseOffset), saturation, brightness);
+		colorOutput.rgbLights[2] = Color.getHSBColor((float) (theta + 0.5 * phaseOffset), saturation, brightness);
+		colorOutput.rgbLights[3] = Color.getHSBColor((float) (theta + 1.5 * phaseOffset), saturation, brightness);
 		
-		// Make the second color a randomized hue, with brightness determined by the clap level.
-		colorOutput.rgbLights[1] = rgbController.getColor();
-		
-		colorOutput.rgbLights[2] = new Color((float) bassLevel, 0.0f, 0.0f);
-		colorOutput.rgbLights[3] = rgbController.getColor();
+		theta += deltaOmega;
+		if (theta > 1.0) {theta--;}
 		
 		
 		// Return the result

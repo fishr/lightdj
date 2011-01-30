@@ -40,7 +40,7 @@ public class BassFinder extends FeatureDetector {
 		minFreq = 20;
 		maxFreq = 80;
 		normalizingVal = 30.0;
-		averageHalfLife = 0.125;
+		averageHalfLife = 0.1;
 		decayRate = 1.0 / (50);
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		recentBassIndex = 0;

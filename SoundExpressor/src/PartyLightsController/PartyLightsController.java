@@ -24,13 +24,11 @@ public class PartyLightsController {
 	private OutputStream outStream;
 	
 	// Protocol information
-	protected static final int PARTY_SYSTEM_ALL_OFF = 254;
-	protected static final int PARTY_SYSTEM_ALL_RGB_FRONT = 253;
-	protected static final int PARTY_SYSTEM_ALL_RGB_REAR = 252;
-	protected static final int PARTY_SYSTEM_ALL_UV = 251;
-	protected static final int PARTY_SYSTEM_ALL_STROBE = 250;
-	protected static final int PARTY_SYSTEM_STROBE_ON = 249;
-	protected static final int PARTY_SYSTEM_STROBE_OFF = 248;
+	protected static final int ACTION_EMERGENCY_LIGHTING = 254;
+	protected static final int ACTION_EVERYTHING_OFF = 253;
+	protected static final int ACTION_ALL_FRONT_RGB = 252;
+	protected static final int ACTION_ALL_REAR_RGB = 251;
+
 	
 	protected static final int NUM_RGB_BOARDS = 1;
 	protected static final int NUM_UV_STROBE_BOARDS = 0;
@@ -41,7 +39,7 @@ public class PartyLightsController {
 	public PartyLightsController() {
 		// Set some defaults
 		this.serialPortName = "/dev/ttyUSB0";
-		this.speed = 19200;
+		this.speed = 38400;
 		isConnected = false;
 		outStream = null;
 		
@@ -66,10 +64,15 @@ public class PartyLightsController {
 			CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
 			if (commPort instanceof SerialPort) {
 				SerialPort serialPort = (SerialPort) commPort;
-				serialPort.setSerialPortParams(speed, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+				serialPort.setSerialPortParams(speed, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_EVEN);
+				
+				
+				//serialPort.setLowLatency();
+				
 				
 				outStream = serialPort.getOutputStream();
 				isConnected = true;
+				System.out.println("Serial successfully connected...");
 			} else {
 				throw new RuntimeException("Got a non-serial port, but only serial ports supported!");
 			}
@@ -86,6 +89,7 @@ public class PartyLightsController {
 	private void write(byte[] data) throws IOException {
 		if (isConnected) {
 			outStream.write(data);
+			outStream.flush();
 		}
 	}
 
@@ -106,7 +110,21 @@ public class PartyLightsController {
 			
 		}
 		
-		//debugPrint(output);
+		
+		
+		
+		try {
+			Thread.sleep(30);
+		} catch (Exception e) {
+			
+		}
+		
+		
+		
+		
+		
+		
+		debugPrint(output);
 		try {
 			write(output);
 		} catch (IOException e) {

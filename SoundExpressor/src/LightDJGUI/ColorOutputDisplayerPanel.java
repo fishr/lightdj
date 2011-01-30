@@ -10,14 +10,14 @@ import Common.ColorOutput;
  * @author Steve Levine
  *
  */
-public class ColorOutputDisplayerTwoLEDs implements ColorOutputDisplayer {
+public class ColorOutputDisplayerPanel implements ColorOutputDisplayer {
 
 	@Override
 	public void render(ColorOutput c, Graphics2D g2D, int x, int y, int width, int height) {
 		
-		int size = Math.min((int) (4.0/9.0*width), height);
+		int size = Math.min((int) (0.25 * width), height);
 		int yOffset = (height - size) / 2;
-		int xOffset =(int) ((width - 9.0/4.0 * size) / 2.0);
+		int xOffset =(int) ((width - 4.0*size)/2.0);
 		
 		// Draw a black rectangle
 		//g2D.setColor(Color.BLACK);
@@ -29,6 +29,13 @@ public class ColorOutputDisplayerTwoLEDs implements ColorOutputDisplayer {
 		
 		g2D.setColor(c.rgbLights[1]);
 		g2D.fillRect(x + xOffset + size, y + yOffset, size, size);
+		
+		g2D.setColor(c.rgbLights[2]);
+		g2D.fillRect(x + xOffset + 2*size, y + yOffset, size, size);
+		
+		g2D.setColor(c.rgbLights[3]);
+		g2D.fillRect(x + xOffset + 3*size, y + yOffset, size, size);
+		
 		
 	}
 	

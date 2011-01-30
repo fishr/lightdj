@@ -11,23 +11,21 @@ import Common.FeatureList;
  * @author Steve Levine0
  *
  */
-public class RedBassColoredClapVisualizer extends Visualizer {
+public class WhitePulseBass extends Visualizer {
 
-	protected ColorGenerator rgbController;
 	
 	@Override
 	public String getName() {
-		return "Original";
+		return "White Bass Pulse";
 	}
 	
-	public RedBassColoredClapVisualizer(int fftSize, double updatesPerSecond) {
+	public WhitePulseBass(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
 	
 	@Override
 	public void init() {
 		// Initialize some parameters
-		rgbController = new HueRotator(0.0, 0.373);
 		
 		// We don't need to request any user controls for this visualization plugin
 		
@@ -42,18 +40,14 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		
 		// Compute a new set of colorings, and store them.
 		ColorOutput colorOutput = new ColorOutput();
-		rgbController.step(clapLevel);
 		
-		//Color g = new Color(128, 0, 64);
+		Color shadeOfWhite = new Color((float) bassLevel, (float) bassLevel, (float) bassLevel);
 		
-		// Make the first light red in proprotion to the bass
-		colorOutput.rgbLights[0] = new Color((float) bassLevel, 0.0f, 0.0f);
-		
-		// Make the second color a randomized hue, with brightness determined by the clap level.
-		colorOutput.rgbLights[1] = rgbController.getColor();
-		
-		colorOutput.rgbLights[2] = new Color((float) bassLevel, 0.0f, 0.0f);
-		colorOutput.rgbLights[3] = rgbController.getColor();
+		// Make the first light red in proportion to the bass
+		colorOutput.rgbLights[0] = shadeOfWhite;
+		colorOutput.rgbLights[1] = shadeOfWhite;
+		colorOutput.rgbLights[2] = shadeOfWhite;
+		colorOutput.rgbLights[3] = shadeOfWhite;
 		
 		
 		// Return the result

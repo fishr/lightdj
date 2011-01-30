@@ -90,13 +90,13 @@ public class SoundVisualizer {
 
 	}
 	
-	public void start() {
+	public void start(double startupDelay) {
 		if (passThru) {
 			outputLine.start();
 			//System.out.println("Available: " + outputLine.available() + ", writing " + silence.length);
 			//outputLine.write(silence, 0, silence.length);
 		}
-		visuals.start();
+		visuals.start(startupDelay);
 	}
 	
 	// Write bytes into the buffer

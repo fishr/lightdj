@@ -7,5 +7,9 @@ package Common;
  */
 public interface UserControl {
 	
+	public void setLocation(int x, int y, int width, int height);
+	
+	public void render();
+	
 	
 }

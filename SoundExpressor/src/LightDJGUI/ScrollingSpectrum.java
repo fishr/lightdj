@@ -146,13 +146,25 @@ public class ScrollingSpectrum {
 	public void move(int x, int y, int width, int height) {
 		screenX = x;
 		screenY = y;
-		this.width = width;
-		this.height = height;
+		if (width > 0) {
+			this.width = width;
+		} else {
+			this.width = 1;
+		}
+		if (height > 0) {
+			this.height = height;
+		} else {
+			this.height = 1;
+		}
 		currentX = 0;
 		
 		setSize(width, height);
 		
 		
+	}
+	
+	public void setGraphics(Graphics2D g2D) {
+		this.outputG2D = g2D;
 	}
 	
 }

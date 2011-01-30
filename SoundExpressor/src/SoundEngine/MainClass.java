@@ -19,11 +19,12 @@ public class MainClass {
 	private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
-	private static final int AUDIO_READ_BUFFER_SIZE = 8192;
+	private static final int AUDIO_READ_BUFFER_SIZE = 1024;
+	private static final int SAMPLE_RATE = 44100;
 	private static final boolean USE_CAPTURED_AUDIO = true;
-	private static final boolean AUDIO_PASS_THRU = false;
+	private static final boolean AUDIO_PASS_THRU = true;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.000;
+	private static final double INITIAL_VIDEO_DELAY = 0.460;
 
 	
 	public static void main(String[] args) {
@@ -74,7 +75,7 @@ public class MainClass {
 			
 			
 			//TimerTicToc timer = new TimerTicToc();
-			engine.start();
+			engine.start(0.5 * AUDIO_READ_BUFFER_SIZE / format.getSampleRate());
 			
 			while((numBytesRead = audioInputStream.read(audioData)) != -1) {
 				
@@ -92,19 +93,21 @@ public class MainClass {
 	}
 
 	
+	
+	
 	// Capture live audio from the computer system, and run on this.
 	public static void runWithCapturedAudio() {
 		
 		// Set up the desired input audio format,  using a default reasonable value
 		AudioFormat format;
-		format = new AudioFormat((float) 44100, 16, 2, true, false);
+		format = new AudioFormat((float) SAMPLE_RATE, 16, 2, true, false);
 		
 		
 		TargetDataLine line;
 		DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
 		if (AudioSystem.isLineSupported(info)) {
 			try {
-				line = (TargetDataLine) AudioSystem.getTargetDataLine(format); //.getLine(info);
+				line = (TargetDataLine) AudioSystem.getLine(info);
 				line.open(format);
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");
@@ -124,14 +127,17 @@ public class MainClass {
 		System.out.println("Starting audio capture...");
 		try {
 			
-			line.start();
 			
 			int numBytesRead = 0;
 			byte[] audioData = new byte[bytesToRead];
 			
+			line.start();
+			line.read(audioData, 0, bytesToRead);	// Start reading now, just to make sure everything is set up
+
+			
 			//TimerTicToc t = new TimerTicToc();
 			
-			engine.start();
+			engine.start(bytesToRead / (SAMPLE_RATE * format.getFrameSize()));
 			while((numBytesRead = line.read(audioData, 0, bytesToRead)) != -1) {
 				
 				// Send data!
@@ -152,7 +158,7 @@ public class MainClass {
 		System.out.println("Audio capture ended!");
 		
 	}
-		
+	
 	
 	
 }

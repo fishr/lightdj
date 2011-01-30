@@ -28,6 +28,7 @@ public abstract class VisualizationEngine {
 	protected final int BYTES_PER_SAMPLE;
 	protected final long MAX_SAMPLE_VAL;
 	protected final int SAMPLE_RATE;
+	protected final boolean INSTANT_PLAY = false;
 	
 	// A rendering thread and timing queue to ensure that the visuals are rendered at the proper time as the audio
 	protected VisualizationEngineRenderThread renderTimingThread;
@@ -80,16 +81,19 @@ public abstract class VisualizationEngine {
 	}
 	
 	/**
-	 * Signifies that data will be starting soon
+	 * Signifies that data will be starting soon. Also specifies a startup delay, in milliseconds.
 	 */
-	public void start() {
+	public void start(double startupDelay) {
 		// Record when "now" is
-		startTime = System.nanoTime();
+		startTime = System.nanoTime() + (long) (startupDelay * 1000000000.0);
+		frameWidth = (long) ((1.0 * BUFFER_SIZE / SAMPLE_RATE / BUFFER_OVERLAP) * 1000000000.0);
 		
-		// Start the rendering thread
-		Thread renderThread = new Thread(renderTimingThread);
-		renderThread.start();
-		renderTimingThread.startTime = startTime;
+		if (!INSTANT_PLAY) {
+			// Start the rendering thread
+			Thread renderThread = new Thread(renderTimingThread);
+			renderThread.start();
+			renderTimingThread.startTime = startTime;
+		}
 		
 	}
 	
@@ -122,7 +126,6 @@ public abstract class VisualizationEngine {
 				if (bufferCursors[i] == BUFFER_SIZE) {
 					
 					// Compute the synchronization timing parameters for the music
-					long frameWidth = (long) ((1.0 * BUFFER_SIZE / SAMPLE_RATE / BUFFER_OVERLAP) * 1000000000.0);
 					long timestamp = startTime + numBuffersRendered * frameWidth + videoDelayOffset;
 					
 					visualize(buffers[i], timestamp, frameWidth);
@@ -145,9 +148,14 @@ public abstract class VisualizationEngine {
 		renderFrame.timestamp = timestamp;
 		renderFrame.frameTimeWidth = timewidth;
 		
-		// Now, add this rendered frame to the render queue to be rendered!
-		synchronized(timeQueue) {
-			timeQueue.add(renderFrame);
+		if (!INSTANT_PLAY) {
+			// Now, add this rendered frame to the render queue to be rendered!
+			synchronized(timeQueue) {
+				timeQueue.add(renderFrame);
+			}
+		} else {
+			// Play this render frame immediately.
+			this.renderVisuals(renderFrame);
 		}
 		
 	}
@@ -188,7 +196,7 @@ class VisualizationEngineRenderThread implements Runnable {
 					RenderFrame frame = timeQueue.peek();
 					if (frame.timestamp + frame.frameTimeWidth < now) {
 						// This frame occurred in the past; we're running too slowly. 
-						// Just drop this rendering and move on to the next.
+						// Just drop this rendering andi move on to the next.
 						//System.out.println("D: " + ((double) (frame.timestamp + frame.frameTimeWidth - startTime) / 1000000));
 						timeQueue.remove();
 						

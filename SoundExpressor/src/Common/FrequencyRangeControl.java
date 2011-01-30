@@ -15,5 +15,17 @@ public class FrequencyRangeControl implements UserControl {
 		maxFreq = initialMaxFreq;
 	}
 
+	@Override
+	public void render() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setLocation(int x, int y, int width, int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }
