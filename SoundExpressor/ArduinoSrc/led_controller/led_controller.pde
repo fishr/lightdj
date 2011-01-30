@@ -40,13 +40,13 @@ void setup() {
 
 	// Set up the LCD
 	pinMode(LCD_PIN, OUTPUT);
-	lcdSerial.begin(9600);
-	backlightOff();
-	clearDisplay();
-	selectLineOne();
-	lcdSerial.print(topLine);
-	selectLineTwo();
-	lcdSerial.print(bottomLine);
+	//lcdSerial.begin(9600);
+	//backlightOff();
+	//clearDisplay();
+	//selectLineOne();
+	//lcdSerial.print(topLine);
+	//selectLineTwo();
+	//lcdSerial.print(bottomLine);
 }
 
 

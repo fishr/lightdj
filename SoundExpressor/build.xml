@@ -1,0 +1,26 @@
+<project name="Music Visualizer" default="compile" basedir=".">
+  <property name="src" location="src/" />
+  <property name="bin" location="bin/" />
+
+  <target name="compile">
+    <javac srcdir="${src}" destdir="${bin}" classpath=".:./lib/RXTXcomm.jar" />
+  </target>
+
+  <target name="run" depends="compile">
+    <java
+       classpath="./bin:./lib/RXTXcomm.jar"
+       classname="SoundEngine.MainClass"
+       fork="true">
+    </java>
+  </target>
+
+  <target name="clean">
+    <delete verbose="true">
+      <fileset dir="./bin">
+	<include name="*/*.class"/>
+      </fileset>
+    </delete>
+  </target>
+
+
+</project>
