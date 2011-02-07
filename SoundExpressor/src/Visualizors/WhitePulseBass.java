@@ -35,7 +35,7 @@ public class WhitePulseBass extends Visualizer {
 	public ColorOutput visualize(FeatureList featureList) {
 		
 		// Retreive any necessary parameters from the FeatureList
-		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
+		double bassLevel = (Double) featureList.getFeature("PULSE_BASS");
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
 		
 		// Compute a new set of colorings, and store them.
@@ -44,11 +44,11 @@ public class WhitePulseBass extends Visualizer {
 		Color shadeOfWhite = new Color((float) bassLevel, (float) bassLevel, (float) bassLevel);
 		
 		// Make the first light red in proportion to the bass
-		colorOutput.rgbLights[0] = shadeOfWhite;
-		colorOutput.rgbLights[1] = shadeOfWhite;
-		colorOutput.rgbLights[2] = shadeOfWhite;
-		colorOutput.rgbLights[3] = shadeOfWhite;
-		
+//		colorOutput.rgbLights[0] = shadeOfWhite;
+//		colorOutput.rgbLights[1] = shadeOfWhite;
+//		colorOutput.rgbLights[2] = shadeOfWhite;
+//		colorOutput.rgbLights[3] = shadeOfWhite;
+		colorOutput.setAllFrontRGBLEDs(shadeOfWhite);
 		
 		// Return the result
 		return colorOutput;

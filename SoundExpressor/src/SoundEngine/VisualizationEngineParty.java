@@ -34,9 +34,11 @@ import FeatureDetectors.FrequencyRangeFinder;
 import FeatureDetectors.LevelMeter;
 import LightDJGUI.ColorOutputDisplayer;
 import LightDJGUI.ColorOutputDisplayerPanel;
+import LightDJGUI.ColorOutputDisplayerParty;
 import LightDJGUI.CrossfaderKnob;
 import LightDJGUI.LightDJGUI;
 import LightDJGUI.MouseAcceptorPanel;
+import LightDJGUI.PulseKeeper;
 import LightDJGUI.ScrollingSpectrum;
 import LightDJGUI.VisualizerChooser;
 import PartyLightsController.PartyLightsController;
@@ -49,10 +51,15 @@ import SignalGUI.ScrollingChannel;
 import SignalGUI.TextLight;
 import Signals.FFT;
 import Utils.TimerTicToc;
+import Visualizors.Ambiance;
+import Visualizors.DoubleChaser;
+import Visualizors.FireSlider;
+import Visualizors.RGBGradientLinear;
 import Visualizors.RainbowSlider;
 import Visualizors.RedBassColoredClapVisualizer;
 import Visualizors.VUBass;
 import Visualizors.Visualizer;
+import Visualizors.WhiteBlackSlider;
 import Visualizors.WhitePulseBass;
 
 /**
@@ -165,11 +172,14 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		visualizers.add(new VUBass(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new WhitePulseBass(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new RainbowSlider(FFT_SIZE, UPDATES_PER_SECOND));
-		
+		visualizers.add(new WhiteBlackSlider(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new FireSlider(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new DoubleChaser(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new Ambiance(FFT_SIZE, UPDATES_PER_SECOND));
 		//visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;
-		
+		 
 	}
 
 	
@@ -177,21 +187,36 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	@Override
 	protected RenderFrame computeVisualsRendering(FFT fft) {
 		
-		// Create a featurelist, and pass it along with the FFT to each FeatureDetector
+		// Create a featurelist, and pass it al ong with the FFT to each FeatureDetector
 		FeatureList featureList = new FeatureList();
 		double[] frequencies = fft.getFrequencies();
 		double[] magnitudes = fft.getMagnitudes();
 		
 		// Compute all of the features
 		for(FeatureDetector f : featureDetectors) {
-			f.computeFeatures(frequencies, magnitudes, featureList);
+			try {
+				f.computeFeatures(frequencies, magnitudes, featureList);
+			} catch (Exception e) {
+				System.out.println("Error with FeatureDetector!");
+				e.printStackTrace();
+			}
 		}
+		
+		// Add in specially-computed features.
+		featureList.addFeature("PULSE", pulseKeeper.getPulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
+		featureList.addFeature("PULSE_BASS", pulseKeeper.getWavePulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
 		
 		// Now that we have a full-fledged FeatureList, pass it to the Visualizers
 		ColorOutput[] colorOutputs = new ColorOutput[visualizers.size()];
 		for(int i = 0; i < visualizers.size(); i++) {
 			Visualizer v = visualizers.get(i);
-			ColorOutput c = v.visualize(featureList);
+			ColorOutput c = null;
+			try {
+				c = v.visualize(featureList);
+			} catch (Exception e) {
+				System.out.println("Error with Visualizer!");
+				e.printStackTrace();
+			}
 			colorOutputs[i] = c;
 		}
 		
@@ -225,7 +250,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// Send the command to the LED's
 		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
 		
-		
+		renderFrame.finalOutput = colorOutput;
 		
 		// Store the last frame so that it can be rendered appropriately!
 		synchronized(this) {
@@ -256,7 +281,69 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			uvStrobe(colorOutput);
 			break;
 			
+		case POST_PROCESSING_WHITE_BURST:
+			whiteBurst(colorOutput);
+			break;
+			
 		}
+	}
+	
+	
+	protected void shiftRight(ColorOutput colorOutput) {
+		
+		
+		
+		
+	}
+	
+	protected void shiftLeft(ColorOutput colorOutput) {
+		
+	}
+	
+	protected void shiftVisuals(ColorOutput colorOutput, int i) {
+		
+		//int SIZE = (int) ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE;
+		
+		
+		
+		int index = (i % ColorOutput.NUM_FRONT_RGB_PANELS*4);
+		if (index < 0) {
+			index += ColorOutput.NUM_FRONT_RGB_PANELS*4;
+		}
+	
+	
+	}
+	
+	protected Color getShiftColor(ColorOutput colorOutput, int pos, int s) {
+		int i = (int) ((pos + s) % (ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE));
+		
+		
+		return null;
+	}
+	
+	
+	protected void whiteBurst(ColorOutput colorOutput) {
+		// Get the timing parameters
+		long now = System.currentTimeMillis();
+		long delta = (now - effectStartTime);
+		
+		// See if we're done
+		if (delta > WHITE_BURST_TIME) {
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+			return;
+		}
+		
+		// Not done - still fading! Compute how much.
+		double alpha = (double) delta / WHITE_BURST_TIME;
+		
+		for(int light = 0; light < ColorOutput.NUM_RGB_LIGHTS; light++) {
+			colorOutput.rgbLights[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLights[light], alpha);
+		}
+		for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
+			colorOutput.uvLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.uvLights[light];
+			colorOutput.whiteLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.whiteLights[light];
+		}
+		
 	}
 	
 	protected void whiteStrobe(ColorOutput colorOutput) {
@@ -307,7 +394,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected final static int SPECTRUM_WIDTH = 900;
 	protected final static int SPECTRUM_HEIGHT = 200;
 	protected final static int BORDER_SIZE = 10;
-	protected final static int LIGHTBAR_HEIGHT = 200;
+	protected final static int LIGHTBAR_HEIGHT = 300;
 	protected final static int RECORD_CONTROLS_WIDTH = 500;
 	protected final static int RECORD_CONTROLS_HEIGHT = 400;
 	protected final static int RECORD_WIDTH = 400;
@@ -326,8 +413,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static int CROSSFADER_WIDTH;
 	protected static int CROSSFADER_HEIGHT;
 	protected static int CROSSFADER_INDENT = 10;
-	protected static int PLUGIN_THUMBNAIL_WIDTH = 300;
-	protected static int PLUGIN_THUMBNAIL_HEIGHT = 200;
+	protected static int PLUGIN_THUMBNAIL_WIDTH = 550;
+	protected static int PLUGIN_THUMBNAIL_HEIGHT = 100;
+	protected static int PULSE_KEEPER_X = BORDER_SIZE;
+	protected static int PULSE_KEEPER_Y = BORDER_SIZE;
+	protected static int PULSE_KEEPER_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
+	protected static int PULSE_KEEPER_HEIGHT = 100;
 	
 	// Some color information
 	protected static Color PANEL_BACKGROUND_COLOR;
@@ -338,6 +429,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static AlphaComposite COMPOSITE_OPAQUE;
 	protected static Font PANEL_FONT;
 	protected static Font PANEL_FONT_LARGE;
+	protected static Font PULSE_KEEPER_FONT;
 	protected static Stroke REGULAR_STROKE;
 	protected static Stroke THICK_STROKE;
 	
@@ -356,6 +448,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected ColorOutputDisplayer colorOutputDisplayer;
 	protected CrossfaderKnob crossfaderKnob;
 	protected VisualizerChooser visualizerChooser;
+	protected PulseKeeper pulseKeeper;
 	
 	// Keep track of all the elements that can receive mouse events.
 	protected List<MouseAcceptorPanel> mouseAcceptors;
@@ -370,6 +463,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static int activePlugin = 1;	// 0 => Left is selected, 1 => Right is selected
 	protected static double alpha;	// The mixing between the two.
 	protected static boolean controlKeyPressed = false;
+	protected static boolean shiftKeyPressed = false;
 	protected static boolean altKeyPressed = false;
 	
 	// Store the state of the LightDJ
@@ -395,13 +489,22 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		POST_PROCESSING_WHITE_STROBE,	// Ignore the color data and instead white strobe
 		POST_PROCESSING_UV_STROBE,	// Ignore the color data and instead UV strobe
 		POST_PROCESSING_ALL_OFF,	// Turn all lights off temporarily
-		POST_PROCESSING_EMERGENCY_LIGHTING	// Turn on all lights to white
+		POST_PROCESSING_EMERGENCY_LIGHTING,	// Turn on all lights to white
+		POST_PROCESSING_WHITE_BURST,	// Temporarily turn everything to white and then fade back
+		POST_PROCESSING_SHIFT_RIGHT,
+		POST_PROCESSING_SHIFT_LEFT
 	}
 	protected LightDJPostProcessing lightDJPostProcessing;
+	protected long effectStartTime;
 	
 	// Keep track of strobing!
 	protected int strobeFrame = 0;
 	protected int strobeFrameLength = 13;
+	protected long WHITE_BURST_TIME = 500;	// milliseconds
+	protected long SHIFT_SPEED = 50;
+	protected long SHIFT_BLOCK_SIZE = 12;
+	protected long shiftCounter;
+	protected long shiftPosition;
 	
 	public void startGUI() {
 		gui = new LightDJGUI(this);
@@ -427,6 +530,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		COMPOSITE_TRANSLUCENT = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f);
 		PANEL_FONT = new Font("Eraser", Font.PLAIN, 24);
 		PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, 48);
+		PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
 		REGULAR_STROKE = new BasicStroke(1.0f);
 		THICK_STROKE = new BasicStroke(3.0f);
 		alpha = 0.0;
@@ -440,13 +544,16 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 30, 20000, 100.0, BUFFER_SIZE, SAMPLE_RATE);
 		
 		// Choose which color output displayer to use!
-		colorOutputDisplayer = new ColorOutputDisplayerPanel();
+		colorOutputDisplayer = new ColorOutputDisplayerParty(this);
 		
 		// Start the crossfader knob
 		crossfaderKnob = new CrossfaderKnob(this);
 		
 		// Start the visualizer chooser
 		visualizerChooser = new VisualizerChooser(this, visualizers);
+		
+		// Start the pulse keeper
+		pulseKeeper = new PulseKeeper();
 		
 		// Set up the mouse acceptors
 		mouseAcceptors = new LinkedList<MouseAcceptorPanel>();
@@ -667,7 +774,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		for(int pluginIndex = 0; pluginIndex < visualizers.size(); pluginIndex++) {
 			Visualizer v = visualizers.get(pluginIndex);
 			int x = ACTIVE_LAYER_X + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_WIDTH + BORDER_SIZE) * col;
-			int y = ACTIVE_LAYER_Y + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_HEIGHT + BORDER_SIZE) * row;
+			int y = ACTIVE_LAYER_Y + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_HEIGHT + BORDER_SIZE + 30) * row;
 			
 			g2D.setColor(PANEL_BORDER_COLOR);
 			g2D.drawRoundRect(x, y, PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT, 20, 20);
@@ -687,7 +794,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			// Now increment
 			col++;
 			i++;
-			if (col * PLUGIN_THUMBNAIL_WIDTH > ACTIVE_LAYER_WIDTH - 4*BORDER_SIZE) {
+			x = ACTIVE_LAYER_X + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_WIDTH + BORDER_SIZE) * col;
+			if (x + PLUGIN_THUMBNAIL_WIDTH > ACTIVE_LAYER_X + ACTIVE_LAYER_WIDTH - 4*BORDER_SIZE) {
 				col = 0;
 				row++;
 			}
@@ -699,6 +807,29 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 		}
 	
+	}
+	
+	public void paintPulseKeeper() {
+		Graphics2D g2D = (Graphics2D) background.getGraphics();
+		
+		g2D.setColor(Color.BLACK);
+		g2D.fillRect(PULSE_KEEPER_X, PULSE_KEEPER_Y, PULSE_KEEPER_WIDTH, PULSE_KEEPER_HEIGHT);
+		
+		//g2D.setColor(RGBGradientLinear.linearGradient(Color.BLACK, Color.WHITE, ))
+		g2D.setColor(TEXT_COLOR);
+		g2D.setFont(PULSE_KEEPER_FONT);
+		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		
+		double pulse = pulseKeeper.getPulse();
+		int beat = (int) pulse;
+		int subBeat = (int) (100.0 * (pulse - beat));
+		String pulseString = String.format("%d:%d", beat, subBeat);
+		String bpmString = String.format("BPM: %.3f", pulseKeeper.getBPM());
+		
+		g2D.drawString(pulseString, PULSE_KEEPER_X, PULSE_KEEPER_Y + 52);
+		g2D.setFont(PANEL_FONT);
+		g2D.drawString(bpmString, PULSE_KEEPER_X + 10, PULSE_KEEPER_Y + 90);
+		
 	}
 	
 	
@@ -740,17 +871,19 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		int height = gui.getHeight();
 		
 		// Compute the mixed colors
-		ColorOutput mixedColors = mixColors(renderFrame); 
+		ColorOutput outputColors = renderFrame.finalOutput;
 		ColorOutput leftColors = renderFrame.colorOutputs[visualizerLeftIndex];
 		ColorOutput rightColors = renderFrame.colorOutputs[visualizerRightIndex];
 		
-		colorOutputDisplayer.render(mixedColors, g2D, SIDEBAR_WIDTH + BORDER_SIZE, BORDER_SIZE, width - SIDEBAR_WIDTH - 2*BORDER_SIZE, LIGHTBAR_HEIGHT);
+		colorOutputDisplayer.render(outputColors, g2D, SIDEBAR_WIDTH + BORDER_SIZE, BORDER_SIZE, width - SIDEBAR_WIDTH - 2*BORDER_SIZE, LIGHTBAR_HEIGHT);
 		colorOutputDisplayer.render(leftColors, g2D, RECORD_BOX_LEFT_X + BORDER_SIZE, RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		colorOutputDisplayer.render(rightColors, g2D, RECORD_BOX_RIGHT_X + BORDER_SIZE, RECORD_BOX_RIGHT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		
-		
 		// Render the spectrum in the lower left corner
 		spectrumMapper.render();
+		
+		// Render the pulse
+		paintPulseKeeper();
 		
 		Graphics2D g2DGui = (Graphics2D) gui.getGraphics();
 		Graphics2D g2DBuf = (Graphics2D) buffer.getGraphics();
@@ -879,6 +1012,32 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 					alpha = 1.0;
 					paintCrossfader(false);
 				}
+			} else if (keyCode == KeyEvent.VK_DOWN) {
+				// Auto cross-fade to the opposite direction
+				if (alpha > 0.5) {
+					// Cross-fade left
+					if (controlKeyPressed) {
+						startAutoCrossfade(-CROSSFADE_SPEED_SLOW);
+					} else if (altKeyPressed) {
+						startAutoCrossfade(-CROSSFADE_SPEED_FAST);
+					} else {
+						alpha = 0.0;
+						paintCrossfader(false);
+					}
+					
+				} else {
+					// Cross-fade right
+					if (controlKeyPressed) {
+						startAutoCrossfade(CROSSFADE_SPEED_SLOW);
+					} else if (altKeyPressed) {
+						startAutoCrossfade(CROSSFADE_SPEED_FAST);
+					} else {
+						alpha = 1.0;
+						paintCrossfader(false);
+					}
+				}
+				
+				
 			} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
 				 // This is a trigger for all off - turn off all lights!
 				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_ALL_OFF;
@@ -886,6 +1045,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			} else if (keyCode == KeyEvent.VK_F12) {
 				// This is a trigger for white-strobing!
 				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE;
+				
+			} else if (keyCode == KeyEvent.VK_F9){
+				// This is a trigger for white-strobing!
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_UV_STROBE;
+				
 			} else if (keyCode == KeyEvent.VK_ESCAPE) {
 				// Turn emergency lighting on/off
 				if (lightDJPostProcessing == LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING) {
@@ -894,7 +1058,19 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 					lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING;
 				}
 				
-				
+			} else if (keyCode == KeyEvent.VK_SHIFT) {
+				// The shift key is a trigger to start entering the pulse
+				pulseKeeper.startEnteringPulses();
+				shiftKeyPressed = true;
+			} else if (keyCode == KeyEvent.VK_Z) {
+				// If the shift key is being held down, then this is a trigger to enter a pulse.
+				if (shiftKeyPressed) {
+					pulseKeeper.enterPulse();
+				}
+			} else if (keyCode == KeyEvent.VK_F8) {
+				// This is a trigger for a white burst!
+				effectStartTime = System.currentTimeMillis();
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_BURST;
 			}
 			
 			break;
@@ -936,6 +1112,13 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		} else if (keyCode == KeyEvent.VK_F12) {
 			// This was a trigger for white-strobing.
 			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		} else if (keyCode == KeyEvent.VK_F9) {
+			// This was a trigger for white-strobing.
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		} else if (keyCode == KeyEvent.VK_SHIFT) {
+			// The shift key is a trigger to enter the pulse!
+			pulseKeeper.stopEnteringPulses();
+			shiftKeyPressed = false;
 		}
 		
 	}
@@ -967,7 +1150,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						e.printStackTrace();
 					}
 				}
-				System.out.println("Done with automatic crossfade.");
+				// System.out.println("Done with automatic crossfade.");
 			}
 		})).start();
 	}
@@ -999,6 +1182,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		}
 	}
 	
+	public LightDJPostProcessing getPostProcessingMethod() {
+		return lightDJPostProcessing;
+	}
+	
 	
 	
 	
@@ -1008,6 +1195,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 class RenderFrameParty extends RenderFrame {
 
 	ColorOutput[] colorOutputs;
+	
+	ColorOutput finalOutput;
 	
 }
 

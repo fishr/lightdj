@@ -14,6 +14,8 @@ import Common.FeatureList;
 public class RedBassColoredClapVisualizer extends Visualizer {
 
 	protected ColorGenerator rgbController;
+	protected double lastPulse = 0.0;
+	protected int state = 0;
 	
 	@Override
 	public String getName() {
@@ -39,21 +41,35 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		// Retreive any necessary parameters from the FeatureList
 		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
+		double pulse = (Double) featureList.getFeature("PULSE");
 		
 		// Compute a new set of colorings, and store them.
 		ColorOutput colorOutput = new ColorOutput();
 		rgbController.step(clapLevel);
 		
-		//Color g = new Color(128, 0, 64);
+		Color colorBass = new Color((float) bassLevel, 0.0f, 0.0f);
+		Color colorHighs = rgbController.getColor();
 		
-		// Make the first light red in proprotion to the bass
-		colorOutput.rgbLights[0] = new Color((float) bassLevel, 0.0f, 0.0f);
+		// Detect a transition to a new measure
+		if (pulse >= 4.75 && lastPulse < 4.75) {
+			state = (state + 1) % 2;
+		}
+		lastPulse = pulse;
 		
-		// Make the second color a randomized hue, with brightness determined by the clap level.
-		colorOutput.rgbLights[1] = rgbController.getColor();
+		if (state == 0) {
+			// Make the first light red in proprotion to the bass
+			colorOutput.setAllFrontPanels(colorBass, colorHighs, colorBass, colorHighs);
+		} else {
+			// Make the second light red in proprotion to the bass
+			colorOutput.setAllFrontPanels(colorHighs, colorBass, colorHighs, colorBass);
+		}
 		
-		colorOutput.rgbLights[2] = new Color((float) bassLevel, 0.0f, 0.0f);
-		colorOutput.rgbLights[3] = rgbController.getColor();
+		
+		// Set the UV's to the bass level
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
+		
+		// Set the back to the highs
+		colorOutput.setAllRearRGBLEDs(colorHighs);
 		
 		
 		// Return the result

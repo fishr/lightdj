@@ -24,7 +24,7 @@ public class MainClass {
 	private static final boolean USE_CAPTURED_AUDIO = true;
 	private static final boolean AUDIO_PASS_THRU = true;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.430;
+	private static final double INITIAL_VIDEO_DELAY = 0.010;
 
 	
 	public static void main(String[] args) {
@@ -108,7 +108,8 @@ public class MainClass {
 		if (AudioSystem.isLineSupported(info)) {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
-				line.open(format);
+				line.open(format, 40*1024);	// Change the line-in audio buffer size here
+				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");
 				return;

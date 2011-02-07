@@ -85,6 +85,7 @@ public class BassFinder extends FeatureDetector {
 			n++;
 		}
 		
+		//double level = Math.sqrt(sum);
 		double level = sum / n;
 		currentBassLevel = level;
 		recentBassLevels[recentBassIndex] = level;

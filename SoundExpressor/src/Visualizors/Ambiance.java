@@ -11,9 +11,9 @@ import Common.FeatureList;
  * @author Steve Levine0
  *
  */
-public class RainbowSlider extends Visualizer {
+public class Ambiance extends Visualizer {
 
-	protected static double phaseOffsetBase = 0.06;
+	protected static double phaseOffsetBase = 0.01;
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
 	
@@ -21,10 +21,10 @@ public class RainbowSlider extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "Rainbow Slider";
+		return "Ambiance";
 	}
 	
-	public RainbowSlider(int fftSize, double updatesPerSecond) {
+	public Ambiance(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
 	
@@ -55,16 +55,6 @@ public class RainbowSlider extends Visualizer {
 		
 		// Make the first light red in proprotion to the bass
 		Color c0, c1, c2, c3;
-//		colorOutput.rgbLights[0] = Color.getHSBColor((float) (theta - 1.5 * phaseOffset), saturation, brightness);
-//		colorOutput.rgbLights[1] = Color.getHSBColor((float) (theta - 0.5 * phaseOffset), saturation, brightness);
-//		colorOutput.rgbLights[2] = Color.getHSBColor((float) (theta + 0.5 * phaseOffset), saturation, brightness);
-//		colorOutput.rgbLights[3] = Color.getHSBColor((float) (theta + 1.5 * phaseOffset), saturation, brightness);
-//		c0 = Color.getHSBColor((float) (theta - 1.5 * phaseOffset), saturation, brightness);
-//		c1 = Color.getHSBColor((float) (theta - 0.5 * phaseOffset), saturation, brightness);
-//		c2 = Color.getHSBColor((float) (theta + 0.5 * phaseOffset), saturation, brightness);
-//		c3 = Color.getHSBColor((float) (theta + 1.5 * phaseOffset), saturation, brightness);
-//		
-//		colorOutput.setAllFrontPanels(c0, c1, c2, c3);
 		
 		
 		double symLight = -(double) NUM_FRONT_RGB_LIGHTS / 2 - 0.5;
