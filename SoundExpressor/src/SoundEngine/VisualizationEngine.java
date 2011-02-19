@@ -1,5 +1,6 @@
 package SoundEngine;
 
+import java.security.acl.LastOwnerException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -18,8 +19,8 @@ import Signals.FFTEngine;
 public abstract class VisualizationEngine {
 	
 	// Audio buffers
-	protected int BUFFER_SIZE = 2048;
-	protected int BUFFER_OVERLAP = 8;	// Must be a power of 2
+	protected int BUFFER_SIZE = 256;
+	protected int BUFFER_OVERLAP = 1;	// Must be a power of 2
 	protected double[][] buffers;
 	protected int[] bufferCursors;
 	
@@ -28,7 +29,7 @@ public abstract class VisualizationEngine {
 	protected final int BYTES_PER_SAMPLE;
 	protected final long MAX_SAMPLE_VAL;
 	protected final int SAMPLE_RATE;
-	protected final boolean INSTANT_PLAY = false;
+	protected final boolean INSTANT_PLAY = true;
 	
 	// A rendering thread and timing queue to ensure that the visuals are rendered at the proper time as the audio
 	protected VisualizationEngineRenderThread renderTimingThread;
@@ -76,7 +77,7 @@ public abstract class VisualizationEngine {
 		// Set up timing and rendering
 		videoDelayOffset = (long) (1000000000 * videoDelaySec);
 		timeQueue = new LinkedList<RenderFrame>();
-		renderTimingThread = new VisualizationEngineRenderThread(this, timeQueue);
+		renderTimingThread = new VisualizationEngineRenderThread(this, timeQueue, INSTANT_PLAY);
 		
 	}
 	
@@ -88,12 +89,12 @@ public abstract class VisualizationEngine {
 		startTime = System.nanoTime() + (long) (startupDelay * 1000000000.0);
 		frameWidth = (long) ((1.0 * BUFFER_SIZE / SAMPLE_RATE / BUFFER_OVERLAP) * 1000000000.0);
 		
-		if (!INSTANT_PLAY) {
+		//if (!INSTANT_PLAY) {
 			// Start the rendering thread
 			Thread renderThread = new Thread(renderTimingThread);
 			renderThread.start();
 			renderTimingThread.startTime = startTime;
-		}
+		//}
 		
 	}
 	
@@ -155,7 +156,10 @@ public abstract class VisualizationEngine {
 			}
 		} else {
 			// Play this render frame immediately.
-			this.renderVisuals(renderFrame);
+			synchronized(timeQueue) {
+				timeQueue.clear();	// Clear any other junk - only care about the latest!
+				timeQueue.add(renderFrame);
+			}
 		}
 		
 	}
@@ -175,59 +179,94 @@ class VisualizationEngineRenderThread implements Runnable {
 	private Queue<RenderFrame> timeQueue;
 	private VisualizationEngine engine;
 	public long startTime;
+	protected boolean INSTANT_PLAY;
 	
-	public VisualizationEngineRenderThread(VisualizationEngine engine, Queue<RenderFrame> timeQueue) {
+	public VisualizationEngineRenderThread(VisualizationEngine engine, Queue<RenderFrame> timeQueue, boolean INSTANT_PLAY) {
 		this.engine = engine;
 		this.timeQueue = timeQueue;
+		this.INSTANT_PLAY = INSTANT_PLAY;
 	}
 	
 	// Precondition: timeQueue is in order
 	public void run() {
 		
-		// Continually see if it's time to render one of the render frames.
-		RenderFrame frameToRender = null;
-		while(true) {
-			long now = System.nanoTime();
+		// Instant play mode - just send out the last rendered frame
+		if (INSTANT_PLAY) {
 			
-			//System.out.println("*** (" + ((double) (now - startTime) / 1000000)+ ")");
-			frameToRender = null;
-			synchronized(timeQueue) {// Must synchronize, since this is the consumer or a producer-consumer process
-				while(!timeQueue.isEmpty()) {
-					RenderFrame frame = timeQueue.peek();
-					if (frame.timestamp + frame.frameTimeWidth < now) {
-						// This frame occurred in the past; we're running too slowly. 
-						// Just drop this rendering andi move on to the next.
-						//System.out.println("D: " + ((double) (frame.timestamp + frame.frameTimeWidth - startTime) / 1000000));
-						timeQueue.remove();
-						
-					} else if (frame.timestamp <= now) {
-						// It is time to render this frame!
-						frameToRender = frame;
-						timeQueue.remove();
-						//System.out.println("R");
-						break;
-						
-					} else {
-						// This frame must be in the future, so wait.
-						//System.out.println("F");
-						break;
+			while (true) {
+				RenderFrame renderFrame = null;
+				synchronized(timeQueue) {
+					if (timeQueue.size() != 0) {
+						renderFrame = timeQueue.remove();
 					}
 				}
+				
+				// Have anything to render?
+				if (renderFrame != null) {
+					engine.renderVisuals(renderFrame);
+				}
+				
+				// Wait a small amount of time
+				try {
+					Thread.sleep(0, 100000); // 100 uS	
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			
 			}
 			
-			// If necessary, render!
-			if (frameToRender != null) {
-				engine.renderVisuals(frameToRender);
-			}
+		} else { // NOT INSTANT PLAY MODE
 			
-			// Wait a small amount of time
-			try {
-				Thread.sleep(0, 100000); // 100 uS	
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			
+			
+			// Continually see if it's time to render one of the render frames.
+			RenderFrame frameToRender = null;
+			while(true) {
+				long now = System.nanoTime();
+				
+				//System.out.println("*** (" + ((double) (now - startTime) / 1000000)+ ")");
+				frameToRender = null;
+				synchronized(timeQueue) {// Must synchronize, since this is the consumer or a producer-consumer process
+					while(!timeQueue.isEmpty()) {
+						RenderFrame frame = timeQueue.peek();
+						if (frame.timestamp + frame.frameTimeWidth < now) {
+							// This frame occurred in the past; we're running too slowly. 
+							// Just drop this rendering andi move on to the next.
+							//System.out.println("D: " + ((double) (frame.timestamp + frame.frameTimeWidth - startTime) / 1000000));
+							timeQueue.remove();
+							
+						} else if (frame.timestamp <= now) {
+							// It is time to render this frame!
+							frameToRender = frame;
+							timeQueue.remove();
+							//System.out.println("R");
+							break;
+							
+						} else {
+							// This frame must be in the future, so wait.
+							//System.out.println("F");
+							break;
+						}
+					}
+				}
+				
+				// If necessary, render!
+				if (frameToRender != null) {
+					engine.renderVisuals(frameToRender);
+				}
+				
+				// Wait a small amount of time
+				try {
+					Thread.sleep(0, 100000); // 100 uS	
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			
 		}
+		
+
 	}
 	
 	

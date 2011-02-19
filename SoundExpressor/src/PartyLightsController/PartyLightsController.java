@@ -60,7 +60,6 @@ public class PartyLightsController {
 	protected static final int START_REAR_PANEL_INDEX = 8;
 	protected static final int START_UVWHITE_PANEL_INDEX = 16;
 	
-	public static double volume = 1.0;
 	
 	public PartyLightsController() {
 		// Set some defaults
@@ -189,11 +188,11 @@ public class PartyLightsController {
 			}
 			
 			// Wait a bit to let the board catch up - other wise we're slamming it with data!
-			try {
-				Thread.sleep(10);
-			} catch (Exception e) {
-				
-			}
+//			try {
+//				Thread.sleep(10);
+//			} catch (Exception e) {
+//				
+//			}
 			break;
 		
 		}
@@ -486,10 +485,10 @@ public class PartyLightsController {
 	
 	
 	protected void debugPrint(byte[] data) {
-		System.out.println("*****");
-		for(int i = 0; i < data.length; i++) {
-			System.out.println(convertSignedByteToUnsignedInt(data[i]));
-		}
+//		System.out.println("*****");
+//		for(int i = 0; i < data.length; i++) {
+//			System.out.println(convertSignedByteToUnsignedInt(data[i]));
+//		}
 	}
 	
 	protected int convertSignedByteToUnsignedInt(byte b) {
@@ -502,6 +501,7 @@ public class PartyLightsController {
 	
 	
 	protected byte limit(int a) {
+		double volume = 0.50;
 		int val = (int) (volume * a);
 		
 		if (val == 170) {
@@ -511,12 +511,12 @@ public class PartyLightsController {
 		}
 	}
 	
-	protected int getFrontLightIndexFromBoard(int board, int light) {
+	protected int getFrontLightIndexFromBoard(int board, int light) { 
 		return 4*board + light;
 	}
 	
 	protected int getRearLightIndexFromBoard(int board, int light) {
-		return 4*board + light + START_REAR_PANEL_INDEX * 4;
+		return 4*board + light + START_REAR_PANEL_INDEX;
 	}
 	
 	

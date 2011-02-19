@@ -46,13 +46,27 @@ public class LevelMeter extends FeatureDetector {
 		double sum = 0;
 		int n = 0;
 		for(int i = 1; i < frequencies.length; i++) {
-			sum += Math.log(1 + magnitudes[i]);
+			//sum += Math.log(1 + magnitudes[i]);
+			
+			sum += magnitudes[i]*magnitudes[i];
 			n++;
 		}
 		
 		double level = sum / n;
+		normalizingVal = 15.0;
+		phi = 0.8;
 		averagedLevel = averagedLevel * phi + level*(1 - phi);
-		return averagedLevel / normalizingVal;
+		
+		double out = averagedLevel / normalizingVal;
+		
+		// Limit to 0.0 to 1.0
+		if (out < 0.0) {
+			return 0.0;
+		} else if (out > 1.0) {
+			return 1.0;
+		} else {
+			return out;
+		}
 		
 	}
 	

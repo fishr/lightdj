@@ -13,7 +13,7 @@ import Common.FeatureList;
  */
 public class DoubleChaser extends Visualizer {
 
-	protected static int FRAMES_PER_MOVE = 4;
+	protected static int FRAMES_PER_MOVE = 12;
 	
 	
 	// Keep a cyclic gradient for the backpanels
@@ -28,7 +28,7 @@ public class DoubleChaser extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "VU Meter - 1 Panel";
+		return "Double Chaser";
 	}
 	
 	public DoubleChaser(int fftSize, double updatesPerSecond) {
@@ -65,8 +65,10 @@ public class DoubleChaser extends Visualizer {
 		}
 		
 		// Set the appropriate lights
-		colorOutput.setRGBLightFrontOrBack(getPosition(position) % NUM_RGB_LEDS, Color.getHSBColor((float) phase, 1.0f, (float) (0.75*bassLevel + 0.25)));
-		colorOutput.setRGBLightFrontOrBack(getPosition(position + NUM_RGB_LEDS / 2) % NUM_RGB_LEDS, Color.getHSBColor((float) phase + 0.5f, 1.0f, (float) (0.75*bassLevel + 0.25)));
+		double brightness = 1.0; //0.75 * bassLevel + 0.25;
+		
+		colorOutput.setRGBLightFrontOrBack(getPosition(position) % NUM_RGB_LEDS, Color.getHSBColor((float) phase, 1.0f, (float) (brightness)));
+		colorOutput.setRGBLightFrontOrBack(getPosition(position + NUM_RGB_LEDS / 2) % NUM_RGB_LEDS, Color.getHSBColor((float) phase + 0.5f, 1.0f, (float) (brightness)));
 		
 		// Update the color for next time
 		phase += deltaPhase;

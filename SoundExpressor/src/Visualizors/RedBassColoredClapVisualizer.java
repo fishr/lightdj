@@ -51,7 +51,7 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		Color colorHighs = rgbController.getColor();
 		
 		// Detect a transition to a new measure
-		if (pulse >= 4.75 && lastPulse < 4.75) {
+		if (pulse < lastPulse) {
 			state = (state + 1) % 2;
 		}
 		lastPulse = pulse;

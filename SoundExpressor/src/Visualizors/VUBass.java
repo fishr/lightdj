@@ -29,7 +29,7 @@ public class VUBass extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "VU Meter - 1 Panel";
+		return "VU Meter - Giant";
 	}
 	
 	public VUBass(int fftSize, double updatesPerSecond) {
@@ -52,12 +52,13 @@ public class VUBass extends Visualizer {
 		// Retreive any necessary parameters from the FeatureList
 		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
+		double level = (Double) featureList.getFeature("OVERALL_LEVEL");
 		
 		// Compute a new set of colorings, and store them.
 		ColorOutput colorOutput = new ColorOutput();
 		
 		// Make the second color a randomized hue, with brightness determined by the clap level.
-		double bright = 0.7 * bassLevel + 0.3 * clapLevel;  //(System.currentTimeMillis() % 1000) / 1000.0;
+		double bright = level; //0.7 * bassLevel + 0.3 * clapLevel;  //(System.currentTimeMillis() % 1000) / 1000.0;
 		double b0 = 0;
 		double b1 = 0;
 		double b2 = 0;
@@ -123,7 +124,7 @@ public class VUBass extends Visualizer {
 		
 		// If necessary, draw the peak
 		fadeoutCounter++;
-		setMirror(peakPosition, RGBGradientLinear.linearGradient(getVUColor(peakPosition), Color.BLACK, (double) fadeoutCounter / FADEOUT_LENGTH), colorOutput);
+		//setMirror(peakPosition, RGBGradientLinear.linearGradient(getVUColor(peakPosition), Color.BLACK, (double) fadeoutCounter / FADEOUT_LENGTH), colorOutput);
 		
 		// Set the back colors
 		colorOutput.setAllRearRGBLEDs(colorGradient.computeGradient(phase));

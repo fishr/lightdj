@@ -32,7 +32,7 @@ public class ClapFinder extends FeatureDetector  {
 	@Override
 	public void init() {
 		
-		minFreq = 1000;
+		minFreq = 8000;
 		maxFreq = 16000;
 		normalizingVal = 0.1;
 		averageHalfLife = 0.125;

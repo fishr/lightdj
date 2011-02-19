@@ -32,7 +32,7 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 	
 	protected static int NUM_STROBE_LIGHTS = 7;
 	protected static int NUM_UV_LIGHTS = 7;
-	protected static int NUM_RGB_LIGHTS = (int) (LIGHTS_PER_RGB_PANEL * (NUM_FRONT_RGB_PANELS + NUM_REAR_RGB_PANELS));
+	protected static int NUM_RGB_LIGHTS = ColorOutput.NUM_RGB_LIGHTS;
 	
 	protected static int REAR_START_RGB_INDEX = 32;
 	

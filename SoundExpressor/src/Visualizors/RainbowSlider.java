@@ -21,7 +21,7 @@ public class RainbowSlider extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "Rainbow Slider";
+		return "Double Rainbow";
 	}
 	
 	public RainbowSlider(int fftSize, double updatesPerSecond) {

@@ -22,7 +22,7 @@ public class FireSlider extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "White/Black Slider";
+		return "Fire Slider";
 	}
 	
 	public FireSlider(int fftSize, double updatesPerSecond) {

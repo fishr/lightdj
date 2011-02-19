@@ -249,7 +249,6 @@ public class ColorOutput {
 	}
 	
 	public void setRearRGBLight(int i, Color c) {
-		System.out.println(": " + i);
 
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
@@ -305,10 +304,12 @@ public class ColorOutput {
 	public static ColorOutput mix(ColorOutput c1, ColorOutput c2, double alpha) {
 		ColorOutput out = new ColorOutput();
 		
-		if (alpha < 0.0) {
+		if (alpha < 0.01) {
 			alpha = 0.0;
-		} else if (alpha > 1.0) {
+			return c1;
+		} else if (alpha > 0.99) {
 			alpha = 1.0;
+			return c2;
 		}
 		
 		// Mix RGB lights

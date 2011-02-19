@@ -22,9 +22,9 @@ public class MainClass {
 	private static final int AUDIO_READ_BUFFER_SIZE = 1024;
 	private static final int SAMPLE_RATE = 44100;
 	private static final boolean USE_CAPTURED_AUDIO = true;
-	private static final boolean AUDIO_PASS_THRU = true;
+	private static final boolean AUDIO_PASS_THRU = false;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.010;
+	private static final double INITIAL_VIDEO_DELAY = 0.005;
 
 	
 	public static void main(String[] args) {
@@ -108,7 +108,8 @@ public class MainClass {
 		if (AudioSystem.isLineSupported(info)) {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
-				line.open(format, 40*1024);	// Change the line-in audio buffer size here
+				//line.open(format);
+				line.open(format, 2*1024);	// Change the line-in audio buffer size here
 				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");
@@ -122,6 +123,18 @@ public class MainClass {
 	
 		// Sound visualization engine
 		SoundVisualizer engine = new SoundVisualizer(format, AUDIO_PASS_THRU, INITIAL_AUDIO_DELAY, INITIAL_VIDEO_DELAY, AUDIO_READ_BUFFER_SIZE);
+		
+		//Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		
+//		try {
+//			Thread.sleep(1000);
+//		} catch (Exception e) {
+//			
+//		}
+		
+		
+		
+		
 		
 		// Start reading data from it!
 		int bytesToRead = AUDIO_READ_BUFFER_SIZE;

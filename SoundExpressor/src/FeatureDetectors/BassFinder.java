@@ -37,11 +37,11 @@ public class BassFinder extends FeatureDetector {
 	@Override
 	public void init() {
 		// Initialize some parameters
-		minFreq = 20;
-		maxFreq = 80;
+		minFreq = 0;
+		maxFreq = 120;
 		normalizingVal = 30.0;
 		averageHalfLife = 0.1;
-		decayRate = 1.0 / (50);
+		decayRate = 1.0 / (30);
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		recentBassIndex = 0;
 		recentBassLevels = new double[NUM_RECENT_BASS_VALS];
