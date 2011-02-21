@@ -68,6 +68,8 @@ public class WhiteBlackSlider extends Visualizer {
 		if (theta > 1.0) {theta--;}
 		if (theta < 0.0) {theta++;}
 		
+		// Set the UV's to the bass level
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
 		
 		// Return the result
 		return colorOutput;

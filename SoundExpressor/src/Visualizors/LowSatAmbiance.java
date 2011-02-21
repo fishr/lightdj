@@ -11,7 +11,7 @@ import Common.FeatureList;
  * @author Steve Levine0
  *
  */
-public class Ambiance extends Visualizer {
+public class LowSatAmbiance extends Visualizer {
 
 	protected static double phaseOffsetBase = 0.01;
 	protected static double deltaOmega = -0.001;
@@ -21,10 +21,10 @@ public class Ambiance extends Visualizer {
 	
 	@Override
 	public String getName() {
-		return "Ambiance";
+		return "Low-Sat Ambiance";
 	}
 	
-	public Ambiance(int fftSize, double updatesPerSecond) {
+	public LowSatAmbiance(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
 	
@@ -50,8 +50,8 @@ public class Ambiance extends Visualizer {
 		ColorOutput colorOutput = new ColorOutput();
 		
 		double phaseOffset = phaseOffsetBase;// * (1 - bassLevel);
-		float brightness = 1.0f; //(float) (1 - bassLevel); //1.0f; //(float) (0.75 + 0.25 * bassLevel);
-		float saturation = 1.0f; //(float) (1.0 - 0.5 * bassLevel);
+		float brightness = 0.1f; //(float) (1 - bassLevel); //1.0f; //(float) (0.75 + 0.25 * bassLevel);
+		float saturation = 0.6f; //(float) (1.0 - 0.5 * bassLevel);
 		
 		// Make the first light red in proprotion to the bass
 		Color c0, c1, c2, c3;

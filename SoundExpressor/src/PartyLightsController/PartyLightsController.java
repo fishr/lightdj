@@ -60,6 +60,11 @@ public class PartyLightsController {
 	protected static final int START_REAR_PANEL_INDEX = 8;
 	protected static final int START_UVWHITE_PANEL_INDEX = 16;
 	
+	public enum LightPlacement {
+		PLACEMENT_FRONT,
+		PLACEMENT_REAR,
+		PLACEMENT_STROBES
+	}
 	
 	public PartyLightsController() {
 		// Set some defaults
@@ -211,24 +216,24 @@ public class PartyLightsController {
 			data[cursor + 1] = (byte) board;
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 0)];
-			data[cursor + 2] = limit(c.getRed());
-			data[cursor + 3] = limit(c.getGreen());
-			data[cursor + 4] = limit(c.getBlue());
+			data[cursor + 2] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 3] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 4] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 1)];
-			data[cursor + 5] = limit(c.getRed());
-			data[cursor + 6] = limit(c.getGreen());
-			data[cursor + 7] = limit(c.getBlue());
+			data[cursor + 5] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 6] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 7] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 2)];
-			data[cursor + 8] = limit(c.getRed());
-			data[cursor + 9] = limit(c.getGreen());
-			data[cursor + 10] = limit(c.getBlue());
+			data[cursor + 8] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 9] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 10] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 3)];
-			data[cursor + 11] = limit(c.getRed());
-			data[cursor + 12] = limit(c.getGreen());
-			data[cursor + 13] = limit(c.getBlue());
+			data[cursor + 11] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 12] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
+			data[cursor + 13] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
 
 			
 			cursor += LENGTH_FRONT_RGB_INDIV_PACKET;
@@ -248,9 +253,9 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_FRONT_LEDS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_FRONT_LEDS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLights[0].getRed());
-		output[3] = (byte) limit(colorOutput.rgbLights[0].getGreen());
-		output[4] = (byte) limit(colorOutput.rgbLights[0].getBlue());
+		output[2] = (byte) limit(colorOutput.rgbLights[0].getRed(), LightPlacement.PLACEMENT_FRONT);
+		output[3] = (byte) limit(colorOutput.rgbLights[0].getGreen(), LightPlacement.PLACEMENT_FRONT);
+		output[4] = (byte) limit(colorOutput.rgbLights[0].getBlue(), LightPlacement.PLACEMENT_FRONT);
 		
 		debugPrint(output);
 		try {
@@ -264,18 +269,18 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_FRONT_PANELS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_FRONT_PANELS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLights[0].getRed());
-		output[3] = (byte) limit(colorOutput.rgbLights[0].getGreen());
-		output[4] = (byte) limit(colorOutput.rgbLights[0].getBlue());
-		output[5] = (byte) limit(colorOutput.rgbLights[1].getRed());
-		output[6] = (byte) limit(colorOutput.rgbLights[1].getGreen());
-		output[7] = (byte) limit(colorOutput.rgbLights[1].getBlue());
-		output[8] = (byte) limit(colorOutput.rgbLights[2].getRed());
-		output[9] = (byte) limit(colorOutput.rgbLights[2].getGreen());
-		output[10] = (byte) limit(colorOutput.rgbLights[2].getBlue());
-		output[11] = (byte) limit(colorOutput.rgbLights[3].getRed());
-		output[12] = (byte) limit(colorOutput.rgbLights[3].getGreen());
-		output[13] = (byte) limit(colorOutput.rgbLights[3].getBlue());
+		output[2] = (byte) limit(colorOutput.rgbLights[0].getRed(), LightPlacement.PLACEMENT_FRONT);
+		output[3] = (byte) limit(colorOutput.rgbLights[0].getGreen(), LightPlacement.PLACEMENT_FRONT);
+		output[4] = (byte) limit(colorOutput.rgbLights[0].getBlue(), LightPlacement.PLACEMENT_FRONT);
+		output[5] = (byte) limit(colorOutput.rgbLights[1].getRed(), LightPlacement.PLACEMENT_FRONT);
+		output[6] = (byte) limit(colorOutput.rgbLights[1].getGreen(), LightPlacement.PLACEMENT_FRONT);
+		output[7] = (byte) limit(colorOutput.rgbLights[1].getBlue(), LightPlacement.PLACEMENT_FRONT);
+		output[8] = (byte) limit(colorOutput.rgbLights[2].getRed(), LightPlacement.PLACEMENT_FRONT);
+		output[9] = (byte) limit(colorOutput.rgbLights[2].getGreen(), LightPlacement.PLACEMENT_FRONT);
+		output[10] = (byte) limit(colorOutput.rgbLights[2].getBlue(), LightPlacement.PLACEMENT_FRONT);
+		output[11] = (byte) limit(colorOutput.rgbLights[3].getRed(), LightPlacement.PLACEMENT_FRONT);
+		output[12] = (byte) limit(colorOutput.rgbLights[3].getGreen(), LightPlacement.PLACEMENT_FRONT);
+		output[13] = (byte) limit(colorOutput.rgbLights[3].getBlue(), LightPlacement.PLACEMENT_FRONT);
 		
 		debugPrint(output);
 		try {
@@ -297,24 +302,24 @@ public class PartyLightsController {
 			data[cursor + 1] = (byte) (board + START_REAR_PANEL_INDEX);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 0)];
-			data[cursor + 2] = limit(c.getRed());
-			data[cursor + 3] = limit(c.getGreen());
-			data[cursor + 4] = limit(c.getBlue());
+			data[cursor + 2] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 3] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 4] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 1)];
-			data[cursor + 5] = limit(c.getRed());
-			data[cursor + 6] = limit(c.getGreen());
-			data[cursor + 7] = limit(c.getBlue());
+			data[cursor + 5] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 6] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 7] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 2)];
-			data[cursor + 8] = limit(c.getRed());
-			data[cursor + 9] = limit(c.getGreen());
-			data[cursor + 10] = limit(c.getBlue());
+			data[cursor + 8] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 9] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 10] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
 			
 			c = colorOutput.rgbLights[getFrontLightIndexFromBoard(board, 3)];
-			data[cursor + 11] = limit(c.getRed());
-			data[cursor + 12] = limit(c.getGreen());
-			data[cursor + 13] = limit(c.getBlue());
+			data[cursor + 11] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 12] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
+			data[cursor + 13] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
 
 			
 			cursor += LENGTH_REAR_RGB_INDIV_PACKET;
@@ -334,9 +339,9 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_REAR_LEDS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_REAR_LEDS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getRed());
-		output[3] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getGreen());
-		output[4] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getBlue());
+		output[2] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getRed(), LightPlacement.PLACEMENT_REAR);
+		output[3] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getGreen(), LightPlacement.PLACEMENT_REAR);
+		output[4] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4].getBlue(), LightPlacement.PLACEMENT_REAR);
 		
 		debugPrint(output);
 		try {
@@ -351,18 +356,18 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_REAR_PANELS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_REAR_PANELS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getRed());
-		output[3] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getGreen());
-		output[4] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getBlue());
-		output[5] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getRed());
-		output[6] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getGreen());
-		output[7] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getBlue());
-		output[8] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getRed());
-		output[9] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getGreen());
-		output[10] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getBlue());
-		output[11] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getRed());
-		output[12] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getGreen());
-		output[13] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getBlue());
+		output[2] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getRed(), LightPlacement.PLACEMENT_REAR);
+		output[3] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getGreen(), LightPlacement.PLACEMENT_REAR);
+		output[4] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 0].getBlue(), LightPlacement.PLACEMENT_REAR);
+		output[5] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getRed(), LightPlacement.PLACEMENT_REAR);
+		output[6] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getGreen(), LightPlacement.PLACEMENT_REAR);
+		output[7] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 1].getBlue(), LightPlacement.PLACEMENT_REAR);
+		output[8] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getRed(), LightPlacement.PLACEMENT_REAR);
+		output[9] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getGreen(), LightPlacement.PLACEMENT_REAR);
+		output[10] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 2].getBlue(), LightPlacement.PLACEMENT_REAR);
+		output[11] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getRed(), LightPlacement.PLACEMENT_REAR);
+		output[12] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getGreen(), LightPlacement.PLACEMENT_REAR);
+		output[13] = (byte) limit(colorOutput.rgbLights[START_REAR_PANEL_INDEX*4 + 3].getBlue(), LightPlacement.PLACEMENT_REAR);
 		
 		debugPrint(output);
 		try {
@@ -376,7 +381,7 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_WHITE_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_WHITES;
-		output[2] = (byte) limit((int) (256.0*colorOutput.whiteLights[0]));
+		output[2] = (byte) limit((int) (256.0*colorOutput.whiteLights[0]), LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -391,7 +396,7 @@ public class PartyLightsController {
 		byte[] output = new byte[LENGTH_UV_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_UVS;
-		output[2] = (byte) limit((int) (256.0*colorOutput.uvLights[0]));
+		output[2] = (byte) limit((int) (256.0*colorOutput.uvLights[0]), LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -411,10 +416,10 @@ public class PartyLightsController {
 			
 			data[cursor] = (byte) SPECIAL_SYNC_BYTE;
 			data[cursor + 1] = (byte) (board + START_UVWHITE_PANEL_INDEX);
-			data[cursor + 2] = (byte) limit((int) (256.0 * colorOutput.uvLights[board]));
-			data[cursor + 3] = (byte) limit((int) (256.0 * colorOutput.whiteLights[board]));
+			data[cursor + 2] = (byte) limit((int) (256.0 * colorOutput.uvLights[board]), LightPlacement.PLACEMENT_STROBES);
+			data[cursor + 3] = (byte) limit((int) (256.0 * colorOutput.whiteLights[board]), LightPlacement.PLACEMENT_STROBES);
 			
-			cursor += LENGTH_REAR_RGB_INDIV_PACKET;
+			cursor += LENGTH_UVWHITE_INDIV_PACKET;
 			
 		}
 		
@@ -500,9 +505,32 @@ public class PartyLightsController {
 	}
 	
 	
-	protected byte limit(int a) {
-		double volume = 0.50;
-		int val = (int) (volume * a);
+	protected byte limit(int a, LightPlacement placement) {
+		// Placement: 0 => front
+		//            1 => rear
+		//            2 => white, uv strobes
+		
+		double overallVolume = 0.5;
+		double frontVolume = 0.5;
+		double rearVolume = 0.10;
+		double strobeVolume = 1.0;
+		int val = 0;
+		
+		switch(placement) {
+		case PLACEMENT_FRONT:
+			val = (int) (overallVolume * frontVolume * a);
+			break;
+			
+		case PLACEMENT_REAR:
+			val = (int) (overallVolume * rearVolume * a);
+			break;
+			
+		case PLACEMENT_STROBES:
+			val = (int) (overallVolume * strobeVolume * a);
+			break;
+		}
+		
+
 		
 		if (val == 170) {
 			return (byte) 171 ;

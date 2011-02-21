@@ -53,7 +53,7 @@ public class LevelMeter extends FeatureDetector {
 		}
 		
 		double level = sum / n;
-		normalizingVal = 15.0;
+		normalizingVal = 60.0;
 		phi = 0.8;
 		averagedLevel = averagedLevel * phi + level*(1 - phi);
 		

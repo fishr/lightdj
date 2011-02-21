@@ -129,6 +129,9 @@ public class VUBass extends Visualizer {
 		// Set the back colors
 		colorOutput.setAllRearRGBLEDs(colorGradient.computeGradient(phase));
 		
+		// Set the UV's to the bass
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
+		
 		phase += deltaPhase;
 		if (phase > 1) {
 			phase--;

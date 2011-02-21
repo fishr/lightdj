@@ -55,6 +55,9 @@ public class WhitePulseBass extends Visualizer {
 		colorOutput.setAllFrontRGBLEDs(shadeOfWhite);
 		colorOutput.setAllRearRGBLEDs(shadeOfRed);
 		
+		// Set the UV's to the bass
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
+		
 		// Return the result
 		return colorOutput;
 	}

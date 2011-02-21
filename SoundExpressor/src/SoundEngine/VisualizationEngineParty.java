@@ -52,9 +52,12 @@ import SignalGUI.TextLight;
 import Signals.FFT;
 import Utils.TimerTicToc;
 import Visualizors.Ambiance;
+import Visualizors.Black;
+import Visualizors.BlockShifter;
 import Visualizors.DoubleChaser;
 import Visualizors.FingerPiano;
 import Visualizors.FireSlider;
+import Visualizors.LowSatAmbiance;
 import Visualizors.RGBGradientLinear;
 import Visualizors.RainbowSlider;
 import Visualizors.RedBassColoredClapVisualizer;
@@ -180,6 +183,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		visualizers.add(new Ambiance(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new UVBass(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new FingerPiano(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new LowSatAmbiance(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new Black(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new BlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
 		//visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;
@@ -304,6 +310,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			whiteBurst(colorOutput);
 			break;
 			
+		case POST_PROCESSING_WHITE_BURST_WITH_STROBES:
+			whiteBurstWithStrobe(colorOutput);
+			break;
+			
 		case POST_PROCESSING_SHIFT_LEFT:
 			shiftLeft(colorOutput);
 			break;
@@ -313,8 +323,37 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			break;
 			
 		case POST_PROCESSING_STROBE_SCATTER:
-			//scatterStrobe(colorOutput);
+			scatterStrobe(colorOutput);
 			break;
+			
+		case POST_PROCESSING_HUE_SHIFT:
+			hueShift(colorOutput);
+			break;
+			
+		}
+	}
+	
+	protected void hueShift(ColorOutput colorOutput) {
+		long now = System.currentTimeMillis();
+		
+		double delta = (now - effectStartTime);
+		
+		if (delta / HUE_SHIFT_TIME > 1.0) {
+			// It's done!
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		} else {
+			float shift = (float) (0.5 + 0.5 * delta / HUE_SHIFT_TIME);
+			
+			for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
+				Color c = colorOutput.rgbLights[light];
+				float[] hsb = new float[3];
+				Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
+				
+				colorOutput.rgbLights[light] = Color.getHSBColor(hsb[0] + shift, hsb[1], hsb[2]);
+				
+			}
+			
+			
 			
 		}
 	}
@@ -322,9 +361,30 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected void scatterStrobe(ColorOutput colorOutput) {
 		boolean allOff = true;
 		
-		for(int strobe = 0; strobe < ColorOutput.NUM_STROBE_LIGHTS; strobe++) {
+		long now = System.currentTimeMillis();
+		
+		for(int strobe = 0; strobe < ColorOutput.NUM_UVWHITE_PANELS; strobe++) {
+			double uv = colorOutput.uvLights[strobe];	// Preserve the UV value - just modify the strobe
+			double delta = (now - scatterStrobes[strobe]);
+			double white;
+			
+			if (delta > scatterTimeLength) {
+				white = 0.0;
+			} else {
+				white = 1.0 - delta / scatterTimeLength;
+				allOff = false;
+			}
+			
+			
+			colorOutput.setUVWhitePanel(strobe, uv, white);
 			
 		}
+		
+		// Are we done yet?
+		if (allOff) {
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		}
+		
 	}
 	
 	
@@ -407,13 +467,36 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// Not done - still fading! Compute how much.
 		double alpha = (double) delta / WHITE_BURST_TIME;
 		
-		for(int light = 0; light < ColorOutput.NUM_RGB_LIGHTS; light++) {
+		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
 			colorOutput.rgbLights[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLights[light], alpha);
 		}
+
+	}
+	
+	
+	protected void whiteBurstWithStrobe(ColorOutput colorOutput) {
+		// Get the timing parameters
+		long now = System.currentTimeMillis();
+		long delta = (now - effectStartTime);
+		
+		// See if we're done
+		if (delta > WHITE_BURST_TIME) {
+			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+			return;
+		}
+		
+		// Not done - still fading! Compute how much.
+		double alpha = (double) delta / WHITE_BURST_TIME;
+		
+		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
+			colorOutput.rgbLights[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLights[light], alpha);
+		}
+
 		for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
 			colorOutput.uvLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.uvLights[light];
 			colorOutput.whiteLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.whiteLights[light];
 		}
+		
 		
 	}
 	
@@ -572,12 +655,14 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		POST_PROCESSING_UV_STROBE,	// Ignore the color data and instead UV strobe
 		POST_PROCESSING_ALL_OFF,	// Turn all lights off temporarily
 		POST_PROCESSING_EMERGENCY_LIGHTING,	// Turn on all lights to white
-		POST_PROCESSING_WHITE_BURST,	// Temporarily turn everything to white and then fade back
-		POST_PROCESSING_SHIFT_RIGHT,
-		POST_PROCESSING_SHIFT_LEFT,
-		POST_PROCESSING_STROBE_SCATTER,
+		POST_PROCESSING_WHITE_BURST,	// Temporarily turn everything to white and then fade back (no white LED's)
+		POST_PROCESSING_WHITE_BURST_WITH_STROBES,	// Same as above, but with white LED's
+		POST_PROCESSING_SHIFT_RIGHT,	// Shift the whole plugin right
+		POST_PROCESSING_SHIFT_LEFT,		// Shift the whole plugin left
+		POST_PROCESSING_STROBE_SCATTER,	// Pick a random strobe and power it
+		POST_PROCESSING_HUE_SHIFT,		// Reverse the hue on all the colors, and fade back into the regular hue
 	}
-	protected LightDJPostProcessing lightDJPostProcessing;
+	protected LightDJPostProcessing lightDJPostProcessing; 
 	protected long effectStartTime;
 	
 	//  Values and constants associated with post-processing effects
@@ -588,7 +673,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// White burst
 	protected long WHITE_BURST_TIME = 500;	// milliseconds
 	
-	// Shifting
+	// Shifting/
 	protected int SHIFT_SPEED = 1;
 	protected int SHIFT_BLOCK_SIZE = 24;
 	protected int shiftCounter;
@@ -596,8 +681,13 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	
 	// Scatter strobing
-	protected float[] scatterStrobes;
-	protected double scatterDecayRate = 0.05;
+	protected long[] scatterStrobes = new long[ColorOutput.NUM_UVWHITE_PANELS];
+	protected long scatterTimeLength = 100;	// in milliseconds
+	protected int lastScatterStrobe = -1;
+	
+	
+	// Hue shifting
+	protected long HUE_SHIFT_TIME = 750;	// milliseconds
 	
 	
 	// TODO
@@ -739,8 +829,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		loadVisualizerPlugin(false, visualizerRightIndex);
 		
 		// Resize where the scrolling spectrum goes
-		spectrumMapper.move(SIDEBAR_WIDTH + BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
-		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
+		//spectrumMapper.move(SIDEBAR_WIDTH + BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
+		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE - 150, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
 		spectrumMapper.setGraphics((Graphics2D) background.getGraphics());
 		
 		// Make sure the visualizer chooser is set up correctly
@@ -877,7 +967,6 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 			g2D.setColor(PANEL_BORDER_COLOR);
 			g2D.drawRoundRect(x, y, PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT, 20, 20);
-			
 			
 			g2D.setFont(PANEL_FONT);
 			g2D.setColor(TEXT_COLOR);
@@ -1166,10 +1255,15 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				if (shiftKeyPressed) {
 					pulseKeeper.enterPulse();
 				}
-			} else if (keyCode == KeyEvent.VK_F8) {
+			} else if (keyCode == KeyEvent.VK_F8 || keyCode == KeyEvent.VK_ENTER) {
 				// This is a trigger for a white burst!
 				effectStartTime = System.currentTimeMillis();
 				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_BURST;
+			} else if (keyCode == KeyEvent.VK_F5) {
+				// Triggers a bigger white burst!
+				effectStartTime = System.currentTimeMillis();
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_BURST_WITH_STROBES;
+				
 			} else if (keyCode == KeyEvent.VK_F10) {
 				// Key trigger for shift right!
 				shiftPosition = 0;
@@ -1177,10 +1271,31 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_SHIFT_RIGHT;
 				
 			} else if (keyCode == KeyEvent.VK_F9) {
-				// Key trigger for shift right!
+				// Key trigger for shift right!]
 				shiftPosition = ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE;
 				shiftCounter = 0;
 				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_SHIFT_LEFT;
+				
+			} else if (keyCode == KeyEvent.VK_OPEN_BRACKET || keyCode == KeyEvent.VK_CLOSE_BRACKET) {
+				// Key trigger for scatter strobing
+				// Select a random strobe that wasn't the one selected last time and put it up full brightness
+				int strobe = (int) (ColorOutput.NUM_UVWHITE_PANELS * Math.random());
+				while (strobe == lastScatterStrobe) {
+					strobe = (int) (ColorOutput.NUM_UVWHITE_PANELS * Math.random()); // Select a new strobe - not the one from last time
+				}
+				lastScatterStrobe = strobe;
+				
+				// Turn that strobe on full-power
+				scatterStrobes[strobe] = System.currentTimeMillis();
+				
+				
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_STROBE_SCATTER;
+				
+			} else if (keyCode == KeyEvent.VK_F7) {
+				// A key trigger for hue shifting
+				effectStartTime = System.currentTimeMillis();
+				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_HUE_SHIFT;
+				
 				
 			} else if (keyCode == KeyEvent.VK_A) {
 				aKeyPressed = 1.0;

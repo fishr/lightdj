@@ -42,6 +42,7 @@ public class FingerPiano extends Visualizer {
 	public ColorOutput visualize(FeatureList featureList) {
 		
 		// Retreive any necessary parameters from the FeatureList
+		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
 		double s = (Double) featureList.getFeature("KEY_S");
 		double d = (Double) featureList.getFeature("KEY_D");
 		double f = (Double) featureList.getFeature("KEY_F");
@@ -124,6 +125,8 @@ public class FingerPiano extends Visualizer {
 		if (theta > 1.0) {theta--;}
 		if (theta < 0.0) {theta++;}
 		
+		// Set the UV's to the bass
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
 		
 		// Return the result
 		return colorOutput;

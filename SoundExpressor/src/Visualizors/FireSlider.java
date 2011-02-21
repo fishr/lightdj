@@ -71,6 +71,8 @@ public class FireSlider extends Visualizer {
 		// Set the back to the fire color
 		colorOutput.setAllRearRGBLEDs(gradient.computeGradient(theta));
 		
+		// Set the UV's to the bass
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
 		
 		// Return the result
 		return colorOutput;

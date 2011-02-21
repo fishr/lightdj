@@ -76,6 +76,9 @@ public class DoubleChaser extends Visualizer {
 			phase--;
 		}
 		
+		// Set the UV's to the bass
+		colorOutput.setAllUVWhites(bassLevel, 0.0);
+		
 		// Return the result
 		return colorOutput;
 	}

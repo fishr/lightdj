@@ -23,7 +23,6 @@ public class ColorOutput {
 	protected static final int START_REAR_LIGHT_ADDRESSES = 32;
 	protected static final int START_REAR_PANEL_ADDRESSES = 8;
 	
-	
 	public Color[] rgbLights;
 	public double[] whiteLights;
 	public double[] uvLights;
