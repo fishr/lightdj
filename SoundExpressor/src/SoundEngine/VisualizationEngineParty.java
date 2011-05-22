@@ -52,11 +52,13 @@ import SignalGUI.TextLight;
 import Signals.FFT;
 import Utils.TimerTicToc;
 import Visualizors.Ambiance;
+import Visualizors.AutoBlockShifter;
 import Visualizors.Black;
 import Visualizors.BlockShifter;
 import Visualizors.DoubleChaser;
 import Visualizors.FingerPiano;
 import Visualizors.FireSlider;
+import Visualizors.HueBass;
 import Visualizors.LowSatAmbiance;
 import Visualizors.RGBGradientLinear;
 import Visualizors.RainbowSlider;
@@ -186,6 +188,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		visualizers.add(new LowSatAmbiance(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new Black(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new BlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new HueBass(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new AutoBlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
 		//visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;

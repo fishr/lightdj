@@ -510,7 +510,7 @@ public class PartyLightsController {
 		//            1 => rear
 		//            2 => white, uv strobes
 		
-		double overallVolume = 0.5;
+		double overallVolume = 0.3;
 		double frontVolume = 0.5;
 		double rearVolume = 0.10;
 		double strobeVolume = 1.0;
