@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -349,11 +350,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			float shift = (float) (0.5 + 0.5 * delta / HUE_SHIFT_TIME);
 			
 			for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-				Color c = colorOutput.rgbLights[light];
+				Color c = colorOutput.rgbLightsFront[light];
 				float[] hsb = new float[3];
 				Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
 				
-				colorOutput.rgbLights[light] = Color.getHSBColor(hsb[0] + shift, hsb[1], hsb[2]);
+				colorOutput.rgbLightsFront[light] = Color.getHSBColor(hsb[0] + shift, hsb[1], hsb[2]);
 				
 			}
 			
@@ -452,7 +453,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		if (i >= ColorOutput.NUM_FRONT_RGB_PANELS*4) {
 			return Color.BLACK;
 		} else {
-			return colorOutput.rgbLights[i];
+			return colorOutput.rgbLightsFront[i];
 		}
 	}
 	
@@ -472,7 +473,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		double alpha = (double) delta / WHITE_BURST_TIME;
 		
 		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-			colorOutput.rgbLights[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLights[light], alpha);
+			colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
 		}
 
 	}
@@ -493,7 +494,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		double alpha = (double) delta / WHITE_BURST_TIME;
 		
 		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-			colorOutput.rgbLights[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLights[light], alpha);
+			colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
 		}
 
 		for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
@@ -721,9 +722,25 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		HOT_COLOR = new Color(200, 114, 0);
 		COMPOSITE_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
 		COMPOSITE_TRANSLUCENT = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f);
-		PANEL_FONT = new Font("Eraser", Font.PLAIN, 24);
-		PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, 48);
-		PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
+		
+		// Attempt to load custom fancy-looking fonts from the Fonts/ directory. If that doesn't work,
+		// try to use ones that may be installed (which may result in completely different fonts)
+		try {
+			Font eraser = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/Eraser.ttf"));
+			PANEL_FONT = eraser.deriveFont(24.0f);
+			PANEL_FONT_LARGE = eraser.deriveFont(48.0f);
+			
+			Font nimbus = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/LiberationMono-Bold.ttf"));
+			PULSE_KEEPER_FONT = nimbus.deriveFont(72.0f);
+			
+		} catch (Exception e) {
+			System.out.println("Error: Could not load custom fonts from the Fonts/ directory!");
+			PANEL_FONT = new Font("Eraser", Font.PLAIN, 24);
+			PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, 48);
+			PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
+			e.printStackTrace();
+		}
+		
 		REGULAR_STROKE = new BasicStroke(1.0f);
 		THICK_STROKE = new BasicStroke(3.0f);
 		alpha = 0.0;
@@ -754,12 +771,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		mouseAcceptors.add(visualizerChooser);
 		mouseAcceptors.add(crossfaderKnob);
 		
-		
-		
 		// Generate the background
 		generateBackground();
 	
-		
 		// Start a tast to render regularly!
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(new RenderTask(this), 0, 50);
@@ -834,7 +848,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		// Resize where the scrolling spectrum goes
 		//spectrumMapper.move(SIDEBAR_WIDTH + BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
-		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE - 150, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
+		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
 		spectrumMapper.setGraphics((Graphics2D) background.getGraphics());
 		
 		// Make sure the visualizer chooser is set up correctly

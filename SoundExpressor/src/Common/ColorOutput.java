@@ -12,18 +12,22 @@ import Visualizors.RGBGradientLinear;
 public class ColorOutput {
 	
 	// Change these to match the number of lights in the system
-	public static final int NUM_RGB_LIGHTS = 64;
-	public static final int NUM_STROBE_LIGHTS = 8;
-	public static final int NUM_UV_LIGHTS = 8;
+	public static int NUM_RGB_LIGHTS_FRONT = 32;
+	public static int NUM_RGB_LIGHTS_REAR = 32;
+	public static int NUM_STROBE_LIGHTS = 8;
+	public static int NUM_UV_LIGHTS = 8;
+	public static int NUM_LEDS_PER_RGB_BOARD = 4;
 	
-	public static final int NUM_FRONT_RGB_PANELS = 6;
-	public static final int NUM_REAR_RGB_PANELS = 6;
-	public static final int NUM_UVWHITE_PANELS = 7;
+	public static int NUM_FRONT_RGB_PANELS = 8;
+	public static int NUM_REAR_RGB_PANELS = 8;
+	public static int NUM_UVWHITE_PANELS = 8;
 	
-	protected static final int START_REAR_LIGHT_ADDRESSES = 32;
-	protected static final int START_REAR_PANEL_ADDRESSES = 8;
+	public static int START_REAR_LIGHT_ADDRESSES = 32;	// Computed elsewhere and set here
+	public static int START_REAR_PANEL_ADDRESSES = 8;
+	public static int START_UVWHITE_PANEL_ADDRESSES = 16;
 	
-	public Color[] rgbLights;
+	public Color[] rgbLightsFront;
+	public Color[] rgbLightsRear;
 	public double[] whiteLights;
 	public double[] uvLights;
 	
@@ -60,9 +64,14 @@ public class ColorOutput {
 	
 	// Initialize everything to black
 	public ColorOutput() {
-		rgbLights = new Color[NUM_RGB_LIGHTS];
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			rgbLights[i] = Color.BLACK;
+		rgbLightsFront = new Color[NUM_RGB_LIGHTS_FRONT];
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = Color.BLACK;
+		}
+		
+		rgbLightsRear = new Color[NUM_RGB_LIGHTS_REAR];
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = Color.BLACK;
 		}
 		
 		whiteLights = new double[NUM_STROBE_LIGHTS];
@@ -89,8 +98,12 @@ public class ColorOutput {
 	public void emergencyLighting() {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_EMERGENCY_LIGHTING;
 		
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			rgbLights[i] = Color.WHITE;
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = Color.WHITE;
+		}
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = Color.WHITE;
 		}
 		
 		whiteLights = new double[NUM_STROBE_LIGHTS];
@@ -110,8 +123,12 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_ALL_OFF;
 		
 		// Turn them all off
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			rgbLights[i] = Color.BLACK;
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = Color.BLACK;
+		}
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsFront[i] = Color.BLACK;
 		}
 		
 		for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
@@ -130,10 +147,10 @@ public class ColorOutput {
 		
 		for(int panelIndex = 0; panelIndex < NUM_FRONT_RGB_PANELS; panelIndex++) {
 			int i = 4 * panelIndex;
-			rgbLights[i] = c0;
-			rgbLights[i + 1] = c1;
-			rgbLights[i + 2] = c2;
-			rgbLights[i + 3] = c3;
+			rgbLightsFront[i] = c0;
+			rgbLightsFront[i + 1] = c1;
+			rgbLightsFront[i + 2] = c2;
+			rgbLightsFront[i + 3] = c3;
 		}
 		
 	}
@@ -143,11 +160,11 @@ public class ColorOutput {
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
 		
 		for(int panelIndex = 0; panelIndex < NUM_REAR_RGB_PANELS; panelIndex++) {
-			int i = START_REAR_LIGHT_ADDRESSES + 4 * panelIndex;
-			rgbLights[i] = c0;
-			rgbLights[i + 1] = c1;
-			rgbLights[i + 2] = c2;
-			rgbLights[i + 3] = c3;
+			int i = 4 * panelIndex;
+			rgbLightsRear[i] = c0;
+			rgbLightsRear[i + 1] = c1;
+			rgbLightsRear[i + 2] = c2;
+			rgbLightsRear[i + 3] = c3;
 		}
 	}
 	
@@ -155,8 +172,8 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
 		
-		for(int i = 0; i < NUM_FRONT_RGB_PANELS * 4; i++) {
-			rgbLights[i] = c;
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = c;
 		}
 		
 	}
@@ -165,8 +182,8 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
 		
-		for(int i = 0; i < NUM_REAR_RGB_PANELS * 4; i++) {
-			rgbLights[i + START_REAR_LIGHT_ADDRESSES] = c;
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = c;
 		}
 		
 		
@@ -193,10 +210,10 @@ public class ColorOutput {
 		}
 		
 		int i = 4*panelIndex;
-		rgbLights[i] = c0;
-		rgbLights[i + 1] = c1;
-		rgbLights[i + 2] = c2;
-		rgbLights[i + 3] = c3;
+		rgbLightsFront[i] = c0;
+		rgbLightsFront[i + 1] = c1;
+		rgbLightsFront[i + 2] = c2;
+		rgbLightsFront[i + 3] = c3;
 		
 		
 	}
@@ -209,11 +226,11 @@ public class ColorOutput {
 			throw new RuntimeException("Error: Invalid Rear PanelIndex: " + panelIndex);
 		}
 		
-		int i = START_REAR_LIGHT_ADDRESSES + 4*panelIndex;
-		rgbLights[i] = c0;
-		rgbLights[i + 1] = c1;
-		rgbLights[i + 2] = c2;
-		rgbLights[i + 3] = c3;
+		int i = 4*panelIndex;
+		rgbLightsRear[i] = c0;
+		rgbLightsRear[i + 1] = c1;
+		rgbLightsRear[i + 2] = c2;
+		rgbLightsRear[i + 3] = c3;
 		
 	}
 	
@@ -232,10 +249,10 @@ public class ColorOutput {
 	
 	
 	public void setRGBLightFrontOrBack(int i, Color c) {
-		if (i < NUM_FRONT_RGB_PANELS*4) {
+		if (i < NUM_RGB_LIGHTS_FRONT) {
 			setFrontRGBLight(i, c);
 		} else {
-			setRearRGBLight(i - START_REAR_LIGHT_ADDRESSES, c);
+			setRearRGBLight(i - NUM_RGB_LIGHTS_FRONT, c);
 		}
 	}
 	
@@ -243,7 +260,7 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
 		
-		rgbLights[i] = c; 
+		rgbLightsFront[i] = c; 
 		
 	}
 	
@@ -252,15 +269,19 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
 		
-		rgbLights[START_REAR_LIGHT_ADDRESSES + i] = c; 
+		rgbLightsRear[i] = c; 
 		
 	}
 	
 	public void setWhiteStrobe() {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_WHITE_STROBE;
 		
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			rgbLights[i] = Color.BLACK;
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = Color.BLACK;
+		}
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = Color.BLACK;
 		}
 		
 		whiteLights = new double[NUM_STROBE_LIGHTS];
@@ -277,8 +298,12 @@ public class ColorOutput {
 	public void setUVStrobe() {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_UV_STROBE;
 		
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			rgbLights[i] = Color.BLACK;
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = Color.BLACK;
+		}
+		
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = Color.BLACK;
 		}
 		
 		whiteLights = new double[NUM_STROBE_LIGHTS];
@@ -312,8 +337,11 @@ public class ColorOutput {
 		}
 		
 		// Mix RGB lights
-		for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-			out.rgbLights[i] = RGBGradientLinear.linearGradient(c1.rgbLights[i], c2.rgbLights[i], alpha);
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			out.rgbLightsFront[i] = RGBGradientLinear.linearGradient(c1.rgbLightsFront[i], c2.rgbLightsFront[i], alpha);
+		}
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			out.rgbLightsRear[i] = RGBGradientLinear.linearGradient(c1.rgbLightsRear[i], c2.rgbLightsRear[i], alpha);
 		}
 		
 		// Mix white lights

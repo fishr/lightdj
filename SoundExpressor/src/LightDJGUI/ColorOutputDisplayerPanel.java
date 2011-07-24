@@ -24,16 +24,16 @@ public class ColorOutputDisplayerPanel implements ColorOutputDisplayer {
 		//g2D.fillRect(x, y, width, height);
 		
 		// Draw color 1, and then color 2
-		g2D.setColor(c.rgbLights[0]);
+		g2D.setColor(c.rgbLightsFront[0]);
 		g2D.fillRect(x + xOffset, y + yOffset, size, size);
 		
-		g2D.setColor(c.rgbLights[1]);
+		g2D.setColor(c.rgbLightsFront[1]);
 		g2D.fillRect(x + xOffset + size, y + yOffset, size, size);
 		
-		g2D.setColor(c.rgbLights[2]);
+		g2D.setColor(c.rgbLightsFront[2]);
 		g2D.fillRect(x + xOffset + 2*size, y + yOffset, size, size);
 		
-		g2D.setColor(c.rgbLights[3]);
+		g2D.setColor(c.rgbLightsFront[3]);
 		g2D.fillRect(x + xOffset + 3*size, y + yOffset, size, size);
 		
 		

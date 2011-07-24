@@ -1,0 +1,55 @@
+# LightDJ Configuration File
+#
+# This file specifies various parameters and configuration setttings for use
+# with the LightDJ software. For examnple, use this file to specify the number
+# of lights, audio sources, serial ports for output, etc. All lines are of the
+# form KEY = value (case insensitive for the key). Lines that begin with a # are
+# comments. If a setting is not specified, it will be automagically set to a
+# reasonable default value.
+
+###############################################################################
+##
+## Lighting settings
+##
+###############################################################################
+
+MAX_BRIGHTNESS = 0
+
+# The number of different types of panels we have
+NUM_FRONT_RGB_PANELS = 6
+NUM_REAR_RGB_PANELS = 6
+NUM_UVWHITE_PANELS = 7
+NUM_LEDS_PER_RGB_BOARD = 4
+
+# The starting addresses for rear and UVwhite PANELS when being individually addressed 
+# (function of the firmware), Please note that each front and rear panel
+# consists of a group of 4 LED's. Historically, these values were chosen for 8
+# front and rear panels, but will work fine for less than that too.
+START_REAR_PANEL_ADDRESSES = 8
+START_UVWHITE_PANEL_ADDRESSES = 16
+
+###############################################################################
+##
+## Serial port settings
+##
+##############################################################################
+SERIAL_PORT = /dev/ttyUSB0
+BAUDRATE = 38400
+DATABITS = 8
+STOPBITS = 1
+PARITY = EVEN
+
+###############################################################################
+##
+##  Audio / visual settings
+##
+###############################################################################
+# USE_CAPTURED_AUDIO - if true, captures live audio from an external input.
+# if false, loads audio from a WAV file as specified in WAV_FILE_NAME.
+# WAV_FILE_NAME is ignored if CAPTURED_AUDIO = TRUE
+USE_CAPTURED_AUDIO = TRUE
+WAV_FILE_NAME = /home/steve/Desktop/04 Troublemaker.wav
+
+
+
+

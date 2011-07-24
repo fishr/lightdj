@@ -24,10 +24,10 @@ public class ColorOutputDisplayerTwoLEDs implements ColorOutputDisplayer {
 		//g2D.fillRect(x, y, width, height);
 		
 		// Draw color 1, and then color 2
-		g2D.setColor(c.rgbLights[0]);
+		g2D.setColor(c.rgbLightsFront[0]);
 		g2D.fillRect(x + xOffset, y + yOffset, size, size);
 		
-		g2D.setColor(c.rgbLights[1]);
+		g2D.setColor(c.rgbLightsFront[1]);
 		g2D.fillRect(x + xOffset + size, y + yOffset, size, size);
 		
 	}

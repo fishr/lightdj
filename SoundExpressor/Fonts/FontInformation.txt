@@ -1,0 +1,9 @@
+The fonts in this directory should be automatically loaded by the LightDJ
+software as needed. If that doesn't work though, you should be able to install
+the fonts on the system and have them work that way as well. For example, if
+you're running Ubuntu, you can add these files to the .fonts directory in your
+home directory.
+
+Cheers!
+Steve
+

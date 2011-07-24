@@ -5,10 +5,12 @@ import java.io.IOException;
 
 import javax.sound.sampled.*;
 
+import Common.ColorOutput;
+import LightDJGUI.ConfigFileParser;
 import Utils.TimerTicToc;
 
 /**
- * Starts everything
+ * Starts everything!
  * @author Steve Levine
  *
  */
@@ -31,6 +33,11 @@ public class MainClass {
 		// Do stuff here
 		System.out.println("Initializing Sound Expressor...");
 		
+		// Load data from the configuration file
+		loadConfigurationFile();
+
+		
+		
 		if (USE_CAPTURED_AUDIO) {
 			System.out.println("Using captured audio...");
 			runWithCapturedAudio();
@@ -41,6 +48,36 @@ public class MainClass {
 		}
 		
 		
+	}
+	
+	// Load the configuration file
+	protected static void loadConfigurationFile() {
+		// Parse the configuration file
+		System.out.println("Parsing configuration file...");
+		ConfigFileParser configFile = new ConfigFileParser("config_settings.txt");
+		
+		// Process settings related to lighting
+		// Now process the configuration file!
+		
+		ColorOutput.NUM_LEDS_PER_RGB_BOARD = Integer.parseInt(configFile.getSettingOrDefault("NUM_LEDS_PER_RGB_BOARD", "4"));
+		ColorOutput.NUM_FRONT_RGB_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_FRONT_RGB_PANELS", "6"));
+		ColorOutput.NUM_REAR_RGB_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_REAR_RGB_PANELS", "6"));
+		ColorOutput.NUM_UVWHITE_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_UVWHITE_PANELS", "7"));
+		ColorOutput.START_REAR_PANEL_ADDRESSES = Integer.parseInt(configFile.getSettingOrDefault("START_REAR_PANEL_ADDRESSES", "8"));
+		ColorOutput.START_UVWHITE_PANEL_ADDRESSES = Integer.parseInt(configFile.getSettingOrDefault("START_UVWHITE_PANEL_ADDRESSES", "16"));
+		
+		// Some computed values for convenience
+		ColorOutput.NUM_RGB_LIGHTS_FRONT = ColorOutput.NUM_LEDS_PER_RGB_BOARD * ColorOutput.NUM_FRONT_RGB_PANELS;
+		ColorOutput.NUM_RGB_LIGHTS_REAR = ColorOutput.NUM_LEDS_PER_RGB_BOARD * ColorOutput.NUM_REAR_RGB_PANELS;
+		ColorOutput.START_REAR_LIGHT_ADDRESSES = ColorOutput.NUM_LEDS_PER_RGB_BOARD * ColorOutput.START_REAR_PANEL_ADDRESSES;
+		ColorOutput.NUM_STROBE_LIGHTS = ColorOutput.NUM_UVWHITE_PANELS;
+		ColorOutput.NUM_UV_LIGHTS = ColorOutput.NUM_UVWHITE_PANELS;
+		
+		// Process settings related to the serial port
+		
+		// Process audio /visual settings
+		
+	
 	}
 	
 	// Don't operate from live captured audio, but rather from a pre-recorded sound file.

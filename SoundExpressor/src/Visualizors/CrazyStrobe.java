@@ -38,9 +38,9 @@ public class CrazyStrobe extends Visualizer {
 		ColorOutput colorOutput = new ColorOutput();
 		
 		if (state == 0) {
-			colorOutput.rgbLights[0] = Color.WHITE;
+			colorOutput.rgbLightsFront[0] = Color.WHITE;
 		} else {
-			colorOutput.rgbLights[0] = Color.BLACK;
+			colorOutput.rgbLightsFront[0] = Color.BLACK;
 		}
 		
 		state = (state + 1) % (172 / 7);

@@ -17,24 +17,25 @@ import Common.ColorOutput;
 public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 
 	// Constants
-	protected static int LIGHTS_PER_RGB_PANEL = 4;
+	protected static int LIGHTS_PER_RGB_PANEL = ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	protected static int LIGHTS_PER_UVWHITE_BOARD = 2;
 	
-	protected static int NUM_FRONT_RGB_PANELS = 6;
+	protected static int NUM_FRONT_RGB_PANELS = ColorOutput.NUM_FRONT_RGB_PANELS;
 	protected static double SPACING_FRONT_PANELS = 1;
 	
-	
-	protected static int NUM_REAR_RGB_PANELS = 6;
+	protected static int NUM_REAR_RGB_PANELS = ColorOutput.NUM_REAR_RGB_PANELS;
 	protected static double SPACING_REAR_PANELS = 1;
 	
-	protected static int NUM_UVWHITE_PANELS = 7;
+	protected static int NUM_UVWHITE_PANELS = ColorOutput.NUM_UVWHITE_PANELS;
 	protected static int SPACING_UVWHITE_PANELS = 2;
 	
-	protected static int NUM_STROBE_LIGHTS = 7;
-	protected static int NUM_UV_LIGHTS = 7;
-	protected static int NUM_RGB_LIGHTS = ColorOutput.NUM_RGB_LIGHTS;
+	protected static int NUM_RGB_LIGHTS_FRONT = ColorOutput.NUM_RGB_LIGHTS_FRONT;
+	protected static int NUM_RGB_LIGHTS_REAR = ColorOutput.NUM_RGB_LIGHTS_REAR;
+	protected static int NUM_STROBE_LIGHTS = ColorOutput.NUM_UVWHITE_PANELS;
+	protected static int NUM_UV_LIGHTS = ColorOutput.NUM_UVWHITE_PANELS;
+
 	
-	protected static int REAR_START_RGB_INDEX = 32;
+	protected static int REAR_START_RGB_INDEX = ColorOutput.START_REAR_LIGHT_ADDRESSES;
 	
 	
 	VisualizationEngineParty engine;
@@ -52,8 +53,11 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 		if (postProcessing == LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE) {
 			if (strobeState == 0) {
 				
-				for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-					c.rgbLights[i] = Color.WHITE;
+				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+					c.rgbLightsFront[i] = Color.BLACK;
+				}
+				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+					c.rgbLightsRear[i] = Color.BLACK;
 				}
 				
 				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
@@ -67,9 +71,13 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 				
 			} else {
 
-				for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-					c.rgbLights[i] = Color.BLACK;
+				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+					c.rgbLightsFront[i] = Color.BLACK;
 				}
+				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+					c.rgbLightsRear[i] = Color.BLACK;
+				}
+				
 				
 				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
 					c.whiteLights[i] = 0.0;
@@ -84,8 +92,11 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 		} else if (postProcessing == LightDJPostProcessing.POST_PROCESSING_UV_STROBE) {
 			if (strobeState == 0) {
 				
-				for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-					c.rgbLights[i] = Color.BLACK;
+				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+					c.rgbLightsFront[i] = Color.BLACK;
+				}
+				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+					c.rgbLightsRear[i] = Color.BLACK;
 				}
 				
 				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
@@ -99,8 +110,11 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 				
 			} else {
 
-				for(int i = 0; i < NUM_RGB_LIGHTS; i++) {
-					c.rgbLights[i] = Color.BLACK;
+				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+					c.rgbLightsFront[i] = Color.BLACK;
+				}
+				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+					c.rgbLightsRear[i] = Color.BLACK;
 				}
 				
 				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
@@ -143,7 +157,7 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 			
 			// Draw this panel
 			for(int light = 0; light < LIGHTS_PER_RGB_PANEL; light++) {
-				g2D.setColor(c.rgbLights[LIGHTS_PER_RGB_PANEL*panelIndex + light]);
+				g2D.setColor(c.rgbLightsFront[LIGHTS_PER_RGB_PANEL*panelIndex + light]);
 				g2D.fillRect(currentX + light*size, currentY, size, size);
 			}
 		}
@@ -155,7 +169,7 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 			
 			// Draw this panel
 			for(int light = 0; light < LIGHTS_PER_RGB_PANEL; light++) {
-				g2D.setColor(c.rgbLights[LIGHTS_PER_RGB_PANEL*panelIndex + light + REAR_START_RGB_INDEX]);
+				g2D.setColor(c.rgbLightsRear[LIGHTS_PER_RGB_PANEL*panelIndex + light]);
 				g2D.fillRect(currentX + light*size, currentY, size, size);
 			}
 		}
