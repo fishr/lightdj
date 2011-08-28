@@ -110,10 +110,8 @@ public abstract class VisualizationEngine {
 		for(int dataCursor = offset; dataCursor < length + offset; dataCursor += FRAME_SIZE) {
 			
 			// Read in one sample
-			lValue = 0;
-			if (BYTES_PER_SAMPLE == 2) {
-				lValue = ((((short) data[dataCursor + 1]) + 128) << 8) | (((short) data[dataCursor]) + 128);
-			}
+			// BYTES_PER_SAMPLE == 2) {
+			lValue = ((((short) data[dataCursor + 1]) + 128) << 8) | (((short) data[dataCursor]) + 128);
 			
 			// Convert this to a double value, and store it!
 			dValue = (double) (lValue - MAX_SAMPLE_VAL) / (MAX_SAMPLE_VAL);
@@ -216,8 +214,6 @@ class VisualizationEngineRenderThread implements Runnable {
 			}
 			
 		} else { // NOT INSTANT PLAY MODE
-			
-			
 			
 			// Continually see if it's time to render one of the render frames.
 			RenderFrame frameToRender = null;

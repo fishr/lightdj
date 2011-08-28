@@ -51,5 +51,32 @@ USE_CAPTURED_AUDIO = TRUE
 WAV_FILE_NAME = /home/steve/Desktop/04 Troublemaker.wav
 
 
+###############################################################################
+##
+## MIDI Controller settings 
+##
+###############################################################################
+# The LightDJ software supports using an external MIDI controller to
+# control the software! The LightDJ software listens to short MIDI messages
+# from all plugged-in controllers (including USB MIDI). Each MIDI short message
+# contains a command (ex., control change, note on, etc.), a track/channel that
+# it applies to (ex. channel 25), and a value between 0 and 127 (ex., 127).
+# MIDI channels are mapped IN ORDER via the following lines. For example, the
+# line
+#     MIDI_LEFT_PLUGIN_CHANNELS = 3, 8, 9
+# means that MIDI events for channel 3 will control the first knob on the left
+# plugin, channel 8 will control the second knob, etc.
+# 
+# An easy way to figure out what channels the knobs on your midi controller
+# sends to is to run the MidiTest.java file, which will echo all short MIDI
+# events to the terminal/console. You can also use some music software to record
+# MIDI events and play them back if you want.
+
+# The following values have been determined experimentally via MidiTest.java for
+# an M-Audio X Session Pro USB MIDI Controller
+MIDI_LEFT_PLUGIN_CHANNELS = 24, 27, 25, 28, 26, 29, 44, 46, 43, 70, 58
+MIDI_RIGHT_PLUGIN_CHANNELS = 34, 31, 35, 32, 36, 33, 45, 56, 57, 69, 59
+MIDI_GENERAL_SLIDER_CHANNELS = 12, 11, 14, 15
+MIDI_CROSSFADER_CHANNEL = 17
 
 

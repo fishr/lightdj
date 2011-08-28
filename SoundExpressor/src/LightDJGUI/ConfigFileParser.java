@@ -12,27 +12,15 @@ import java.util.Map;
  *
  */
 public class ConfigFileParser {
-	private String filename;
-	private Map<String,String> configSettings;
+	private static Map<String,String> configSettings;
 	
-	// Constructor accepts a filename as input
-	public ConfigFileParser(String filename) {
-		this.filename = filename;
+	// Parse the file
+	public static void parseFile(String filename) {
 		
 		// Create a new map to store the key and value pairs
 		configSettings = new HashMap<String, String>();
 		
-		// Parse the file
-		parseFile();
-		
-		
-	}
-	
-	// Parse the file
-	private void parseFile() {
-		
 		BufferedReader in;
-		
 		try {
 			in = new BufferedReader(new FileReader(filename));
 		} catch (Exception e) {
@@ -76,7 +64,7 @@ public class ConfigFileParser {
 	}
 	
 	// Return the value corresponding to some key in the configuration file
-	public String getSettingOrDefault(String key, String defaultVal) {
+	public static String getSettingOrDefault(String key, String defaultVal) {
 		if (containsSetting(key)) {
 			return configSettings.get(key);
 		} else {
@@ -85,12 +73,12 @@ public class ConfigFileParser {
 	}
 	
 	// Checks to see if the configuration file contains the given setting
-	public boolean containsSetting(String key) {
+	public static boolean containsSetting(String key) {
 		return configSettings.containsKey(key);
 	}
 	
 	// Print out a configuration file to standard out
-	public void printConfigFile() {
+	public static void printConfigFile() {
 		System.out.println("Configuration File:");
 		for(String key : configSettings.keySet()) {
 			String val = configSettings.get(key);

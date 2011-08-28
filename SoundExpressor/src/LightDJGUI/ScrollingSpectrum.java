@@ -84,7 +84,8 @@ public class ScrollingSpectrum {
 			double alpha = interpolationBlends[yPixelIndex];
 			int index = interpolationIndices[yPixelIndex];
 			
-			double magnitude = (1 - alpha) * magnitudes[index] + alpha * magnitudes[index + 1];
+			//double magnitude = (1 - alpha) * magnitudes[index] + alpha * magnitudes[index + 1];
+			double magnitude = (1 - alpha) * magnitudes[index]* magnitudes[index] + alpha * magnitudes[index + 1]* magnitudes[index + 1];
 			
 			g2D.setColor(getColor(magnitude / max_val));
 			g2D.drawRect(currentX, height - yPixelIndex - 1, 1, 1);
@@ -159,8 +160,6 @@ public class ScrollingSpectrum {
 		currentX = 0;
 		
 		setSize(width, height);
-		
-		
 	}
 	
 	public void setGraphics(Graphics2D g2D) {

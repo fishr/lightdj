@@ -1,7 +1,7 @@
 package FeatureDetectors;
 
 import Common.FeatureList;
-import Common.FrequencyRangeControl;
+import LightDJGUI.FrequencyRangeControl;
 
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
@@ -40,7 +40,7 @@ public class BassFinder extends FeatureDetector {
 		minFreq = 0;
 		maxFreq = 120;
 		normalizingVal = 30.0;
-		averageHalfLife = 0.1;
+		averageHalfLife = 0.3;
 		decayRate = 1.0 / (30);
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		recentBassIndex = 0;
@@ -81,7 +81,7 @@ public class BassFinder extends FeatureDetector {
 		double sum = 0;
 		int n = 0;
 		for(int i = minIndex; i <= maxIndex; i++) {
-			sum += magnitudes[i];
+			sum += magnitudes[i]*magnitudes[i];
 			n++;
 		}
 		
@@ -95,7 +95,7 @@ public class BassFinder extends FeatureDetector {
 		// Compute a very low-passed version of the signal to use as an estimate of the overall
 		// level of this frequency range. This is the "adaptive" part that allows the frequency
 		// range finder to adjust to different volume levels
-		double threshold = averagedLevel + averagedSpread + 10.0; //* 1.25 + 5.0;
+		double threshold = averagedLevel + averagedSpread + 300.0; //* 1.25 + 5.0;
 		this.threshold = threshold;
 		double spread = Math.abs(level - averagedLevel);
 		

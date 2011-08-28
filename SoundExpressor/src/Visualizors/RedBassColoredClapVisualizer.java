@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import Common.ColorOutput;
 import Common.FeatureList;
+import LightDJGUI.GenericKnob;
 
 /**
  * A basic visualizer that sets the first light to red corresponding to how much bass there is,
@@ -16,6 +17,9 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 	protected ColorGenerator rgbController;
 	protected double lastPulse = 0.0;
 	protected int state = 0;
+	
+	// GUI controls
+	GenericKnob knob;
 	
 	@Override
 	public String getName() {
@@ -31,7 +35,10 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		// Initialize some parameters
 		rgbController = new HueRotator(0.0, 0.373);
 		
-		// We don't need to request any user controls for this visualization plugin
+		// Request controls for this plugin
+		knob = new GenericKnob(0.4f, 50, "Label");
+		requestUserControl(knob);
+		requestUserControl(new GenericKnob(0.4f, 50, "Label2"));
 		
 	}
 

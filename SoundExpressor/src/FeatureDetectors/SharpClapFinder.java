@@ -1,12 +1,14 @@
 package FeatureDetectors;
 
+import Common.FeatureList;
+
 /**
  * A state-machine like object that, when stepped with FFT values, attempts to output the current bass level.
  * Attempts to auto-adapt to changing volume.
  * @author Steve Levine
  *
  */
-public class SharpClapFinder  {
+public class SharpClapFinder extends FeatureDetector  {
 	
 	protected double averageHalfLife;
 	
@@ -19,7 +21,7 @@ public class SharpClapFinder  {
 	protected double lastOutput;
 	
 	protected double averagedLevel;
-	protected double currentBassLevel;
+	protected double currentSharpLevel;
 	protected double threshold;
 	protected double averagedSpread;
 	
@@ -27,21 +29,8 @@ public class SharpClapFinder  {
 	protected double[] recentBassLevels;
 	protected int recentBassIndex;
 	
-	public SharpClapFinder(int sampleRate, int fftSize) {
-
-		// Initiate other parameters
-		minFreq = 5000;
-		maxFreq = 8000;
-		normalizingVal = 30.0;
-		averageHalfLife = 1.0;
-		decayRate = 1.0 / (25);
-		
-		// Calculate some parameters
-		updatesPerSecond = 1.0 * sampleRate / fftSize; 
-		phi = Math.pow(0.5, 1/(averageHalfLife * updatesPerSecond));
-		
-		recentBassIndex = 0;
-		recentBassLevels = new double[NUM_RECENT_BASS_VALS];
+	public SharpClapFinder(int fftSize, double updatesPerSecond) {
+		super(fftSize, updatesPerSecond);
 		
 	}
 	
@@ -63,7 +52,7 @@ public class SharpClapFinder  {
 		}
 		
 		double level = sum / n;
-		currentBassLevel = level;
+		currentSharpLevel = level;
 		
 		recentBassLevels[recentBassIndex] = level;
 		recentBassIndex = (recentBassIndex + 1) % NUM_RECENT_BASS_VALS;
@@ -94,7 +83,7 @@ public class SharpClapFinder  {
 		
 		double actualOutput;
 		
-//		// Limit how fast the output can fal, in an attempt to minimize flicker
+//		// Limit how fast the output can fall, in an attempt to minimize flicker
 //		if (outputVal < decayRate * lastOutput) {
 //			actualOutput = decayRate * lastOutput;
 //		} else {
@@ -121,12 +110,12 @@ public class SharpClapFinder  {
 		
 		
 		lastOutput = actualOutput;
-		return actualOutput;
+		return currentSharpLevel;
 		
 	}
 	
 	public double getCurrentLevel() {
-		return currentBassLevel;
+		return currentSharpLevel;
 	}
 	
 	public double getAveragedLevel() {
@@ -156,6 +145,33 @@ public class SharpClapFinder  {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public void computeFeatures(double[] frequencies, double[] magnitudes, FeatureList featureList) {
+		// Compute the level of bass
+		double sharpLevel = getFreqs(frequencies, magnitudes);
+		
+		// Create a feature of this, and add it to the featureList.
+		featureList.addFeature("SHARP_LEVEL", sharpLevel);
+		
+	}
+
+	@Override
+	public void init() {
+		// Initiate other parameters
+		minFreq = 4000;
+		maxFreq = 10000;
+		normalizingVal = 30.0;
+		averageHalfLife = 1.0;
+		decayRate = 1.0 / (25);
+		
+		// Calculate some parameters
+		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
+		
+		recentBassIndex = 0;
+		recentBassLevels = new double[NUM_RECENT_BASS_VALS];
+		
 	}
 	
 }

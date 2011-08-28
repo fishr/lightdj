@@ -17,31 +17,40 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
+import javax.sound.midi.MidiEvent;
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.ShortMessage;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
 
 import Common.ColorOutput;
 import Common.FeatureList;
+import Common.UserControl;
 import FeatureDetectors.BassFinder;
 import FeatureDetectors.ClapFinder;
 import FeatureDetectors.FeatureDetector;
 import FeatureDetectors.FrequencyRangeFinder;
 import FeatureDetectors.LevelMeter;
+import FeatureDetectors.SharpClapFinder;
 import LightDJGUI.ColorOutputDisplayer;
 import LightDJGUI.ColorOutputDisplayerPanel;
 import LightDJGUI.ColorOutputDisplayerParty;
+import LightDJGUI.ConfigFileParser;
 import LightDJGUI.CrossfaderKnob;
 import LightDJGUI.LightDJGUI;
 import LightDJGUI.MouseAcceptorPanel;
 import LightDJGUI.PulseKeeper;
 import LightDJGUI.ScrollingSpectrum;
 import LightDJGUI.VisualizerChooser;
+import MidiInterface.MidiConnector;
 import PartyLightsController.PartyLightsController;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
@@ -84,7 +93,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	ColoredLight bassLight;
 	RGBLight rgbLight;
 	TextLight textLight;
-	RealtimePlotter plotter;
+	//RealtimePlotter plotter;
 
 	// The list of feature detectors
 	public ArrayList<FeatureDetector> featureDetectors;
@@ -96,6 +105,16 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// The arduino LED visualizer
 	//LEDVisualizer ledVisuals;
 	PartyLightsController ledVisuals;
+	
+	// MIDI stuff
+	// The following class allows for MIDI communication
+	MidiConnector midiConnector;
+	// The following map MIDI channels to UserControl indices
+	Map<Integer, Integer> midiLeftPluginIndices;
+	Map<Integer, Integer> midiRightPluginIndices;
+	Map<Integer, Integer> midiGeneralIndices;
+	int midiCrossfaderChannel;
+	
 	
 	TimerTicToc tictoc;
 	
@@ -135,7 +154,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			System.out.println("WARNING: Couldn't connect to LED's via USB!");
 		}
 		
-		
+		// Start up MIDI
+		setupMIDIControllers();
 		
 		// Set up the GUI
 		startGUI();
@@ -157,6 +177,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		detectors.add(new ClapFinder(FFT_SIZE, UPDATES_PER_SECOND));
 		//detectors.add(new FrequencyRangeFinder(FFT_SIZE, UPDATES_PER_SECOND));
 		detectors.add(new LevelMeter(FFT_SIZE, UPDATES_PER_SECOND));
+		detectors.add(new SharpClapFinder(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		
 		// Return them all
@@ -256,10 +277,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		
 		
-		//plotter.update(new double[] {100.0*((Double) featureList.getFeature("BASS_RAW")), 0.0});
-		
-		
-		//plotter.render();
+		// Update (but do not render) relevant visual GUI elements
+		plotter.update(new double[] {(0.1 * (Double) featureList.getFeature("BASS_RAW")), 0.0, 0.0});
 		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes);
 		
 		
@@ -278,7 +297,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		applyPostProcessing(colorOutput);
 		
 		// Send the command to the LED's
-		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
+//		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
 		
 		renderFrame.finalOutput = colorOutput;
 		
@@ -552,6 +571,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected final static int SIDEBAR_WIDTH = 350;
 	protected final static int SPECTRUM_WIDTH = 900;
 	protected final static int SPECTRUM_HEIGHT = 200;
+	protected final static int PLOTTER_WIDTH = 900;
+	protected final static int PLOTTER_HEIGHT = 300;
 	protected final static int BORDER_SIZE = 10;
 	protected final static int LIGHTBAR_HEIGHT = 300;
 	protected final static int RECORD_CONTROLS_WIDTH = 500;
@@ -572,25 +593,27 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static int CROSSFADER_WIDTH;
 	protected static int CROSSFADER_HEIGHT;
 	protected static int CROSSFADER_INDENT = 10;
-	protected static int PLUGIN_THUMBNAIL_WIDTH = 550;
-	protected static int PLUGIN_THUMBNAIL_HEIGHT = 100;
+	protected static int PLUGIN_THUMBNAIL_WIDTH = 430; // 550
+	protected static int PLUGIN_THUMBNAIL_HEIGHT = 80; // 100
 	protected static int PULSE_KEEPER_X = BORDER_SIZE;
 	protected static int PULSE_KEEPER_Y = BORDER_SIZE;
 	protected static int PULSE_KEEPER_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
 	protected static int PULSE_KEEPER_HEIGHT = 100;
+	protected static int USER_CONTROL_SLOT_HEIGHT = 60;
 	
 	// Some color information
-	protected static Color PANEL_BACKGROUND_COLOR;
-	protected static Color PANEL_BORDER_COLOR;
-	protected static Color TEXT_COLOR;
-	protected static Color HOT_COLOR;
-	protected static AlphaComposite COMPOSITE_TRANSLUCENT;
-	protected static AlphaComposite COMPOSITE_OPAQUE;
-	protected static Font PANEL_FONT;
-	protected static Font PANEL_FONT_LARGE;
-	protected static Font PULSE_KEEPER_FONT;
-	protected static Stroke REGULAR_STROKE;
-	protected static Stroke THICK_STROKE;
+	public static Color PANEL_BACKGROUND_COLOR;
+	public static Color PANEL_BORDER_COLOR;
+	public static Color TEXT_COLOR;
+	public static Color HOT_COLOR;
+	public static AlphaComposite COMPOSITE_TRANSLUCENT;
+	public static AlphaComposite COMPOSITE_OPAQUE;
+	public static Font PANEL_FONT;
+	public static Font PANEL_FONT_SMALL;
+	public static Font PANEL_FONT_LARGE;
+	public static Font PULSE_KEEPER_FONT;
+	public static Stroke REGULAR_STROKE;
+	public static Stroke THICK_STROKE;
 	
 	// Render buffers
 	protected BufferedImage background;
@@ -603,6 +626,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	// Controls and displays
 	protected ScrollingSpectrum spectrumMapper;
+	protected RealtimePlotter plotter;
 	protected RenderFrameParty lastFrame;
 	protected ColorOutputDisplayer colorOutputDisplayer;
 	protected CrossfaderKnob crossfaderKnob;
@@ -728,6 +752,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		try {
 			Font eraser = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/Eraser.ttf"));
 			PANEL_FONT = eraser.deriveFont(24.0f);
+			PANEL_FONT_SMALL = eraser.deriveFont(16.0f);
 			PANEL_FONT_LARGE = eraser.deriveFont(48.0f);
 			
 			Font nimbus = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/LiberationMono-Bold.ttf"));
@@ -736,6 +761,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		} catch (Exception e) {
 			System.out.println("Error: Could not load custom fonts from the Fonts/ directory!");
 			PANEL_FONT = new Font("Eraser", Font.PLAIN, 24);
+			PANEL_FONT_SMALL= new Font("Eraser", Font.PLAIN, 16);
 			PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, 48);
 			PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
 			e.printStackTrace();
@@ -751,7 +777,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
 		
 		// Set up some other GUI elements
-		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 30, 20000, 100.0, BUFFER_SIZE, SAMPLE_RATE);
+		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 40, 20000, 500.0, BUFFER_SIZE, SAMPLE_RATE);
+		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW, Color.GREEN}, 0, 0, PLOTTER_WIDTH, PLOTTER_HEIGHT, 100.0, null);
 		
 		// Choose which color output displayer to use!
 		colorOutputDisplayer = new ColorOutputDisplayerParty(this);
@@ -806,6 +833,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		CROSSFADER_Y = RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT + 200;
 		CROSSFADER_WIDTH = RECORD_CONTROLS_WIDTH + BORDER_SIZE;
 		CROSSFADER_HEIGHT = 150;
+		if (crossfaderKnob != null) {
+			crossfaderKnob.setLocation(CROSSFADER_X, CROSSFADER_Y, CROSSFADER_WIDTH, CROSSFADER_HEIGHT);
+		}
 		
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
@@ -851,15 +881,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
 		spectrumMapper.setGraphics((Graphics2D) background.getGraphics());
 		
+		// Resize where the graphs go
+		plotter.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE * 2 - PLOTTER_HEIGHT, SIDEBAR_WIDTH - 2*BORDER_SIZE, PLOTTER_HEIGHT);
+		plotter.setGraphics((Graphics2D) background.getGraphics());
+		
 		// Make sure the visualizer chooser is set up correctly
-		visualizerChooser.setPosition(ACTIVE_LAYER_X, ACTIVE_LAYER_Y, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT);
-		
-		// Make sure the crossfader knob is set up correctly!
-		crossfaderKnob.setPosition(CROSSFADER_X, CROSSFADER_Y, CROSSFADER_WIDTH, CROSSFADER_HEIGHT);
-		
-		// Draw the cross-fader knob
-		paintCrossfader(false);
-		
+		visualizerChooser.setPosition(ACTIVE_LAYER_X, ACTIVE_LAYER_Y, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT);		
 		
 	}
 	
@@ -901,13 +928,26 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		g2D.drawString(visualizer.getName(), x, y + 16);
 		g2D.setColor(PANEL_BORDER_COLOR);
 		g2D.drawLine(x, y + 25, x + width, y + 25);
+	
+		y += 30;
+		
+		// Set the location of any controls that needed to be rendered, and render them
+		int slotX = 0; int slotY = 0;
+		for(UserControl control : visualizer.getRequestedUserControls()) {
+			control.setLocation(x + slotX * width / 2, y + slotY * USER_CONTROL_SLOT_HEIGHT, width / 2, USER_CONTROL_SLOT_HEIGHT - BORDER_SIZE);
+			control.render(g2D);
+			
+			slotX++;
+			if (slotX == 2) {
+				slotX = 0;
+				slotY++;
+			}
+		}
+		
 		
 	}
 	
 	public void setMixerAlpha(double a) {
-		
-		// Disable any automated cross-fading
-		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
 		
 		// Set the mixer!
 		if (a < 0.0) {
@@ -920,47 +960,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 	}
 	
-	/**
-	 * Paint the crossfader knob
-	 */
-	public void paintCrossfader(boolean hot) {
-		Graphics2D g2D = (Graphics2D) background.getGraphics();
-		
-		// Erase what was there before
-		g2D.setColor(Color.BLACK);
-		g2D.fillRect(CROSSFADER_X, CROSSFADER_Y, CROSSFADER_WIDTH, CROSSFADER_HEIGHT);
-		
-		
-		g2D.setColor(PANEL_BORDER_COLOR);
-		//g2D.drawRect(CROSSFADER_X, CROSSFADER_Y, CROSSFADER_WIDTH, CROSSFADER_HEIGHT);
-		g2D.setStroke(THICK_STROKE);
-		int yCenter = CROSSFADER_Y + CROSSFADER_HEIGHT / 2;
-		g2D.drawLine(CROSSFADER_X + CROSSFADER_INDENT, yCenter, CROSSFADER_X + CROSSFADER_WIDTH - CROSSFADER_INDENT, yCenter);
 	
-		// Draw hair lines
-		for (int i = 0; i  <= 8; i++) {
-			int x = CROSSFADER_X + CROSSFADER_INDENT + i * (CROSSFADER_WIDTH - 2*CROSSFADER_INDENT) / 8;
-			g2D.drawLine(x, yCenter - 10, x, yCenter + 10);
-		}
-	
-		// Now draw the main box
-		g2D.setStroke(REGULAR_STROKE);
-		int x = (int) (CROSSFADER_X + CROSSFADER_INDENT + alpha * (CROSSFADER_WIDTH - 2*CROSSFADER_INDENT));
-		if (hot) {
-			g2D.setColor(HOT_COLOR);
-		} else {
-			g2D.setColor(PANEL_BACKGROUND_COLOR);
-		}
-		g2D.fillRect(x - 10, yCenter - 40, 19, 80);
-		if (hot) {
-			g2D.setColor(Color.WHITE);
-		} else {
-			g2D.setColor(PANEL_BORDER_COLOR);
-		}
-		
-		g2D.drawRect(x - 10, yCenter - 40, 19, 80);
-		
-	}
 	
 	
 	/**
@@ -1041,7 +1041,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	public void chooseVisualizer(int pluginIndex, int activePlugin) {
 		
-		if (activePlugin == 0) {
+		// Don't change it the left and right plugins are being set to the same thing!
+		if (activePlugin == 0 && pluginIndex == visualizerRightIndex) {
+			 // The same! Do nothingPAINT
+		} else if (activePlugin == 1 && pluginIndex == visualizerLeftIndex) {
+			// The same! Do nothing
+		} else if (activePlugin == 0) {
 			visualizerLeftIndex = pluginIndex;
 			loadVisualizerPlugin(true, pluginIndex);
 		} else {
@@ -1081,12 +1086,34 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		ColorOutput leftColors = renderFrame.colorOutputs[visualizerLeftIndex];
 		ColorOutput rightColors = renderFrame.colorOutputs[visualizerRightIndex];
 		
+		// Display the mixed colors, as well as the left and ride individual colors in the appropriate locations
 		colorOutputDisplayer.render(outputColors, g2D, SIDEBAR_WIDTH + BORDER_SIZE, BORDER_SIZE, width - SIDEBAR_WIDTH - 2*BORDER_SIZE, LIGHTBAR_HEIGHT);
 		colorOutputDisplayer.render(leftColors, g2D, RECORD_BOX_LEFT_X + BORDER_SIZE, RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		colorOutputDisplayer.render(rightColors, g2D, RECORD_BOX_RIGHT_X + BORDER_SIZE, RECORD_BOX_RIGHT_Y + RECORD_CONTROLS_HEIGHT - BORDER_SIZE - RECORD_BOX_COLOR_DISPLAY_HEIGHT, RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE, RECORD_BOX_COLOR_DISPLAY_HEIGHT); 
 		
+		// Render any user controls that are requesting to be updated
+		for(UserControl control : visualizers.get(visualizerLeftIndex).getRequestedUserControls()) {
+			if (control.needsToRender()) {
+				control.render(g2D);
+			}
+		}
+		for(UserControl control : visualizers.get(visualizerRightIndex).getRequestedUserControls()) {
+			if (control.needsToRender()) {
+				control.render(g2D);
+			}
+		}
+			
+		// Draw the cross-fader knob
+		//paintCrossfader(false);
+		if (crossfaderKnob.needsToRender()) {
+			crossfaderKnob.render(g2D);
+		}
+		
 		// Render the spectrum in the lower left corner
 		spectrumMapper.render();
+		
+		// Render graphs
+		plotter.render();
 		
 		// Render the pulse
 		paintPulseKeeper();
@@ -1100,10 +1127,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			g2DBuf.drawImage(background, 0, 0, null);
 			
 			g2DBuf.setColor(PANEL_BACKGROUND_COLOR);
-			g2DBuf.setComposite(COMPOSITE_TRANSLUCENT);
+			//g2DBuf.setComposite(COMPOSITE_TRANSLUCENT);
 			g2DBuf.fillRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, 50, 50);
-			g2DBuf.setComposite(COMPOSITE_OPAQUE);
-			
+			//g2DBuf.setComposite(COMPOSITE_OPAQUE);
+			 
 			g2DBuf.setColor(PANEL_BORDER_COLOR);
 			g2DBuf.drawRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, 50, 50);
 			
@@ -1140,7 +1167,27 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	 * Mouse stuff
 	 */
 	public void mouseDown(int xM, int yM) {
-		for(MouseAcceptorPanel p : mouseAcceptors) {
+		boolean result;
+		
+		result = processMouseDown(xM, yM, mouseAcceptors);
+		
+		// If not a general one, try the left plugin
+		if (!result) {
+			result = processMouseDown(xM, yM, visualizers.get(visualizerLeftIndex).getRequestedUserControls());
+		}
+		
+		// If not a left one, try the right plugin
+		if (!result) {
+			result = processMouseDown(xM, yM, visualizers.get(visualizerRightIndex).getRequestedUserControls());
+		}
+		
+	}
+	
+	// Search through the mouseAcceptors, and process mousedowns. Returns true if we find
+	// a mouseacceptor where we clicked, false otherwise.
+	protected boolean processMouseDown(int xM, int yM, List list) {
+		List<MouseAcceptorPanel> acceptors = (List<MouseAcceptorPanel>) list;
+		for(MouseAcceptorPanel p : acceptors) {
 			// Does the mouse event fall into this panel? If it does, cast it!
 			int x = p.getX();
 			int y = p.getY();
@@ -1151,10 +1198,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				// Found it! Convert to relative coordinates and go.
 				activePanel = p;
 				p.mouseDown(xM - x, yM - y);
-				return;
+				return true;
 			}
 			
 		}
+		return false;
 	}
 	
 	public void mouseUp(int xM, int yM) {
@@ -1205,7 +1253,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				} else {
 					// Left arrow - cross-fade all the way to the left if not automated
 					alpha = 0.0;
-					paintCrossfader(false);
+					crossfaderKnob.setValue((float) alpha);
 				}
 				
 			} else if (keyCode == KeyEvent.VK_RIGHT) {
@@ -1216,7 +1264,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				} else {
 					// Right arrow - cross-fade all the way to the right if not automated
 					alpha = 1.0;
-					paintCrossfader(false);
+					crossfaderKnob.setValue((float) alpha);
 				}
 			} else if (keyCode == KeyEvent.VK_DOWN) {
 				// Auto cross-fade to the opposite direction
@@ -1228,7 +1276,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						startAutoCrossfade(-CROSSFADE_SPEED_FAST);
 					} else {
 						alpha = 0.0;
-						paintCrossfader(false);
+						crossfaderKnob.setValue((float) alpha);
 					}
 					
 				} else {
@@ -1239,7 +1287,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						startAutoCrossfade(CROSSFADE_SPEED_FAST);
 					} else {
 						alpha = 1.0;
-						paintCrossfader(false);
+						crossfaderKnob.setValue((float) alpha);
 					}
 				}
 				
@@ -1411,7 +1459,6 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		crossfadeSpeed = speed;
 		if (crossfadeAutomator == CrossfadeAutomator.CROSSFADE_AUTO) {
 			// Already cross-fading don't start a new thread!
-			System.out.println("Already cross-fading!");
 			return;
 		}
 		
@@ -1448,13 +1495,16 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			if (alpha < 0.0) {
 				alpha = 0.0;
 				crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
-				paintCrossfader(false);
+				crossfaderKnob.setIsHot(false);
+				crossfaderKnob.setValue((float) alpha);
 			} else if (alpha > 1.0) {
 				alpha = 1.0;
 				crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
-				paintCrossfader(false);
+				crossfaderKnob.setIsHot(false);
+				crossfaderKnob.setValue((float) alpha);;
 			} else {
-				paintCrossfader(true);
+				crossfaderKnob.setIsHot(true);
+				crossfaderKnob.setValue((float) alpha);
 			}
 			break;
 			
@@ -1462,10 +1512,123 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		}
 	}
 	
+	public void endAutomaticCrossfade() {
+		// Disable any automated cross-fading
+		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
+	}
+	
 	public LightDJPostProcessing getPostProcessingMethod() {
 		return lightDJPostProcessing;
 	}
 	
+	
+	/**
+	 * MIDI Processing events
+	 */
+	
+	public void setupMIDIControllers() {
+		
+		// Initialize some data structures
+		midiLeftPluginIndices = new HashMap<Integer, Integer>();
+		midiRightPluginIndices = new HashMap<Integer, Integer>();
+		midiGeneralIndices = new HashMap<Integer, Integer>();
+		midiCrossfaderChannel = 0;
+		
+		// Parse the configuration file		
+		// Left plugins
+		String pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_LEFT_PLUGIN_CHANNELS", "");
+		String[] channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiLeftPluginIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
+		// Right plugins
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_RIGHT_PLUGIN_CHANNELS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiRightPluginIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
+		// General sliders
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_GENERAL_SLIDER_CHANNELS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiGeneralIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
+		// MIDI crossfader
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_CROSSFADER_CHANNEL", "");
+		channels = pluginChannels.split(",");
+		if (channels.length > 1) {
+			System.out.println("Error in configuration file: MIDI_CROSSFADER_CHANNEL may only contain one value!");
+		}
+		if (channels.length == 1) {	// Ignore if 0 specified
+			try {
+				midiCrossfaderChannel = Integer.parseInt(channels[0].trim());
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI_CROSSFADER_CHANNEL line!");
+				e.printStackTrace();
+			}
+		}
+		
+		// Set up MIDI communication
+		midiConnector = new MidiConnector();
+		midiConnector.connectToMIDIControllers(this);
+	}
+	
+	public void processMIDIEvent(MidiMessage message) {
+		// For now, only deal with short messages
+		if (message instanceof ShortMessage) {
+			ShortMessage event = (ShortMessage) message;
+			
+			// See if the channel corresponding to this event matches one of the ones specified by the
+			// configuration file
+			int channel = event.getData1();
+			int index;
+			
+			if (channel == midiCrossfaderChannel) {
+				// Crossfade it!
+				updateControl(crossfaderKnob, event);
+				
+			} else if (midiLeftPluginIndices.containsKey(channel)) {
+				index = midiLeftPluginIndices.get(channel);
+				List<UserControl> userControls = visualizers.get(visualizerLeftIndex).getRequestedUserControls();
+				if (index < userControls.size()) {
+					// We have a valid mapping!
+					updateControl(userControls.get(index), event);
+				}
+			} else if (midiRightPluginIndices.containsKey(channel)) {
+				index = midiRightPluginIndices.get(channel);
+				List<UserControl> userControls = visualizers.get(visualizerRightIndex).getRequestedUserControls();
+				if (index < userControls.size()) {
+					// We have a valid mapping!
+					updateControl(userControls.get(index), event);
+				}
+			}
+			
+		}
+	}
+	
+	// Update a user control by setting it to a new value from a MIDI message
+	private void updateControl(UserControl control, ShortMessage event) {
+		float value = event.getData2() / 127.0f;
+		control.setValue(value);
+	}
 	
 	
 	

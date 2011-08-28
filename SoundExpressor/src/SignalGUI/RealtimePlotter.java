@@ -148,6 +148,31 @@ public class RealtimePlotter {
 		return (int) (height - y);
 	}
 	
+	public void move(int x, int y, int width, int height) {
+		screenX = x;
+		screenY = y;
+		if (width > 0) {
+			this.width = width;
+		} else {
+			this.width = 1;
+		}
+		if (height > 0) {
+			this.height = height;
+		} else {
+			this.height = 1;
+		}
+		
+		setSize(width, height);
+		
+	}
+	
+	private void setSize(int w, int h) {
+		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	}
+	
+	public void setGraphics(Graphics2D g2D) {
+		this.outputG2D = g2D;
+	}
 	
 }
 

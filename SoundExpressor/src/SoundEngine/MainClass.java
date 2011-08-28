@@ -54,17 +54,17 @@ public class MainClass {
 	protected static void loadConfigurationFile() {
 		// Parse the configuration file
 		System.out.println("Parsing configuration file...");
-		ConfigFileParser configFile = new ConfigFileParser("config_settings.txt");
+		ConfigFileParser.parseFile("config_settings.txt");
 		
 		// Process settings related to lighting
 		// Now process the configuration file!
 		
-		ColorOutput.NUM_LEDS_PER_RGB_BOARD = Integer.parseInt(configFile.getSettingOrDefault("NUM_LEDS_PER_RGB_BOARD", "4"));
-		ColorOutput.NUM_FRONT_RGB_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_FRONT_RGB_PANELS", "6"));
-		ColorOutput.NUM_REAR_RGB_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_REAR_RGB_PANELS", "6"));
-		ColorOutput.NUM_UVWHITE_PANELS = Integer.parseInt(configFile.getSettingOrDefault("NUM_UVWHITE_PANELS", "7"));
-		ColorOutput.START_REAR_PANEL_ADDRESSES = Integer.parseInt(configFile.getSettingOrDefault("START_REAR_PANEL_ADDRESSES", "8"));
-		ColorOutput.START_UVWHITE_PANEL_ADDRESSES = Integer.parseInt(configFile.getSettingOrDefault("START_UVWHITE_PANEL_ADDRESSES", "16"));
+		ColorOutput.NUM_LEDS_PER_RGB_BOARD = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_LEDS_PER_RGB_BOARD", "4"));
+		ColorOutput.NUM_FRONT_RGB_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_FRONT_RGB_PANELS", "6"));
+		ColorOutput.NUM_REAR_RGB_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_REAR_RGB_PANELS", "6"));
+		ColorOutput.NUM_UVWHITE_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_UVWHITE_PANELS", "7"));
+		ColorOutput.START_REAR_PANEL_ADDRESSES = Integer.parseInt(ConfigFileParser.getSettingOrDefault("START_REAR_PANEL_ADDRESSES", "8"));
+		ColorOutput.START_UVWHITE_PANEL_ADDRESSES = Integer.parseInt(ConfigFileParser.getSettingOrDefault("START_UVWHITE_PANEL_ADDRESSES", "16"));
 		
 		// Some computed values for convenience
 		ColorOutput.NUM_RGB_LIGHTS_FRONT = ColorOutput.NUM_LEDS_PER_RGB_BOARD * ColorOutput.NUM_FRONT_RGB_PANELS;
@@ -78,6 +78,9 @@ public class MainClass {
 		// Process audio /visual settings
 		
 	
+		
+
+		
 	}
 	
 	// Don't operate from live captured audio, but rather from a pre-recorded sound file.

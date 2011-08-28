@@ -63,8 +63,6 @@ public class ScrollingChannel {
 		
 	}
 	
-
-	
 	private void outputGraph() {
 		outputG2D.drawImage(buffer, screenX, screenY, null);
 	}

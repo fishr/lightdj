@@ -238,5 +238,10 @@ public class DistributionPlotter {
 		}
 	}
 	
+	public void setGraphics(Graphics2D g2D) {
+		this.outputG2D = g2D;
+	}
+	
+	
 }
 

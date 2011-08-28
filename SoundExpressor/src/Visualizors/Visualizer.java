@@ -1,5 +1,6 @@
 package Visualizors;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public abstract class Visualizer {
 	public Visualizer(int fftSize, double updatesPerSecond) {
 		FFT_SIZE = fftSize;
 		UPDATES_PER_SECOND = updatesPerSecond;
-		controls = new LinkedList<UserControl>();
+		controls = new ArrayList<UserControl>();
 	}
 	
 	/**
