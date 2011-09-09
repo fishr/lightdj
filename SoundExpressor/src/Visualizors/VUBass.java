@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import Common.ColorOutput;
 import Common.FeatureList;
+import LightDJGUI.GenericKnob;
 
 /**
  * A basic visualizer that sets the first light to red corresponding to how much bass there is,
@@ -25,7 +26,12 @@ public class VUBass extends Visualizer {
 	protected static int FADEOUT_LENGTH = 300;
 	protected static int fadeoutCounter = 0;
 	
-	protected int HALF_SIZE = 12;
+	protected int HALF_SIZE;
+	protected int CUTOFF_GREEN;
+	protected int CUTOFF_YELLOW;
+	
+	// User controls
+	GenericKnob knobSensitivity;
 	
 	@Override
 	public String getName() {
@@ -39,10 +45,16 @@ public class VUBass extends Visualizer {
 	@Override
 	public void init() {
 		// Initialize some parameters
+		HALF_SIZE = ColorOutput.NUM_FRONT_RGB_PANELS * ColorOutput.NUM_LEDS_PER_RGB_BOARD / 2;
+		CUTOFF_GREEN = (int) (HALF_SIZE * 0.25);
+		CUTOFF_YELLOW = (int) (HALF_SIZE * 0.58334);
+		
 		// Set up a color gradient
 		colorGradient = new RGBGradientCompoundLinear(new Color[] {Color.GREEN, Color.YELLOW, Color.RED}, new Color[] {Color.YELLOW, Color.RED, Color.GREEN}, new double[] {0.0, 0.333, 0.667}, new double[] {0.333, 0.667, 1.0});
 		
-		// We don't need to request any user controls for this visualization plugin
+		// Request user controls
+		knobSensitivity = new GenericKnob(0.5f, 50, "Level sensitivity");
+		requestUserControl(knobSensitivity);
 		
 	}
 
@@ -54,11 +66,15 @@ public class VUBass extends Visualizer {
 		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
 		double level = (Double) featureList.getFeature("OVERALL_LEVEL");
 		
+		// Retrieve knob parameters
+		double gain = 12.0 * knobSensitivity.getValue() + 0.25;
+		
+		
 		// Compute a new set of colorings, and store them.
 		ColorOutput colorOutput = new ColorOutput();
 		
 		// Make the second color a randomized hue, with brightness determined by the clap level.
-		double bright = level; //0.7 * bassLevel + 0.3 * clapLevel;  //(System.currentTimeMillis() % 1000) / 1000.0;
+		double bright = gain * level; //0.7 * bassLevel + 0.3 * clapLevel;  //(System.currentTimeMillis() % 1000) / 1000.0;
 		double b0 = 0;
 		double b1 = 0;
 		double b2 = 0;
@@ -159,9 +175,9 @@ public class VUBass extends Visualizer {
 //			c = Color.RED;
 //		}
 //		
-		if (i < 3) {
+		if (i < CUTOFF_GREEN) {
 			c = Color.GREEN;
-		} else if (i < 7) {
+		} else if (i < CUTOFF_YELLOW) {
 			c = Color.YELLOW;
 		} else {
 			c = Color.RED;

@@ -21,12 +21,12 @@ public class MainClass {
 	private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
-	private static final int AUDIO_READ_BUFFER_SIZE = 1024;
+	private static final int AUDIO_READ_BUFFER_SIZE = 256;
 	private static final int SAMPLE_RATE = 44100;
 	private static final boolean USE_CAPTURED_AUDIO = true;
 	private static final boolean AUDIO_PASS_THRU = false;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.005;
+	private static final double INITIAL_VIDEO_DELAY = 0.010;
 
 	
 	public static void main(String[] args) {
@@ -59,12 +59,12 @@ public class MainClass {
 		// Process settings related to lighting
 		// Now process the configuration file!
 		
-		ColorOutput.NUM_LEDS_PER_RGB_BOARD = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_LEDS_PER_RGB_BOARD", "4"));
-		ColorOutput.NUM_FRONT_RGB_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_FRONT_RGB_PANELS", "6"));
-		ColorOutput.NUM_REAR_RGB_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_REAR_RGB_PANELS", "6"));
-		ColorOutput.NUM_UVWHITE_PANELS = Integer.parseInt(ConfigFileParser.getSettingOrDefault("NUM_UVWHITE_PANELS", "7"));
-		ColorOutput.START_REAR_PANEL_ADDRESSES = Integer.parseInt(ConfigFileParser.getSettingOrDefault("START_REAR_PANEL_ADDRESSES", "8"));
-		ColorOutput.START_UVWHITE_PANEL_ADDRESSES = Integer.parseInt(ConfigFileParser.getSettingOrDefault("START_UVWHITE_PANEL_ADDRESSES", "16"));
+		ColorOutput.NUM_LEDS_PER_RGB_BOARD = ConfigFileParser.getSettingOrDefault("NUM_LEDS_PER_RGB_BOARD", 4);
+		ColorOutput.NUM_FRONT_RGB_PANELS = ConfigFileParser.getSettingOrDefault("NUM_FRONT_RGB_PANELS", 6);
+		ColorOutput.NUM_REAR_RGB_PANELS = ConfigFileParser.getSettingOrDefault("NUM_REAR_RGB_PANELS", 6);
+		ColorOutput.NUM_UVWHITE_PANELS = ConfigFileParser.getSettingOrDefault("NUM_UVWHITE_PANELS", 7);
+		ColorOutput.START_REAR_PANEL_ADDRESSES = ConfigFileParser.getSettingOrDefault("START_REAR_PANEL_ADDRESSES", 8);
+		ColorOutput.START_UVWHITE_PANEL_ADDRESSES = ConfigFileParser.getSettingOrDefault("START_UVWHITE_PANEL_ADDRESSES", 16);
 		
 		// Some computed values for convenience
 		ColorOutput.NUM_RGB_LIGHTS_FRONT = ColorOutput.NUM_LEDS_PER_RGB_BOARD * ColorOutput.NUM_FRONT_RGB_PANELS;

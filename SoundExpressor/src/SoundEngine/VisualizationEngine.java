@@ -19,7 +19,7 @@ import Signals.FFTEngine;
 public abstract class VisualizationEngine {
 	
 	// Audio buffers
-	protected int BUFFER_SIZE = 256;
+	protected int BUFFER_SIZE = 256; //256
 	protected int BUFFER_OVERLAP = 1;	// Must be a power of 2
 	protected double[][] buffers;
 	protected int[] bufferCursors;
@@ -177,7 +177,7 @@ class VisualizationEngineRenderThread implements Runnable {
 	private Queue<RenderFrame> timeQueue;
 	private VisualizationEngine engine;
 	public long startTime;
-	protected boolean INSTANT_PLAY;
+	protected final boolean INSTANT_PLAY;
 	
 	public VisualizationEngineRenderThread(VisualizationEngine engine, Queue<RenderFrame> timeQueue, boolean INSTANT_PLAY) {
 		this.engine = engine;

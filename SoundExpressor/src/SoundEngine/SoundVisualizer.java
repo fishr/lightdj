@@ -19,7 +19,7 @@ import Utils.TimerTicToc;
 public class SoundVisualizer {
 
 	// Constants
-	private int SOUNDCARD_BUFFER_SIZE = 1024*64;	// The size of the audio buffer used by Java
+	private int SOUNDCARD_BUFFER_SIZE = 1024*64; //1024*64	// The size of the audio buffer used by Java
 	private int AUDIO_BUFFER_SIZE;					// The size fo the audio buffer used by this software
 													// to lock-step synchronize audio with visuals
 	
@@ -87,6 +87,7 @@ public class SoundVisualizer {
 		// Set up video
 		// Set up a visualization engine
 		visuals = new VisualizationEngineParty(format, initialVideoDelaySec);
+		//visuals = new VisualizationEngineAC(format, initialVideoDelaySec);
 
 	}
 	
@@ -103,12 +104,7 @@ public class SoundVisualizer {
 	public void write(byte[] data, int offset, int length) {
 		// Pass through to the audio buffer and to the visuals
 		
-		// Write the audio to the visualizer!
-		visuals.write(data, offset, length);
-		
-		TimerTicToc t = new TimerTicToc();
-
-		if (passThru) {
+if (passThru) {
 			
 			// Add this data to the audio buffer
 			for(int i = offset; i < offset + length; i++) {
@@ -127,6 +123,13 @@ public class SoundVisualizer {
 			}
 			bufferReadPointer = (bufferReadPointer + length) % AUDIO_BUFFER_SIZE;
 		}
+		
+		// Write the audio to the visualizer!
+		visuals.write(data, offset, length);
+		
+		TimerTicToc t = new TimerTicToc();
+
+		
 	
 	}
 	

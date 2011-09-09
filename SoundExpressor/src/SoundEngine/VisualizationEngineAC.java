@@ -64,7 +64,9 @@ public class VisualizationEngineAC extends VisualizationEngine {
 	//LEDVisualizer ledVisuals;
 	RelayVisuals ledVisuals;
 	
-
+	// Add hysteresis
+	boolean bassHigh = false;
+	
 	public VisualizationEngineAC(AudioFormat format, double videoDelaySec) {
 		super(format, videoDelaySec);
 	}
@@ -92,6 +94,11 @@ public class VisualizationEngineAC extends VisualizationEngine {
 		silenceFinder = new SilenceFinder(Math.round(0.5 * SAMPLE_RATE * BUFFER_OVERLAP / BUFFER_SIZE));
 		sharpClapFinder = new SharpClapFinder(SAMPLE_RATE, BUFFER_SIZE);
 		
+		// INitialize them
+		bassFinder.init();
+		silenceFinder.init();
+		sharpClapFinder.init();
+		
 		// Signal multiplexer
 		signalMux = new SignalMultiplexer(3);
 		
@@ -117,14 +124,30 @@ public class VisualizationEngineAC extends VisualizationEngine {
 		double bassLevel = bassFinder.getFreqs(frequencies, magnitudes);
 		double sharpClapLevel = sharpClapFinder.getFreqs(frequencies, magnitudes);
 		
+		// Add some hysteresis to the bass to redice flicker!
+		if (bassHigh == true) {
+			if (bassLevel < 0.4) {
+				bassHigh = false;
+				bassLevel = 0.0;
+			} else {
+				bassLevel = 1.0;
+			}
+		} else {
+			if (bassLevel > 0.6) {
+				bassHigh = true;
+				bassLevel = 1.0;
+			} else {
+				bassLevel = 0.0;
+			}
+		}
 		
 		signalMux.update(bassLevel);
 		
 		// Compute some channel values
 		double[] channels = new double[numChannels];
 		channels[0] = bassLevel;
-		channels[1] = sharpClapLevel;
-		channels[2] = sharpClapLevel;
+		channels[1] = bassLevel; //sharpClapLevel;
+		channels[2] = bassLevel;//sharpClapLevel;
 		channels[3] = signalMux.getChannelValue(0);
 		channels[4] = signalMux.getChannelValue(1);
 		channels[5] = signalMux.getChannelValue(2);
@@ -145,7 +168,7 @@ public class VisualizationEngineAC extends VisualizationEngine {
 		RenderFrameAC renderFrame = (RenderFrameAC) rf;
 		
 		// Update LED lights	
-		//ledVisuals.visualize(renderFrame.channels);					// Send SERIAL to the RGB's
+		ledVisuals.visualize(renderFrame.channels);					// Send SERIAL to the RGB's
 		bassLight.update(renderFrame.channels[0]);
 		highsLight.update(renderFrame.channels[1]);
 	}

@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import Common.ColorOutput;
 import Common.FeatureList;
+import LightDJGUI.ColorKnob;
 import LightDJGUI.GenericKnob;
 
 /**
@@ -20,6 +21,7 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 	
 	// GUI controls
 	GenericKnob knob;
+	ColorKnob colorKnob;
 	
 	@Override
 	public String getName() {
@@ -37,8 +39,9 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		
 		// Request controls for this plugin
 		knob = new GenericKnob(0.4f, 50, "Label");
+		colorKnob = new ColorKnob(0.0f, 50, "Color!one!");
 		requestUserControl(knob);
-		requestUserControl(new GenericKnob(0.4f, 50, "Label2"));
+		requestUserControl(colorKnob);
 		
 	}
 
@@ -54,7 +57,7 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		ColorOutput colorOutput = new ColorOutput();
 		rgbController.step(clapLevel);
 		
-		Color colorBass = new Color((float) bassLevel, 0.0f, 0.0f);
+		Color colorBass = RGBGradientLinear.linearGradient(Color.BLACK, colorKnob.getColor(), bassLevel);
 		Color colorHighs = rgbController.getColor();
 		
 		// Detect a transition to a new measure

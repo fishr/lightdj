@@ -206,7 +206,9 @@ public class ColorOutput {
 		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_FRONT_RGB_PANELS) {
-			throw new RuntimeException("Error: Invalid Front PanelIndex: " + panelIndex);
+			//throw new RuntimeException("Error: Invalid Front PanelIndex: " + panelIndex);
+			System.out.println("Warning: Invalid Front PanelIndex: " + panelIndex);
+			return;
 		}
 		
 		int i = 4*panelIndex;
@@ -223,7 +225,9 @@ public class ColorOutput {
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_REAR_RGB_PANELS) {
-			throw new RuntimeException("Error: Invalid Rear PanelIndex: " + panelIndex);
+			//throw new RuntimeException("Error: Invalid Rear PanelIndex: " + panelIndex);
+			System.out.println("Warning: Invalid Rear PanelIndex: " + panelIndex);
+			return;
 		}
 		
 		int i = 4*panelIndex;
@@ -239,7 +243,9 @@ public class ColorOutput {
 		uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_UVWHITE_PANELS) {
-			throw new RuntimeException("Error: Invalid UV/White PanelIndex: " + panelIndex);
+			//throw new RuntimeException("Error: Invalid UV/White PanelIndex: " + panelIndex);
+			System.out.println("Warning: Invalid UV/White PanelIndex: " + panelIndex);
+			return;
 		}
 		
 		uvLights[panelIndex] = uv;
@@ -260,7 +266,11 @@ public class ColorOutput {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
 		
-		rgbLightsFront[i] = c; 
+		if (i >= 0 && i < rgbLightsFront.length) { 
+			rgbLightsFront[i] = c; 
+		} else {
+			System.out.println("Error: Invalid Front RGB Light Index: " + i);
+		}
 		
 	}
 	
@@ -268,8 +278,12 @@ public class ColorOutput {
 
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
-		
-		rgbLightsRear[i] = c; 
+
+		if (i >= 0 && i < rgbLightsRear.length) { 
+			rgbLightsRear[i] = c; 
+		} else {
+			System.out.println("Error: Invalid Rear RGB Light Index: " + i);
+		}
 		
 	}
 	

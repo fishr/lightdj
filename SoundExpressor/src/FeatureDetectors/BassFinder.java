@@ -40,8 +40,8 @@ public class BassFinder extends FeatureDetector {
 		minFreq = 0;
 		maxFreq = 120;
 		normalizingVal = 30.0;
-		averageHalfLife = 0.3;
-		decayRate = 1.0 / (30);
+		averageHalfLife = 0.5;
+		decayRate = 1.0 / (60);
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		recentBassIndex = 0;
 		recentBassLevels = new double[NUM_RECENT_BASS_VALS];
@@ -95,7 +95,7 @@ public class BassFinder extends FeatureDetector {
 		// Compute a very low-passed version of the signal to use as an estimate of the overall
 		// level of this frequency range. This is the "adaptive" part that allows the frequency
 		// range finder to adjust to different volume levels
-		double threshold = averagedLevel + averagedSpread + 300.0; //* 1.25 + 5.0;
+		double threshold = averagedLevel + 1.5 * averagedSpread + 10.0; //* 1.25 + 5.0;
 		this.threshold = threshold;
 		double spread = Math.abs(level - averagedLevel);
 		
@@ -114,7 +114,7 @@ public class BassFinder extends FeatureDetector {
 		
 		double actualOutput;
 		
-		// Limit how fast the output can fal, in an attempt to minimize flicker
+		// Limit how fast the output can fall, in an attempt to minimize flicker
 		if (outputVal < lastOutput - decayRate) {
 			actualOutput = lastOutput - decayRate;
 		} else {

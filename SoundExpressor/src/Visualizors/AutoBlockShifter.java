@@ -22,7 +22,7 @@ public class AutoBlockShifter extends Visualizer {
 	protected static int SHIFT_LENGTH = 12;
 	protected static int shiftCounter = 0;
 	
-	protected int HALF_SIZE = 12;
+	protected int HALF_SIZE;
 	
 	protected static boolean triggerState;
 	protected static final double TRIGGER_HIGH = 0.99;
@@ -41,6 +41,7 @@ public class AutoBlockShifter extends Visualizer {
 	
 	@Override
 	public void init() {
+		HALF_SIZE = ColorOutput.NUM_FRONT_RGB_PANELS * ColorOutput.NUM_LEDS_PER_RGB_BOARD / 2;
 		colorRegister = new Color[HALF_SIZE];
 		triggerState = false;
 		

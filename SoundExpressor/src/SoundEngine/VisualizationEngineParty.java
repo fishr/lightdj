@@ -65,6 +65,7 @@ import Visualizors.Ambiance;
 import Visualizors.AutoBlockShifter;
 import Visualizors.Black;
 import Visualizors.BlockShifter;
+import Visualizors.ColorEnergyWave;
 import Visualizors.DoubleChaser;
 import Visualizors.FingerPiano;
 import Visualizors.FireSlider;
@@ -151,7 +152,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			//ledVisuals = new LEDVisualizer();
 			ledVisuals = new PartyLightsController();
 		} catch (Throwable o) {
-			System.out.println("WARNING: Couldn't connect to LED's via USB!");
+			System.out.println("WARNING: Couldn't connect to LEDs!");
 		}
 		
 		// Start up MIDI
@@ -212,6 +213,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		visualizers.add(new BlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new HueBass(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new AutoBlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new ColorEnergyWave(FFT_SIZE, UPDATES_PER_SECOND));
 		//visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;
@@ -297,7 +299,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		applyPostProcessing(colorOutput);
 		
 		// Send the command to the LED's
-//		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
+		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
 		
 		renderFrame.finalOutput = colorOutput;
 		
@@ -803,7 +805,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 		// Start a tast to render regularly!
 		Timer t = new Timer();
-		t.scheduleAtFixedRate(new RenderTask(this), 0, 50);
+		t.scheduleAtFixedRate(new RenderTask(this), 0, 17);
 		
 		System.out.println("Light DJ started.");
 	}
