@@ -21,19 +21,21 @@ public class ArduinoColorTest {
 		
 		while (true) {
 			color = Color.getHSBColor(hue, saturation, brightness);
-			double red = color.getRed() / 255.0;
-			double green = color.getGreen() / 255.0;
-			double blue = color.getBlue() / 255.0;
+			float colors[] = new float[3];
+			color.getRGBColorComponents(colors);
+			double red = colors[0];
+			double green = colors[1];
+			double blue = colors[2];
 			
-			System.out.println("(" + red + ", " + green + ", " + blue + ")");
+			//System.out.println("(" + red + ", " + green + ", " + blue + ")");
 			
 			rgbLED.visualize(new double[] {0, red, green, blue});
 			
-			hue = (hue + 0.001f) % 1.0f;
+			hue = (hue + 0.00005f) % 1.0f;
 			
 			// Wait a little bit
 			try {
-				Thread.sleep(10);
+				//Thread.sleep(1);
 			} catch (Exception e) {
 				
 			}

@@ -13,11 +13,11 @@ import Common.FeatureList;
  */
 public class RainbowSlider extends Visualizer {
 
-	protected static double phaseOffsetBase = 0.06;
+	protected static double phaseOffsetBase = 0.12;
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
 	
-	protected static int NUM_FRONT_RGB_LIGHTS = 24;
+	protected static int NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS * ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	
 	@Override
 	public String getName() {

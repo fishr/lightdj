@@ -1,0 +1,76 @@
+package Visualizors;
+
+import java.awt.Color;
+
+import Common.ColorOutput;
+import Common.FeatureList;
+import LightDJGUI.GenericKnob;
+
+/**
+ * A basic visualizer that sets the first light to red corresponding to how much bass there is,
+ * and the second light to a color rotator based on the clap level.
+ * @author Steve Levine0
+ *
+ */
+public class ColoredBass extends Visualizer {
+
+
+	
+	// GUI elements
+	GenericKnob hueKnob;
+	GenericKnob colorSpeed;
+	GenericKnob bassBounce;
+	
+	@Override
+	public String getName() {
+		return "Bass Colorz";
+	}
+	
+	public ColoredBass(int fftSize, double updatesPerSecond) {
+		super(fftSize, updatesPerSecond);
+	}
+	
+	@Override
+	public void init() {
+		// Initialize some parameters
+
+		
+		// Request user controls
+		hueKnob = new GenericKnob(0.0f, 80, "Color Hue");
+		colorSpeed = new GenericKnob(0.1f, 50, "Color rotate speed");
+		bassBounce = new GenericKnob(1.0f, 50, "Bass Bounce");
+		requestUserControl(hueKnob);
+		requestUserControl(colorSpeed);
+		requestUserControl(bassBounce);
+		
+		
+	}
+
+	@Override
+	public ColorOutput visualize(FeatureList featureList) {
+		
+		// Retreive any necessary parameters from the FeatureList
+	
+		// Retrieve parameters from the knobs
+		double omegaColor = 0.01 * colorSpeed.getValue();
+		double omegaBlanking = 0.2 * blankSpeed.getValue() + 0.07;
+		double blankingAmount = blankAmplitude.getValue();
+		double heat = heatKnob.getValue();
+		
+		// Compute a new set of colorings, and store them.
+		colorTheta += omegaColor;
+		blankingTheta += omegaBlanking;
+		double blank = 0.6 * (1.0 - blankingAmount / 2.0 * (1 + Math.sin(blankingTheta)));
+		Color c = Color.getHSBColor((float) colorTheta, (float) (1.0 - heat), (float) blank);
+		
+		ColorOutput colorOutput = new ColorOutput();
+		colorOutput.setAllFrontRGBLEDs(c);
+		colorOutput.setAllRearRGBLEDs(c);
+		
+		// Return the result
+		return colorOutput;
+	}
+
+
+
+}

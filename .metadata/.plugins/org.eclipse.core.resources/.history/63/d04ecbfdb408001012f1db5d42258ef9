@@ -1,0 +1,376 @@
+package SoundEngine;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.Semaphore;
+import javax.sound.sampled.AudioFormat;
+
+
+import Arduino.LEDVisualizer;
+import Arduino.RelayVisuals;
+import GenreClassifier.NaiveBayesClassifier;
+import GenreClassifier.SongFeatureVector;
+import SignalGUI.ChannelLights;
+import SignalGUI.ColoredLight;
+import SignalGUI.DistributionPlotter;
+import SignalGUI.GUIVisualizer;
+import SignalGUI.GraphDisplay;
+import SignalGUI.RGBLight;
+import SignalGUI.RealtimePlotter;
+import SignalGUI.ScrollingChannel;
+import SignalGUI.ScrollingSpectrum;
+import SignalGUI.TextLight;
+import Signals.FFT;
+import Signals.FFTEngine;
+import Utils.TimerTicToc;
+
+/**
+ * This class is responsible for music visualizations.
+ *
+ */
+public class VisualizationEngineAC extends VisualizationEngine {
+
+	private double[][] buffers;
+	private int[] bufferCursors;
+	private final int BUFFER_SIZE = 2048;
+	private final int BUFFER_OVERLAP = 8;	// Must be a power of 2
+	
+	// The audio format of data being written in
+	private final int FRAME_SIZE;
+	private final int BYTES_PER_SAMPLE;
+	private final long MAX_SAMPLE_VAL;
+	private final int SAMPLE_RATE;
+	
+	
+	// For multi-channel audio (ex., stereo), only use this channel for processing
+	private final int CHANNEL_TO_PROCESS = 0;
+	
+	// Visualization stuff
+	GUIVisualizer gui;
+	GraphDisplay graphMapper;
+	ScrollingSpectrum spectrumMapper;
+	ScrollingChannel channelMapper;
+	ChannelLights lights;
+	ColoredLight bassLight;
+	ColoredLight highsLight;
+	TextLight textLight;
+	
+	RealtimePlotter plotter;
+
+	
+	// State machines that output channel values
+	int numChannels = 6; //4;
+	BassFinder bassFinder;
+	SilenceFinder silenceFinder;
+	SharpClapFinder sharpClapFinder;
+	
+	// Alternator state machine
+	SignalMultiplexer signalMux;
+	
+	// The arduino LED visualizer
+	//LEDVisualizer ledVisuals;
+	RelayVisuals ledVisuals;
+	
+	// A rendering thread and timing queue to ensure that the visuals are rendered at the proper time as the audio
+	VisualizationEngineRenderThread renderTimingThread;
+	Queue<RenderFrame> timeQueue;
+	long frameWidth;
+	long startTime;
+	int numBuffersRendered = 0;
+	private long videoDelayOffset;
+	
+	// Used for profiling and debugging
+	TimerTicToc timer;
+	
+	// The FFT engine
+	FFTEngine fftEngine;
+	
+	protected long cycle_clock = 0;
+	
+	public VisualizationEngineAC(AudioFormat format, double videoDelaySec) {
+		super(format);
+		
+		// Remember stuff about the audio format
+		// For simplicity for now, only support 16 bit samples
+		if (format.getSampleSizeInBits() != 16) {
+			System.out.println("Error: I currently only support 16 bit linear PCM audio data!");
+			throw new RuntimeException("I only support 16 bit linear PCM audio data!");	
+		} else if (format.isBigEndian()){
+			System.out.println("Error: I don't feel like supporting big endian!");
+			throw new RuntimeException("I don't feel like supporting big endian!");	
+		} else {
+			// Okay
+			BYTES_PER_SAMPLE = 2;
+			FRAME_SIZE = format.getFrameSize();
+			MAX_SAMPLE_VAL = (long) Math.pow(2, 8*BYTES_PER_SAMPLE - 1);
+			SAMPLE_RATE = (int) format.getSampleRate();
+			
+			System.out.println("Audio frame size: " + format.getFrameSize());
+			
+		}
+		
+		// Set up sample buffers
+		buffers = new double[BUFFER_OVERLAP][BUFFER_SIZE];
+		bufferCursors = new int[BUFFER_OVERLAP];
+		for(int i = 0; i < BUFFER_OVERLAP; i++) {
+			bufferCursors[i] = i*(BUFFER_SIZE/BUFFER_OVERLAP);
+		}
+		
+		
+		
+		// Set up a profiler, for debugging use
+		timer = new TimerTicToc();
+		
+		// Start the FFT engine
+		fftEngine = new FFTEngine(BUFFER_SIZE, SAMPLE_RATE);
+		
+		// Load up the visualizations
+		initVisualizations();
+		
+		videoDelayOffset = (long) (1000000000 * videoDelaySec);
+	}
+	
+	private void initVisualizations() {
+		
+		// Set up the GUI
+		gui = GUIVisualizer.makeGUI();
+		Graphics2D g2D = (Graphics2D) gui.getGraphics(); //null
+		
+		// Divide up the GUI into different useful stuff.
+		graphMapper = new GraphDisplay(30, 30, 700, 350, (Graphics2D) g2D);
+		spectrumMapper = new ScrollingSpectrum(30, 400, 500, 300, g2D);
+		channelMapper = new ScrollingChannel(30, 750, 500, 200, (Graphics2D) g2D);
+		bassLight = new ColoredLight(Color.RED, 150, 750, 30, 150, 150, (Graphics2D) g2D);
+		highsLight = new ColoredLight(Color.GREEN, 150, 920, 30, 150, 150, (Graphics2D) g2D);
+		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.GREEN}, 605, 400, 450, 300, 200.0, (Graphics2D) g2D);
+		textLight = new TextLight(100, 100, 300, 100, g2D);
+		//plotter = new RealtimePlotter(new Color[]{Color.RED}, 605, 400, 450, 300, 200.0, (Graphics2D) gui.getGraphics());
+		
+		
+		// Start some state machines
+		bassFinder = new BassFinder(SAMPLE_RATE, BUFFER_SIZE);
+		silenceFinder = new SilenceFinder(Math.round(0.5 * SAMPLE_RATE * BUFFER_OVERLAP / BUFFER_SIZE));
+		sharpClapFinder = new SharpClapFinder(SAMPLE_RATE, BUFFER_SIZE);
+		
+		// Signal multiplexer
+		signalMux = new SignalMultiplexer(3);
+		
+		try {
+			//ledVisuals = new LEDVisualizer();
+			ledVisuals = new RelayVisuals();
+		} catch (Throwable o) {
+			System.out.println("WARNING: Couldn't connect to LED's via USB!");
+		}
+		
+		
+		// Set up timing and rendering
+		timeQueue = new LinkedList<RenderFrame>();
+		renderTimingThread = new VisualizationEngineRenderThread(this, timeQueue);
+		
+	}
+	
+	@Override
+	public void start() {
+		// Start the rendering thread
+		Thread renderThread = new Thread(renderTimingThread);
+		renderThread.start();
+		
+		// Record when "now" is
+		startTime = System.nanoTime();
+		renderTimingThread.startTime = startTime;
+		
+	}
+	
+	/**
+	 * Write data into the buffer, and visualize when appropriate.
+	 */
+	public void write(byte[] data, int offset, int length) {
+		// Data is in the form of frames, which could be multi-channel audio.
+		// Read in by samples
+		long lValue;
+		double dValue;
+		
+		for(int dataCursor = offset; dataCursor < length + offset; dataCursor += FRAME_SIZE) {
+			// Read in one sample
+			lValue = 0;
+			if (BYTES_PER_SAMPLE == 2) {
+				lValue = ((((short) data[dataCursor + 1]) + 128) << 8) | (((short) data[dataCursor]) + 128);
+			}
+			
+			// Convert this to a double value, and store it!
+			dValue = (double) (lValue - MAX_SAMPLE_VAL) / (MAX_SAMPLE_VAL);
+			
+			// Put in in the buffers!
+			for(int i = 0; i < BUFFER_OVERLAP; i++) {
+			
+				buffers[i][bufferCursors[i]++] = dValue;
+				
+				// Is it time to visualize?
+				if (bufferCursors[i] == BUFFER_SIZE) {
+					// Compute the synchronization parameters for the music
+					
+					long frameWidth = (long) ((1.0 * BUFFER_SIZE / SAMPLE_RATE / BUFFER_OVERLAP) * 1000000000.0);
+					long timestamp = startTime + numBuffersRendered * frameWidth + videoDelayOffset;
+					
+					visualize(buffers[i], timestamp, frameWidth);
+					numBuffersRendered++;
+					
+					// Reset the ring buffer
+					bufferCursors[i] = 0;
+				}
+				
+			}
+
+		}
+	}
+	
+
+	
+	private void visualize(double[] buffer, long timestamp, long timewidth) {
+		//timer.tic();
+		
+		
+		// Compute an FFT
+		FFT fft = fftEngine.computeFFT(buffer);  //new FFT(buffer, SAMPLE_RATE);
+		//timer.toc();
+		//System.out.println(timer.getAverageTime());
+		
+		// Run in lock step - don't use a separate thread
+		RenderFrame renderFrame = computeVisualsRendering(fft);
+		// Set the timestamp and timewidth 2
+		renderFrame.timestamp = timestamp;
+		renderFrame.frameTimeWidth = timewidth;
+		
+		// Now, add this rendered frame to the render queue to be rendered! 3
+		synchronized(timeQueue) {
+			timeQueue.add(renderFrame);
+		}
+		
+		//renderVisuals(renderFrame);
+		
+		//timer.toc();
+		//System.out.println("Timer average: " + timer.getAverageTime()); 4
+		//System.out.println("Calls / sec: " + timer.getNumCallsPerSecond());
+	}
+	
+	/**
+	 * Compute a frame to be rendered at the appropriate time
+	 */
+	public RenderFrame computeVisualsRendering(FFT fft) {
+		
+		// Obtain the frequencies and corresponding magnitudes of the FFT
+		double[] frequencies = fft.getFrequencies();
+		double[] magnitudes = fft.getMagnitudes();
+		
+		// Compute useful values from the FFT data
+		double bassLevel = bassFinder.getFreqs(frequencies, magnitudes);
+		double sharpClapLevel = sharpClapFinder.getFreqs(frequencies, magnitudes);
+		
+		
+		signalMux.update(bassLevel);
+		
+		// Compute some channel values
+		double[] channels = new double[numChannels];
+		channels[0] = bassLevel;
+		channels[1] = sharpClapLevel;
+		channels[2] = sharpClapLevel;
+		channels[3] = signalMux.getChannelValue(0);
+		channels[4] = signalMux.getChannelValue(1);
+		channels[5] = signalMux.getChannelValue(2);
+		
+		// Create and return a render frame. Assume that the timestamp and framewidth will be set elsewhere.
+		RenderFrame renderFrame = new RenderFrame();
+		renderFrame.channels = channels;
+		return renderFrame;
+
+	}
+	
+	
+	/**
+	 * Actually render the previously computed frame
+	 */
+	public void renderVisuals(RenderFrame renderFrame) {
+		// Update LED lights	
+		//ledVisuals.visualize(renderFrame.channels);					// Send SERIAL to the RGB's
+		bassLight.update(renderFrame.channels[0]);
+		highsLight.update(renderFrame.channels[1]);
+	}
+	
+}
+
+class VisualizationEngineRenderThread implements Runnable {
+	
+	private Queue<RenderFrame> timeQueue;
+	private VisualizationEngineAC engine;
+	public long startTime;
+	
+	public VisualizationEngineRenderThread(VisualizationEngineAC engine, Queue<RenderFrame> timeQueue, long startTime) {
+		this.engine = engine;
+		this.timeQueue = timeQueue;
+	}
+	
+	// Precondition: timeQueue is in order
+	public void run() {
+		
+		// Continually see if it's time to render one of the render frames.
+		RenderFrame frameToRender = null;
+		while(true) {
+			long now = System.nanoTime();
+			
+			System.out.println("*** (" + ((double) (now - startTime) / 1000000)+ ")");
+			frameToRender = null;
+			synchronized(timeQueue) {// Must synchronize, since this is the consumer or a producer-consumer process
+				while(!timeQueue.isEmpty()) {
+					RenderFrame frame = timeQueue.peek();
+					if (frame.timestamp + frame.frameTimeWidth < now) {
+						// This frame occurred in the past; we're running too slowly. 
+						// Just drop this rendering and move on to the next.
+						System.out.println("D: " + ((double) (now - frame.timestamp - frame.frameTimeWidth) / 1000000));
+						timeQueue.remove();
+						
+					} else if (frame.timestamp <= now) {
+						// It is time to render this frame!
+						frameToRender = frame;
+						System.out.println("R");
+						break;
+						
+					} else {
+						// This frame must be in the future, so wait.
+						System.out.println("F");
+						break;
+					}
+				}
+			}
+			
+			// If necessary, render!
+			if (frameToRender != null) {
+				engine.renderVisuals(frameToRender);
+			}
+			
+			
+			// Wait a small amount of time
+			try {
+				Thread.sleep(0, 100000); // 100 uS	
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	
+}
+
+class RenderFrame {
+	// Timing information
+	public long timestamp;			// When this frame should start to be rendered - absolute time in nanoseconds
+	public long frameTimeWidth;		// How wide this frame is, in nanoseconds
+
+	// Rendering details
+	public double[] channels;
+}
+

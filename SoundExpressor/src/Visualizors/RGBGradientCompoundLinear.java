@@ -10,16 +10,12 @@ import java.awt.Color;
 public class RGBGradientCompoundLinear {
 	
 	
-	protected Color[] c1;
-	protected Color[] c2;
+	protected Color[] c;
 	protected double[] startPoints;
-	protected double[] endPoints;
 	
-	public RGBGradientCompoundLinear(Color[] c1, Color[] c2, double[] startPoints, double[] endPoints) {
-		this.c1 = c1;
-		this.c2 = c2;
+	public RGBGradientCompoundLinear(Color[] c, double[] startPoints) {
+		this.c = c;
 		this.startPoints = startPoints;
-		this.endPoints = endPoints;
 	}
 	
 	/**
@@ -27,9 +23,9 @@ public class RGBGradientCompoundLinear {
 	 */
 	public Color computeGradient(double x) {
 		
-		for(int i = 0; i < c1.length; i++) {
-			if (x >= startPoints[i] && x <= endPoints[i]) {
-				return RGBGradientLinear.linearGradient(c1[i], c2[i], (x - startPoints[i]) / (endPoints[i] - startPoints[i]));
+		for(int i = 0; i < c.length - 1; i++) {
+			if (x >= startPoints[i] && x <= startPoints[i + 1]) {
+				return RGBGradientLinear.linearGradient(c[i], c[i + 1], (x - startPoints[i]) / (startPoints[i + 1] - startPoints[i]));
 			}
 		}
 		

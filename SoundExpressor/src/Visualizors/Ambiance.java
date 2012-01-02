@@ -57,7 +57,7 @@ public class Ambiance extends Visualizer {
 		Color c0, c1, c2, c3;
 		
 		
-		double symLight = -(double) NUM_FRONT_RGB_LIGHTS / 2 - 0.5;
+		double symLight = -NUM_FRONT_RGB_LIGHTS / 2.0 - 0.5;
 		double a = 1.0;
 		
 		for(int light = 0; light < NUM_FRONT_RGB_LIGHTS; light++) {

@@ -52,6 +52,7 @@ import LightDJGUI.ScrollingSpectrum;
 import LightDJGUI.VisualizerChooser;
 import MidiInterface.MidiConnector;
 import PartyLightsController.PartyLightsController;
+import PartyLightsController.PartyLightsController16;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.GraphDisplay;
@@ -66,10 +67,13 @@ import Visualizors.AutoBlockShifter;
 import Visualizors.Black;
 import Visualizors.BlockShifter;
 import Visualizors.ColorEnergyWave;
+import Visualizors.ColoredBass;
 import Visualizors.DoubleChaser;
 import Visualizors.FingerPiano;
 import Visualizors.FireSlider;
 import Visualizors.HueBass;
+import Visualizors.HueBass2;
+import Visualizors.JazzColors;
 import Visualizors.LowSatAmbiance;
 import Visualizors.RGBGradientLinear;
 import Visualizors.RainbowSlider;
@@ -105,7 +109,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	// The arduino LED visualizer
 	//LEDVisualizer ledVisuals;
-	PartyLightsController ledVisuals;
+	//PartyLightsController ledVisuals;
+	PartyLightsController16 ledVisuals;
 	
 	// MIDI stuff
 	// The following class allows for MIDI communication
@@ -150,7 +155,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		try {
 			//ledVisuals = new LEDVisualizer();
-			ledVisuals = new PartyLightsController();
+			//ledVisuals = new PartyLightsController();
+			ledVisuals = new PartyLightsController16();
 		} catch (Throwable o) {
 			System.out.println("WARNING: Couldn't connect to LEDs!");
 		}
@@ -187,7 +193,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	
 	/**
-	 * Return the comprehensive list of all FeatureDetectors. Must be added here to show up in the LightDJ GUI.
+	 * Return the comprehensive list of all visualizers. Must be added here to show up in the LightDJ GUI.
 	 * @return
 	 */
 	public ArrayList<Visualizer> allVisualizers() {
@@ -214,6 +220,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		visualizers.add(new HueBass(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new AutoBlockShifter(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new ColorEnergyWave(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new HueBass2(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new ColoredBass(FFT_SIZE, UPDATES_PER_SECOND));
+		visualizers.add(new JazzColors(FFT_SIZE, UPDATES_PER_SECOND));
 		//visualizers.add(new CrazyStrobe(FFT_SIZE, UPDATES_PER_SECOND));
 		
 		return visualizers;
@@ -699,7 +708,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	//  Values and constants associated with post-processing effects
 	// Strobe speeds, for white and UV
 	protected int strobeFrame = 0;
-	protected int strobeFrameLength = 16;
+	protected int strobeFrameLength = 8;
 	
 	// White burst
 	protected long WHITE_BURST_TIME = 500;	// milliseconds

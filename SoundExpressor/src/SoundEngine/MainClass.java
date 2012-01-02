@@ -18,13 +18,13 @@ import Utils.TimerTicToc;
 public class MainClass {
 
 	//private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
-	private static final String soundFilename = "/home/steve/Desktop/04 Troublemaker.wav";
+	private static final String soundFilename = "/home/steve/Music/04 Troublemaker.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
 	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
 	private static final int AUDIO_READ_BUFFER_SIZE = 256;
 	private static final int SAMPLE_RATE = 44100;
 	private static final boolean USE_CAPTURED_AUDIO = true;
-	private static final boolean AUDIO_PASS_THRU = false;
+	private static final boolean AUDIO_PASS_THRU = true;
 	private static final double INITIAL_AUDIO_DELAY = 0.000;
 	private static final double INITIAL_VIDEO_DELAY = 0.010;
 
@@ -149,7 +149,7 @@ public class MainClass {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
 				//line.open(format);
-				line.open(format, 2*1024);	// Change the line-in audio buffer size here
+				line.open(format, 8*1024);	// Change the line-in audio buffer size here
 				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");

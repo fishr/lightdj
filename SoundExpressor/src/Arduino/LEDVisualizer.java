@@ -12,9 +12,9 @@ import Common.ColorOutput;
 public class LEDVisualizer {
 
 	// Some constants
-	private int MAX_PWM = 255;
+	private int MAX_PWM = 4095;
 	private int MIN_PWM = 0;
-	private String serialPort = "/dev/ttyUSB0";
+	private String serialPort = "/dev/ttyACM0";
 	private int portSpeed = 115200;
 	
 	// Fields
@@ -33,12 +33,18 @@ public class LEDVisualizer {
 	
 	public void visualize(ColorOutput colors) {
 		// Just look at the first two colors
-		double[] channels = new double[4];
+//		double[] channels = new double[4];
+//		
+//		channels[0] = colors.rgbLightsFront[0].getRed() / ((double) MAX_PWM);
+//		channels[1] = colors.rgbLightsFront[1].getRed() / ((double) MAX_PWM);
+//		channels[2] = colors.rgbLightsFront[1].getGreen() / ((double) MAX_PWM);
+//		channels[3] = colors.rgbLightsFront[1].getBlue() / ((double) MAX_PWM);
 		
-		channels[0] = colors.rgbLightsFront[0].getRed() / 255.0;
-		channels[1] = colors.rgbLightsFront[1].getRed() / 255.0;
-		channels[2] = colors.rgbLightsFront[1].getGreen() / 255.0;
-		channels[3] = colors.rgbLightsFront[1].getBlue() / 255.0;
+		double[] channels = new double[3];
+		
+		channels[0] = colors.rgbLightsFront[0].getRed() / ((double) MAX_PWM);
+		channels[1] = colors.rgbLightsFront[0].getGreen() / ((double) MAX_PWM);
+		channels[2] = colors.rgbLightsFront[0].getBlue() / ((double) MAX_PWM);
 		
 		// Call the original visualizer
 		visualize(channels);
@@ -51,7 +57,7 @@ public class LEDVisualizer {
 		
 		for(int i = 0; i < vals.length; i++) {
 			// Convert to an integer
-			int intVal = (int) Math.round(255.0 * vals[i]);
+			int intVal = (int) Math.round(MAX_PWM * vals[i]);
 			if (intVal > MAX_PWM) {intVal = MAX_PWM;} else if (intVal < MIN_PWM) {intVal = MIN_PWM;}
 			sb.append(String.valueOf(intVal));
 			

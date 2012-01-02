@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.debug.ui.SCOPED_SAVE_SELECTION_DIALOG">
-		<item value="350" key="DIALOG_WIDTH"/>
+		<item value="466" key="DIALOG_WIDTH"/>
 		<item value="282" key="DIALOG_Y_ORIGIN"/>
-		<item value="350" key="DIALOG_HEIGHT"/>
-		<item value="660" key="DIALOG_X_ORIGIN"/>
+		<item value="744" key="DIALOG_X_ORIGIN"/>
+		<item value="275" key="DIALOG_HEIGHT"/>
+		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+	</section>
+	<section name="org.eclipse.debug.ui.sourcelookup.SourceLookupDialog">
+		<item value="613" key="DIALOG_WIDTH"/>
+		<item value="300" key="DIALOG_Y_ORIGIN"/>
+		<item value="662" key="DIALOG_X_ORIGIN"/>
+		<item value="451" key="DIALOG_HEIGHT"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+	</section>
+	<section name="org.eclipse.debug.ui.LAUNCH_CONFIGURATION_PROPERTIES_DIALOG_SECTION">
+		<item value="674" key="DIALOG_WIDTH"/>
+		<item value="-49" key="DIALOG_Y_ORIGIN"/>
+		<item value="200" key="DIALOG_X_ORIGIN"/>
+		<item value="720" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.debug.ui.LAUNCH_CONFIGURATIONS_DIALOG_SECTION">
 		<item value="888" key="DIALOG_WIDTH"/>
-		<item value="89" key="DIALOG_Y_ORIGIN"/>
+		<item value="-122" key="DIALOG_Y_ORIGIN"/>
 		<item value=", org.eclipse.jdt.launching.localJavaApplication, " key="org.eclipse.debug.ui.EXPANDED_NODES"/>
-		<item value="441" key="DIALOG_X_ORIGIN"/>
-		<item value="720" key="DIALOG_HEIGHT"/>
+		<item value="1198" key="DIALOG_HEIGHT"/>
+		<item value="449" key="DIALOG_X_ORIGIN"/>
 		<item value="237" key="org.eclipse.debug.ui.DIALOG_SASH_WEIGHTS_1"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 		<item value="762" key="org.eclipse.debug.ui.DIALOG_SASH_WEIGHTS_2"/>
-		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.debug.ui.SELECT_LAUNCH_SHORTCUT_DIALOG">
 		<item value="358" key="DIALOG_WIDTH"/>
 		<item value="281" key="DIALOG_Y_ORIGIN"/>
-		<item value="662" key="DIALOG_X_ORIGIN"/>
 		<item value="353" key="DIALOG_HEIGHT"/>
+		<item value="662" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 </section>

@@ -50,7 +50,7 @@ public class VUBass extends Visualizer {
 		CUTOFF_YELLOW = (int) (HALF_SIZE * 0.58334);
 		
 		// Set up a color gradient
-		colorGradient = new RGBGradientCompoundLinear(new Color[] {Color.GREEN, Color.YELLOW, Color.RED}, new Color[] {Color.YELLOW, Color.RED, Color.GREEN}, new double[] {0.0, 0.333, 0.667}, new double[] {0.333, 0.667, 1.0});
+		colorGradient = new RGBGradientCompoundLinear(new Color[] {Color.GREEN, Color.YELLOW, Color.RED, Color.RED}, new double[] {0.0, 0.333, 0.667, 1.0});
 		
 		// Request user controls
 		knobSensitivity = new GenericKnob(0.5f, 50, "Level sensitivity");

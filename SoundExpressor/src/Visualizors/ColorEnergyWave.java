@@ -42,7 +42,7 @@ public class ColorEnergyWave extends Visualizer {
 		// Request user controls
 		heatKnob = new GenericKnob(0.0f, 50, "Heat");
 		blankSpeed = new GenericKnob(0.1f, 50, "Blanking speed");
-		colorSpeed = new GenericKnob(0.1f, 50, "Color roate speed");
+		colorSpeed = new GenericKnob(0.1f, 50, "Color rotate speed");
 		blankAmplitude = new GenericKnob(1.0f, 50, "Blanking Amplitude");
 		requestUserControl(blankAmplitude);
 		requestUserControl(colorSpeed);

@@ -1,0 +1,90 @@
+package SoundEngine;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.sound.sampled.*;
+
+import SignalGUI.GUIVisualizer;
+import SignalGUI.GraphDisplay;
+
+public class SoundVisualizer {
+
+	// Constants
+	private int AUDIO_BUFFER_SIZE = 1024*128;
+	
+	// Audio stuff
+	SourceDataLine outputLine;
+	boolean audioWorking = false;
+	boolean passThru;
+	
+	// A visualization engine
+	VisualizationEngine visuals;
+	
+	public SoundVisualizer(AudioFormat format, boolean passThruToAudio, double initialAudioDelay, double initialVideoDelay) {
+		// Set up audio
+		initAudioAndVideo(format, initialAudioDelay, initialVideoDelay, passThruToAudio);
+
+
+		
+	}
+	
+	// Sets up audio
+	private void initAudioAndVideo(AudioFormat format, double initialAudioDelaySec, double initialVideoDelaySec, boolean passThruToAudio) {
+		
+		int audioFrameSize = format.getChannels() * format.getSampleSizeInBits() / 8;
+		int audioSamplesToDelay = (int) (initialAudioDelaySec * format.getSampleRate());
+		int videoSamplesToDelay = (int) (initialVideoDelaySec * format.getSampleRate());
+		
+		try {
+			
+			if (audioSamplesToDelay * audioFrameSize > AUDIO_BUFFER_SIZE) {
+				AUDIO_BUFFER_SIZE = audioSamplesToDelay * audioFrameSize * audioFrameSize;
+			}
+			
+			outputLine = AudioSystem.getSourceDataLine(format);
+			outputLine.open(format, AUDIO_BUFFER_SIZE);
+			
+			System.out.println("Audio Buffer Size: " + outputLine.getBufferSize());
+			
+		} catch (LineUnavailableException e) {
+			System.out.println("SoundVisualizer cannot open source data line!");
+			e.printStackTrace();
+			return;
+		}
+		
+		outputLine.start();
+		
+		// Write empty data into the audio buffer for a prescribed period of time// Set up video
+
+		// so that we can effectively adjust the initial delay of the audio. This will help
+		// to sync the music to the lights.
+		byte[] silence = new byte[audioSamplesToDelay * audioFrameSize];
+		outputLine.write(silence, 0, audioSamplesToDelay * audioFrameSize);
+		audioWorking = true;
+		
+		// Set up video
+		// Set up a visualization engine
+		visuals = new VisualizationEngineAC(format, initialVideoDelaySec);
+		visuals.start();
+		passThru = passThruToAudio;
+	}
+	
+	// Write bytes into the buffer
+	public void write(byte[] data, int offset, int length) {
+		// Pass through to the audio buffer!
+		if (passThru) {
+			outputLine.write(data, offset, length);
+		}
+		
+		// Also write the audio to the visualizer!
+		visuals.write(data, offset, length);
+		
+		
+	}
+	
+	
+}
+
+

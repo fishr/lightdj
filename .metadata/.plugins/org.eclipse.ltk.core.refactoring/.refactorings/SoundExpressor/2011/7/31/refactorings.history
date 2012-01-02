@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;currentBassLevel&apos; in &apos;FeatureDetectors.SharpClapFinder&apos; to &apos;currentSharpLevel&apos;&#x0A;- Original project: &apos;SoundExpressor&apos;&#x0A;- Original element: &apos;FeatureDetectors.SharpClapFinder.currentBassLevel&apos;&#x0A;- Renamed element: &apos;FeatureDetectors.SharpClapFinder.currentSharpLevel&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;currentBassLevel&apos;" flags="589830" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;FeatureDetectors{SharpClapFinder.java[SharpClapFinder^currentBassLevel" name="currentSharpLevel" references="true" setter="false" stamp="1311732188928" textual="false" version="1.0"/>
+</session>

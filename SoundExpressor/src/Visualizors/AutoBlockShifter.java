@@ -25,8 +25,8 @@ public class AutoBlockShifter extends Visualizer {
 	protected int HALF_SIZE;
 	
 	protected static boolean triggerState;
-	protected static final double TRIGGER_HIGH = 0.99;
-	protected static final double TRIGGER_LOW = 0.2;
+	protected static final double TRIGGER_HIGH = 0.7;
+	protected static final double TRIGGER_LOW = 0.5;
 	
 	protected Color[] colorRegister;
 	

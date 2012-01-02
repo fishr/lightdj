@@ -16,7 +16,7 @@ public class FireSlider extends Visualizer {
 	protected static double phaseOffsetBase = 0.06;
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
-	protected static double NUM_FRONT_RGB_LIGHTS = 24;
+	protected static double NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS * ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	
 	protected static RGBGradientCompoundLinear gradient;
 	
@@ -32,7 +32,8 @@ public class FireSlider extends Visualizer {
 	@Override
 	public void init() {
 		// Initialize some parameters
-		gradient = new RGBGradientCompoundLinear(new Color[]{Color.RED, Color.ORANGE, Color.YELLOW, Color.BLACK, Color.BLACK}, new Color[]{Color.ORANGE, Color.YELLOW, Color.BLACK, Color.BLACK, Color.RED}, new double[]{0.0, 0.15, 0.3, 0.45, 0.85}, new double[]{0.15, 0.3, 0.45, 0.85, 1.0});
+		Color brown = new Color(40, 15, 0);
+		gradient = new RGBGradientCompoundLinear(new Color[]{Color.RED, Color.ORANGE, Color.YELLOW, brown, brown, Color.RED}, new double[]{0.0, 0.2, 0.4, 0.6, 0.8, 1.0});
 		
 		// We don't need to request any user controls for this visualization plugin
 		
@@ -50,6 +51,8 @@ public class FireSlider extends Visualizer {
 		
 		ColorOutput colorOutput = new ColorOutput();
 
+		//double alpha = 0.03;
+		//bassSmoothed = alpha * bassLevel + (1 - alpha) * bassSmoothed;
 		
 		double symLight = -(double) NUM_FRONT_RGB_LIGHTS / 2 - 0.5;
 		double a = 1.0;

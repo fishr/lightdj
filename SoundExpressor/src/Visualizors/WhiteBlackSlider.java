@@ -16,7 +16,7 @@ public class WhiteBlackSlider extends Visualizer {
 	protected static double phaseOffsetBase = 0.06;
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
-	protected static double NUM_FRONT_RGB_LIGHTS = 24;
+	protected static double NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS * ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	
 	protected static RGBGradientCompoundLinear gradient;
 	
@@ -32,7 +32,7 @@ public class WhiteBlackSlider extends Visualizer {
 	@Override
 	public void init() {
 		// Initialize some parameters
-		gradient = new RGBGradientCompoundLinear(new Color[]{Color.BLACK, Color.WHITE}, new Color[]{Color.WHITE, Color.BLACK}, new double[]{0.0, 0.5}, new double[]{0.5, 1.0});
+		gradient = new RGBGradientCompoundLinear(new Color[]{Color.BLACK, Color.WHITE, Color.BLACK}, new double[]{0.0, 0.5, 1.0});
 		
 		// We don't need to request any user controls for this visualization plugin
 		

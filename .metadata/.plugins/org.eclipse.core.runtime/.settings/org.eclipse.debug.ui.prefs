@@ -1,6 +1,6 @@
-#Sun Aug 08 22:49:02 EDT 2010
+#Sat Jan 29 14:15:31 EST 2011
 org.eclipse.debug.ui.switch_perspective_on_suspend=always
-pref_state_memento.org.eclipse.debug.ui.VariableView=<?xml version\="1.0" encoding\="UTF-8"?>\n<VariablesViewMemento org.eclipse.debug.ui.SASH_DETAILS_PART\="78" org.eclipse.debug.ui.SASH_VIEW_PART\="921">\n<PRESENTATION_CONTEXT_PROPERTIES IMemento.internal.id\="org.eclipse.debug.ui.VariableView"/>\n</VariablesViewMemento>
+pref_state_memento.org.eclipse.debug.ui.VariableView=<?xml version\="1.0" encoding\="UTF-8"?>\n<VariablesViewMemento org.eclipse.debug.ui.SASH_DETAILS_PART\="78" org.eclipse.debug.ui.SASH_VIEW_PART\="921">\n<COLUMN_SIZES IMemento.internal.id\="org.eclipse.debug.ui.VARIALBE_COLUMN_PRESENTATION.COL_VAR_NAME" SIZE\="391"/>\n<COLUMN_SIZES IMemento.internal.id\="org.eclipse.debug.ui.VARIALBE_COLUMN_PRESENTATION.COL_VAR_VALUE" SIZE\="557"/>\n<PRESENTATION_CONTEXT_PROPERTIES IMemento.internal.id\="org.eclipse.debug.ui.VariableView"/>\n</VariablesViewMemento>
 pref_state_memento.org.eclipse.debug.ui.DebugVieworg.eclipse.debug.ui.DebugView=<?xml version\="1.0" encoding\="UTF-8"?>\n<DebugViewMemento org.eclipse.debug.ui.BREADCRUMB_DROPDOWN_AUTO_EXPAND\="false"/>
 eclipse.preferences.version=1
 preferredDetailPanes=DefaultDetailPane\:DefaultDetailPane|

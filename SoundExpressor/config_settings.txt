@@ -16,21 +16,21 @@
 MAX_BRIGHTNESS = 0
 
 # The number of different types of panels we have
-NUM_FRONT_RGB_PANELS = 6
-NUM_REAR_RGB_PANELS = 6
-NUM_UVWHITE_PANELS = 7
+NUM_FRONT_RGB_PANELS = 2
+NUM_REAR_RGB_PANELS = 2
+NUM_UVWHITE_PANELS = 2
 NUM_LEDS_PER_RGB_BOARD = 4
 
 # The starting addresses for rear and UVwhite PANELS when being individually addressed 
 # (function of the firmware), Please note that each front and rear panel
 # consists of a group of 4 LED's. Historically, these values were chosen for 8
 # front and rear panels, but will work fine for less than that too.
-START_REAR_PANEL_ADDRESSES = 8
-START_UVWHITE_PANEL_ADDRESSES = 16
+START_REAR_PANEL_ADDRESSES = 2
+START_UVWHITE_PANEL_ADDRESSES = 4
 
 ###############################################################################
 ##
-## Serial port settings
+6## Serial port settings
 ##
 ##############################################################################
 SERIAL_PORT = /dev/ttyUSB0

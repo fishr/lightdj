@@ -16,6 +16,12 @@ public class LevelMeter extends FeatureDetector {
 	protected double normalizingVal;
 	protected double averagedLevel;
 	
+	// Low-pass smoothing
+	protected double timeLowPass = 0.15;
+	protected double percentLowPass = 0.05;
+	protected double alpha;
+	protected double levelSmoothed = 0.0;
+	
 	public LevelMeter(int fftSize, double updatesPerSecond) {
 		super(fftSize, updatesPerSecond);
 	}
@@ -27,6 +33,8 @@ public class LevelMeter extends FeatureDetector {
 		averageHalfLife = 0.0025;
 		decayRate = 1.0 / (20);
 		
+		alpha = 1 - Math.exp(Math.log(percentLowPass) / (UPDATES_PER_SECOND * timeLowPass));
+		
 		// Calculate some parameters
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 	}
@@ -36,8 +44,10 @@ public class LevelMeter extends FeatureDetector {
 		// Compute the level of bass
 		double level = getLevel(frequencies, magnitudes);
 		
+		levelSmoothed = alpha * level + (1 - alpha) * levelSmoothed;
+		
 		// Create a feature of this, and add it to the featureList.
-		featureList.addFeature("OVERALL_LEVEL", level);
+		featureList.addFeature("OVERALL_LEVEL", levelSmoothed);
 	}
 	
 

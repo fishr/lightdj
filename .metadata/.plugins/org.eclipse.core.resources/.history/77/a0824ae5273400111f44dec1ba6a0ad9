@@ -1,0 +1,91 @@
+package Visualizors;
+
+import java.awt.Color;
+
+import Common.ColorOutput;
+import Common.FeatureList;
+import LightDJGUI.ColorKnob;
+import LightDJGUI.GenericKnob;
+
+/**
+ * A basic visualizer that sets the first light to red corresponding to how much bass there is,
+ * and the second light to a color rotator based on the clap level.
+ * @author Steve Levine0
+ *
+ */
+public class JazzColors extends Visualizer {
+
+	// State
+	double colorTheta;
+	
+	// Jazz color gradient
+	RGBGradientCompoundLinear gradient;
+	
+	// GUI elements
+	GenericKnob colorSpeed;
+	GenericKnob bassBounce;
+	
+	@Override
+	public String getName() {
+		return "Jazz";
+	}
+	
+	public JazzColors(int fftSize, double updatesPerSecond) {
+		super(fftSize, updatesPerSecond);
+	}
+	
+	@Override
+	public void init() {
+		// Initialize some parameters
+
+		
+		// Request user controls
+		colorSpeed = new GenericKnob(0.01f, 50, "Color rotate speed");
+		bassBounce = new GenericKnob(0.7f, 50, "Bass Bounce");
+		requestUserControl(colorSpeed);
+		requestUserControl(bassBounce);
+		
+		// Set up a nice jazzy gradient!
+		Color purple = new Color(255, 0, 255);
+		Color nightBlue = new Color(0, 14, 122);
+		gradient = new RGBGradientCompoundLinear(new Color[]{Color.BLUE, purple, Color.RED, nightBlue, Color.BLUE}, new double[]{0.0, 0.333, 0.6667, 1.0});
+		
+		
+	}
+
+	@Override
+	public ColorOutput visualize(FeatureList featureList) {
+		
+		// Retreive any necessary parameters from the FeatureList
+		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
+		
+		// Retrieve parameters from the knobs
+		float omega = colorSpeed.getValue();
+		float bounce = bassBounce.getValue();
+		
+		colorTheta = (colorTheta + 0.01 * omega) % 1.0f;
+		
+		float saturation = 1.0f;
+		float brightness = (float) (bounce * bassLevel + (1 - bounce));
+		
+		Color c = gradient.computeGradient(colorTheta);
+		float rgb[] = new float[3];
+		c.getRGBColorComponents(rgb);
+
+		float r = rgb[0] * brightness;
+		float g = rgb[1] * brightness;
+		float b = rgb[2] * brightness;
+		
+		Color outputColor = new Color(r, g, b);
+		
+		ColorOutput colorOutput = new ColorOutput();
+		colorOutput.setAllFrontRGBLEDs(outputColor);
+		colorOutput.setAllRearRGBLEDs(outputColor);
+		
+		// Return the result
+		return colorOutput;
+	}
+
+
+
+}

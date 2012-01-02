@@ -21,6 +21,12 @@ public class ClapFinder extends FeatureDetector  {
 	protected double minFreq;
 	protected double maxFreq;
 	
+	// Low-pass smoothing
+	protected double timeLowPass = 0.15;
+	protected double percentLowPass = 0.05;
+	protected double alpha;
+	protected double clapLevelSmoothed = 0.0;
+	
 	private double[] averagedFrequencyLevels;
 	
 	double lastOutput = 0;
@@ -38,6 +44,8 @@ public class ClapFinder extends FeatureDetector  {
 		averageHalfLife = 0.125;
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		
+		alpha = 1 - Math.exp(Math.log(percentLowPass) / (UPDATES_PER_SECOND * timeLowPass));
+		
 		// This will store a low pass on every frequency.
 		averagedFrequencyLevels = new double[FFT_SIZE];
 		for(int i = 0; i < FFT_SIZE; i++) {
@@ -51,8 +59,10 @@ public class ClapFinder extends FeatureDetector  {
 		// Compute the level of bass
 		double clapLevel = getFreqs(frequencies, magnitudes);
 		
+		clapLevelSmoothed = alpha * clapLevel + (1 - alpha) * clapLevelSmoothed;
+		
 		// Create a feature of this, and add it to the featureList.
-		featureList.addFeature("CLAP_LEVEL", clapLevel);
+		featureList.addFeature("CLAP_LEVEL", clapLevelSmoothed);
 	}
 	
 	
