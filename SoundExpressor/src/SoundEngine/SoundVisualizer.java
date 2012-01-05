@@ -104,7 +104,7 @@ public class SoundVisualizer {
 	public void write(byte[] data, int offset, int length) {
 		// Pass through to the audio buffer and to the visuals
 		
-if (passThru) {
+		if (passThru) {
 			
 			// Add this data to the audio buffer
 			for(int i = offset; i < offset + length; i++) {

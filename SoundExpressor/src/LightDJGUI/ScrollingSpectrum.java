@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import Visualizors.RGBGradientCompoundLinear;
+
 /**
  * Represents a scrolling spectrum, showing the past spectrums as a function of time!
  * @author Steve Levine
@@ -29,6 +31,8 @@ public class ScrollingSpectrum {
 	protected int[] interpolationIndices;
 	protected double[] interpolationBlends;
 	
+	protected RGBGradientCompoundLinear gradient;
+	
 	
 	public ScrollingSpectrum(int screenX, int screenY, int width, int height, Graphics2D g2D, double minFreq, double maxFreq, double max_val, int fftSize, double fftMaxFreq) {
 		this.screenX = screenX;
@@ -43,6 +47,13 @@ public class ScrollingSpectrum {
 		this.fftMaxFreq = fftMaxFreq;
 
 		setSize(width, height);
+		
+		Color darkBlue = new Color(0, 0, 70);
+		Color darkReddish = new Color(200, 0, 70);
+		Color yellow = new Color(255, 255, 0);
+		gradient = new RGBGradientCompoundLinear(new Color[]{Color.BLACK, darkBlue, darkReddish, yellow, Color.WHITE}, new double[]{0.0, 0.2, 0.55, 0.9, 1.0});
+		//gradient = new RGBGradientCompoundLinear(new Color[]{Color.BLACK, Color.WHITE}, new double[]{0.0, 1.0});
+
 		
 	}
 	
@@ -85,7 +96,7 @@ public class ScrollingSpectrum {
 			int index = interpolationIndices[yPixelIndex];
 			
 			//double magnitude = (1 - alpha) * magnitudes[index] + alpha * magnitudes[index + 1];
-			double magnitude = (1 - alpha) * magnitudes[index]* magnitudes[index] + alpha * magnitudes[index + 1]* magnitudes[index + 1];
+			double magnitude = Math.log10((1 - alpha) * magnitudes[index]* magnitudes[index] + alpha * magnitudes[index + 1]* magnitudes[index + 1]);
 			
 			g2D.setColor(getColor(magnitude / max_val));
 			g2D.drawRect(currentX, height - yPixelIndex - 1, 1, 1);
@@ -128,7 +139,8 @@ public class ScrollingSpectrum {
 			normalizedVal = 0.0;
 		}
 		
-		return new Color((float) normalizedVal, (float) normalizedVal, (float) normalizedVal);
+		//return new Color((float) normalizedVal, (float) normalizedVal, (float) normalizedVal);
+		return gradient.computeGradient(normalizedVal);
 		
 	}
 	

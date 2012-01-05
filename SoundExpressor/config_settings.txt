@@ -1,4 +1,4 @@
-# LightDJ Configuration File
+# LightDJ Configuration File - gEt ReAdY tO rOcK! :-D
 #
 # This file specifies various parameters and configuration setttings for use
 # with the LightDJ software. For examnple, use this file to specify the number
@@ -9,35 +9,56 @@
 
 ###############################################################################
 ##
-## Lighting settings
+## Lighting system settings
 ##
 ###############################################################################
 
-MAX_BRIGHTNESS = 0
-
 # The number of different types of panels we have
-NUM_FRONT_RGB_PANELS = 2
-NUM_REAR_RGB_PANELS = 2
-NUM_UVWHITE_PANELS = 2
+NUM_FRONT_RGB_PANELS = 6
+NUM_REAR_RGB_PANELS = 6
+NUM_UVWHITE_PANELS = 6
 NUM_LEDS_PER_RGB_BOARD = 4
 
 # The starting addresses for rear and UVwhite PANELS when being individually addressed 
 # (function of the firmware), Please note that each front and rear panel
 # consists of a group of 4 LED's. Historically, these values were chosen for 8
 # front and rear panels, but will work fine for less than that too.
-START_REAR_PANEL_ADDRESSES = 2
-START_UVWHITE_PANEL_ADDRESSES = 4
+START_REAR_PANEL_ADDRESSES = 8
+START_UVWHITE_PANEL_ADDRESSES = 16
 
 ###############################################################################
 ##
-6## Serial port settings
+## Serial communication settings
 ##
 ##############################################################################
+
+# Select serial port settings here for communication with the lighting system.
+# Uncomment the proper group of lines, or edit for your own system's settings.
+
+## The following settings work great for the wired Next Lighting system:
+#SERIAL_PORT = /dev/ttyUSB0
+#SERIAL_BAUDRATE = 38400
+#SERIAL_DATABITS = 8
+#SERIAL_STOPBITS = 1
+#SERIAL_PARITY = 2
+
+## The following settings work great for an Arduino Uno-based system:
+#SERIAL_PORT = /dev/ttyACM0
+#SERIAL_BAUDRATE = 115200
+#SERIAL_DATABITS = 8
+#SERIAL_STOPBITS = 1
+#SERIAL_PARITY = 0
+
+## The following settings work great for wireless via Xbee:
+## (note that setting 2 stop bits here and 1 stop bit on the Xbee
+## configuration is a hack to account for the clock difference between
+## the Xbee (16MHz) and a regular UART)
 SERIAL_PORT = /dev/ttyUSB0
-BAUDRATE = 38400
-DATABITS = 8
-STOPBITS = 1
-PARITY = EVEN
+SERIAL_BAUDRATE = 115200
+SERIAL_DATABITS = 8
+SERIAL_STOPBITS = 2
+SERIAL_PARITY = 0
+
 
 ###############################################################################
 ##
@@ -49,7 +70,11 @@ PARITY = EVEN
 # WAV_FILE_NAME is ignored if CAPTURED_AUDIO = TRUE
 USE_CAPTURED_AUDIO = TRUE
 WAV_FILE_NAME = /home/steve/Desktop/04 Troublemaker.wav
-
+# AUDIO_PASS_THROUGH - if true, plays the received sound through the speakers.
+# Set to true if you're hooking an iPod/MP3 player up to your computer and want
+# to connect the computer to the speakers to here sound. If you use a separate
+# audio splitter cable (i.e., at a Next House party for example!), set to false.
+AUDIO_PASS_THROUGH = FALSE
 
 ###############################################################################
 ##

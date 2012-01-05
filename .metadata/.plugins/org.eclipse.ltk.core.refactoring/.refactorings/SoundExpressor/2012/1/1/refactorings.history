@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;PartyLightsController.PartyLightsController&apos; to &apos;PartyLightsController8&apos;&#x0A;- Original project: &apos;SoundExpressor&apos;&#x0A;- Original element: &apos;PartyLightsController.PartyLightsController&apos;&#x0A;- Renamed element: &apos;PartyLightsController.PartyLightsController8&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;PartyLightsController&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;PartyLightsController{PartyLightsController.java[PartyLightsController" matchStrategy="1" name="PartyLightsController8" qualified="false" references="true" similarDeclarations="false" stamp="1325612989053" textual="false" version="1.0"/>
+</session>

@@ -3,7 +3,7 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="314" key="DIALOG_WIDTH"/>
 		<item value="356" key="DIALOG_Y_ORIGIN"/>
-		<item value="1132" key="DIALOG_X_ORIGIN"/>
+		<item value="1202" key="DIALOG_X_ORIGIN"/>
 		<item value="437" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
@@ -13,16 +13,16 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="" key="selection"/>
+		<item value="SPECTRUM_HEIGHT" key="selection"/>
 		<list key="findhistory">
-			<item value="add"/>
-			<item value="void debugPrint"/>
-			<item value="debugPrint"/>
-			<item value="strobeFrameLength"/>
-			<item value="whiteStrobe"/>
-			<item value="postProcess"/>
-			<item value="renderVisuals"/>
-			<item value="ledVisuals"/>
+			<item value="SPECTRUM_HEIGHT"/>
+			<item value="scrollingSpectrum"/>
+			<item value="plotter"/>
+			<item value="spectrum"/>
+			<item value="phi"/>
+			<item value="decayRate"/>
+			<item value="update"/>
+			<item value="!"/>
 		</list>
 		<list key="replacehistory">
 			<item value="256"/>

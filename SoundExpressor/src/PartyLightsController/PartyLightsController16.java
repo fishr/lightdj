@@ -6,6 +6,7 @@ import java.io.OutputStream;
 
 import Common.ColorOutput;
 import Common.ColorOutput.OverallOutputCompression;
+import LightDJGUI.ConfigFileParser;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -22,8 +23,11 @@ import gnu.io.SerialPort;
 public class PartyLightsController16 {
 
 	// Serial port fields
-	private String serialPortName;
-	private int speed;
+	protected String serialPortName;
+	protected int speed;
+	protected int serialDataBits = 8;
+	protected int serialStopBits = 2;
+	protected int serialParityBits = 0;
 	private boolean isConnected;
 	private OutputStream outStream;
 	
@@ -93,8 +97,16 @@ public class PartyLightsController16 {
 		START_UVWHITE_PANEL_INDEX = ColorOutput.START_UVWHITE_PANEL_ADDRESSES;
 		
 		// Set some defaults
-		this.serialPortName = "/dev/ttyUSB0";
-		this.speed = 115200;	// Friggin' Xbee
+		
+		final String serialPortNameDefault = "/dev/ttyUSB0";	// Xbee
+		final int serialPortSpeedDefault = 115200;				// Friggin XBee
+		
+		
+		this.serialPortName = ConfigFileParser.getSettingOrDefault("SERIAL_PORT_NAME", "/dev/ttyUSB0");
+		this.speed = ConfigFileParser.getSettingOrDefault("SERIAL_BAUDRATE", 115200);
+		this.serialDataBits = ConfigFileParser.getSettingOrDefault("SERIAL_DATABITS", 8);
+		this.serialParityBits = ConfigFileParser.getSettingOrDefault("SERIAL_PARITY", 0);
+		this.serialStopBits = ConfigFileParser.getSettingOrDefault("SERIAL_STOPBITS", 2);
 		isConnected = false;
 		outStream = null;
 		
@@ -112,20 +124,18 @@ public class PartyLightsController16 {
 	 * If there's an error, it is thrown.
 	 */
 	protected void connect() throws Exception {
-		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPortName);
+		System.out.println("Serial: " + this.serialPortName + " " + this.serialDataBits + "-" + this.serialParityBits + "-" + this.serialStopBits);
+		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(this.serialPortName);
 		if (portIdentifier.isCurrentlyOwned()) {
 			throw new RuntimeException("Error: The serial port " + serialPortName + " is already owned!");
 		} else {
 			CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
 			if (commPort instanceof SerialPort) {
 				SerialPort serialPort = (SerialPort) commPort;
-				serialPort.setSerialPortParams(speed, SerialPort.DATABITS_8, SerialPort.STOPBITS_2, SerialPort.PARITY_NONE);
-				
-				
+				serialPort.setSerialPortParams(this.speed, this.serialDataBits, this.serialStopBits, this.serialParityBits);
 				
 				//serialPort.setLowLatency();
-				
-				
+						
 				outStream = serialPort.getOutputStream();
 				isConnected = true;
 				System.out.println("Serial successfully connected...");
@@ -139,8 +149,6 @@ public class PartyLightsController16 {
 	 * Writes data to the port
 	 */
 	protected void write(byte[] data) throws IOException {
-		System.out.println(data.length + ", " + System.currentTimeMillis());
-				
 		if (isConnected) {
 			outStream.write(data);
 			outStream.flush();

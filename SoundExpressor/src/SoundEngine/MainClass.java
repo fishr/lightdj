@@ -17,27 +17,31 @@ import Utils.TimerTicToc;
 
 public class MainClass {
 
-	//private static final String soundFilename = "/home/steve/Desktop/01 Replay.wav";
-	private static final String soundFilename = "/home/steve/Music/04 Troublemaker.wav";
-	//private static final String soundFilename = "/home/steve/Desktop/sweep.wav";
-	//private static final String soundFilename = "/home/steve/Desktop/whitenoise.wav";
-	private static final int AUDIO_READ_BUFFER_SIZE = 256;
-	private static final int SAMPLE_RATE = 44100;
-	private static final boolean USE_CAPTURED_AUDIO = true;
-	private static final boolean AUDIO_PASS_THRU = true;
-	private static final double INITIAL_AUDIO_DELAY = 0.000;
-	private static final double INITIAL_VIDEO_DELAY = 0.010;
+	//private static String soundFilename = "/home/steve/Desktop/01 Replay.wav";
+	protected static String soundFilename = "/home/steve/Music/04 Troublemaker.wav";
+	//private static String soundFilename = "/home/steve/Desktop/sweep.wav";
+	//private static String soundFilename = "/home/steve/Desktop/whitenoise.wav";
+	protected static int AUDIO_READ_BUFFER_SIZE;
+	protected static final int SAMPLE_RATE = 44100;
+	protected static boolean USE_CAPTURED_AUDIO = true;
+	protected static boolean AUDIO_PASS_THRU = true;
+	
+	// The following parameters shouldn't generally be used. They were used if INSTANT_PLAY was
+	// set to false in VisualiationEngine. It was an attempt to better synchronize audio and video,
+	// but is a bit buggy and might not work properly.
+	protected static double INITIAL_AUDIO_DELAY = 0.000;
+	private static final double INITIAL_VIDEO_DELAY = 0.000;
 
 	
 	public static void main(String[] args) {
 		// Do stuff here
+		System.out.println("~~ Welcome to LightDJ! :-D ~~");
+		System.out.println();
 		System.out.println("Initializing Sound Expressor...");
 		
 		// Load data from the configuration file
 		loadConfigurationFile();
 
-		
-		
 		if (USE_CAPTURED_AUDIO) {
 			System.out.println("Using captured audio...");
 			runWithCapturedAudio();
@@ -75,7 +79,9 @@ public class MainClass {
 		
 		// Process settings related to the serial port
 		
-		// Process audio /visual settings
+		
+		
+		// Process audio/visual settings
 		
 	
 		
@@ -104,6 +110,9 @@ public class MainClass {
 		
 		AudioFormat format = audioInputStream.getFormat();
 		
+		// Set the audio buffer to read at a good chunk size
+		AUDIO_READ_BUFFER_SIZE = VisualizationEngine.BUFFER_SIZE * format.getFrameSize() / VisualizationEngine.BUFFER_OVERLAP;
+		
 		SoundVisualizer engine = new SoundVisualizer(format, true, INITIAL_AUDIO_DELAY, INITIAL_VIDEO_DELAY, AUDIO_READ_BUFFER_SIZE);
 		// Start sending it data!
 		int bytesToRead = AUDIO_READ_BUFFER_SIZE;
@@ -113,12 +122,10 @@ public class MainClass {
 			int numBytesRead = 0;
 			byte[] audioData = new byte[bytesToRead];
 			
-			
 			//TimerTicToc timer = new TimerTicToc();
 			engine.start(0.5 * AUDIO_READ_BUFFER_SIZE / format.getSampleRate());
 			
 			while((numBytesRead = audioInputStream.read(audioData)) != -1) {
-				
 				// Send data!
 				engine.write(audioData, 0, numBytesRead);
 			}
@@ -142,14 +149,13 @@ public class MainClass {
 		AudioFormat format;
 		format = new AudioFormat((float) SAMPLE_RATE, 16, 2, true, false);
 		
-		
 		TargetDataLine line;
 		DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
 		if (AudioSystem.isLineSupported(info)) {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
 				//line.open(format);
-				line.open(format, 8*1024);	// Change the line-in audio buffer size here
+				line.open(format, 4*1024);	// Change the line-in audio buffer size here. Too big => Higher latency. To small => sounds shitty with audio pass through (buffer not filled fast enough)
 				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");
@@ -161,48 +167,32 @@ public class MainClass {
 		}
 		System.out.println("Successfully opened up audio port...");
 	
+		// Set the audio buffer to read at a good chunk size
+		AUDIO_READ_BUFFER_SIZE = VisualizationEngine.BUFFER_SIZE * format.getFrameSize() / VisualizationEngine.BUFFER_OVERLAP;
+		
 		// Sound visualization engine
 		SoundVisualizer engine = new SoundVisualizer(format, AUDIO_PASS_THRU, INITIAL_AUDIO_DELAY, INITIAL_VIDEO_DELAY, AUDIO_READ_BUFFER_SIZE);
-		
-		//Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-		
-//		try {
-//			Thread.sleep(1000);
-//		} catch (Exception e) {
-//			
-//		}
-		
-		
-		
-		
 		
 		// Start reading data from it!
 		int bytesToRead = AUDIO_READ_BUFFER_SIZE;
 		System.out.println("Starting audio capture...");
 		try {
-			
-			
 			int numBytesRead = 0;
 			byte[] audioData = new byte[bytesToRead];
 			
 			line.start();
 			line.read(audioData, 0, bytesToRead);	// Start reading now, just to make sure everything is set up
 
-			
-			//TimerTicToc t = new TimerTicToc();
-			
+			//TimerTicToc t = new TimerTicToc(); // Useful for benchmarking
 			engine.start(bytesToRead / (SAMPLE_RATE * format.getFrameSize()));
 			while((numBytesRead = line.read(audioData, 0, bytesToRead)) != -1) {
-				
 				// Send data!
 				//t.tic();
 				engine.write(audioData, 0, numBytesRead);
 				//t.toc();
 				
 				//System.out.println("Engine: " + t.getAverageTime());
-				
 			}
-			
 			
 		} catch (Exception e) {
 			System.out.println("Error during audio capture!");
@@ -210,9 +200,6 @@ public class MainClass {
 			return;
 		}
 		System.out.println("Audio capture ended!");
-		
 	}
-	
-	
-	
+
 }

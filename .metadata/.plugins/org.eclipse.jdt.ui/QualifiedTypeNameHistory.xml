@@ -19,7 +19,6 @@
 <fullyQualifiedTypeName name="LightDJGUI.PulseKeeper"/>
 <fullyQualifiedTypeName name="Common.ColorOutput.RGBFrontColorOutputCompression"/>
 <fullyQualifiedTypeName name="Common.ColorOutput.UVWhiteColorOutputCompression"/>
-<fullyQualifiedTypeName name="Visualizors.RGBGradientCompoundLinear"/>
 <fullyQualifiedTypeName name="Visualizors.DoubleChaser"/>
 <fullyQualifiedTypeName name="LightDJGUI.ColorOutputDisplayerParty"/>
 <fullyQualifiedTypeName name="Visualizors.RGBGradientLinear"/>
@@ -46,7 +45,6 @@
 <fullyQualifiedTypeName name="java.util.Map"/>
 <fullyQualifiedTypeName name="MidiInterface.MidiConnector"/>
 <fullyQualifiedTypeName name="javax.sound.midi.MidiMessage"/>
-<fullyQualifiedTypeName name="LightDJGUI.ConfigFileParser"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="SoundEngine.VisualizationEngineParty"/>
 <fullyQualifiedTypeName name="Common.UserControl"/>
@@ -60,4 +58,6 @@
 <fullyQualifiedTypeName name="Visualizors.ColoredBass"/>
 <fullyQualifiedTypeName name="LightDJGUI.ColorKnob"/>
 <fullyQualifiedTypeName name="Visualizors.JazzColors"/>
+<fullyQualifiedTypeName name="LightDJGUI.ConfigFileParser"/>
+<fullyQualifiedTypeName name="Visualizors.RGBGradientCompoundLinear"/>
 </qualifiedTypeNameHistroy>

@@ -86,6 +86,20 @@ public class ConfigFileParser {
 		}
 	}
 	
+	// Return the value corresponding to some key in the configuration file
+	public static boolean getSettingOrDefault(String key, boolean defaultVal) {
+		if (containsSetting(key)) {
+			try {
+				return Boolean.parseBoolean(configSettings.get(key).trim());
+			} catch (Exception e) {
+				System.out.println("Error: Configuration file " + key + " is an invalid integer!");
+				return defaultVal;
+			}
+		} else {
+			return defaultVal;
+		}
+	}
+	
 	// Checks to see if the configuration file contains the given setting
 	public static boolean containsSetting(String key) {
 		return configSettings.containsKey(key);

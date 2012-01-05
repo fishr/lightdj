@@ -12,7 +12,7 @@ import Common.FeatureList;
 public class ClapFinder extends FeatureDetector  {
 	
 	
-	protected double averageHalfLife = 0.125;
+	protected double averageHalfLife = 0.25;
 	protected double phi;
 	protected double averagedLevel = 0;
 	protected double decayRate = 0.75;
@@ -22,7 +22,7 @@ public class ClapFinder extends FeatureDetector  {
 	protected double maxFreq;
 	
 	// Low-pass smoothing
-	protected double timeLowPass = 0.15;
+	protected double timeLowPass = 1.0;
 	protected double percentLowPass = 0.05;
 	protected double alpha;
 	protected double clapLevelSmoothed = 0.0;
@@ -81,7 +81,7 @@ public class ClapFinder extends FeatureDetector  {
 			averagedFrequencyLevels[i] = phi*averagedFrequencyLevels[i] + (1 - phi) *  magnitudes[i];
 			
 			if (magnitudes[i] / averagedFrequencyLevels[i] > 1.414) {
-				// Compute the percentage of points that is higher than the averaged levels
+				// Compute the percentage of points that are higher than their averaged levels
 				sum += 1.0;
 			}
 			
@@ -98,14 +98,16 @@ public class ClapFinder extends FeatureDetector  {
 		}
 		
 		// Implement a half lowpass filter, to limit the decay rate
-		double c = 0.99;
-		double output;
-		if (preLowPassRetVal < c * lastOutput) {
-			output = c * lastOutput;
-		} else {
-			output = preLowPassRetVal;
-		}
-		lastOutput = output;
+//		double c = 0.98;
+//		double output;
+//		if (preLowPassRetVal < c * lastOutput) {
+//			output = c * lastOutput;
+//		} else {
+//			output = preLowPassRetVal;
+//		}
+//		lastOutput = output;
+//		
+		double output = preLowPassRetVal;
 		
 		return output;
 		

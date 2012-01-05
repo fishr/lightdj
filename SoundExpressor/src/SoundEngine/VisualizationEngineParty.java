@@ -51,7 +51,7 @@ import LightDJGUI.PulseKeeper;
 import LightDJGUI.ScrollingSpectrum;
 import LightDJGUI.VisualizerChooser;
 import MidiInterface.MidiConnector;
-import PartyLightsController.PartyLightsController;
+import PartyLightsController.PartyLightsController8;
 import PartyLightsController.PartyLightsController16;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
@@ -200,7 +200,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		ArrayList<Visualizer> visualizers = new ArrayList<Visualizer>();
 		
 		int FFT_SIZE = BUFFER_SIZE;
-		double UPDATES_PER_SECOND = 1.0 * SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
+		double UPDATES_PER_SECOND = (double) SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
 		
 		// Add the detectors here
 		
@@ -250,8 +250,6 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		}
 		
 		
-		
-		
 		// Add in specially-computed features.
 		featureList.addFeature("PULSE", pulseKeeper.getPulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
 		featureList.addFeature("PULSE_BASS", pulseKeeper.getWavePulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
@@ -264,9 +262,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		featureList.addFeature("KEY_J", jKeyPressed);
 		featureList.addFeature("KEY_K", kKeyPressed);
 		featureList.addFeature("KEY_L", lKeyPressed);
-		
-		
-		
+
 		
 		// Now that we have a full-fledged FeatureList, pass it to the Visualizers
 		ColorOutput[] colorOutputs = new ColorOutput[visualizers.size()];
@@ -289,7 +285,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		
 		// Update (but do not render) relevant visual GUI elements
-		plotter.update(new double[] {(0.1 * (Double) featureList.getFeature("BASS_RAW")), 0.0, 0.0});
+		plotter.update(new double[] {(100.0 * (Double) featureList.getFeature("BASS_LEVEL")), 0.0, 0.0});
 		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes);
 		
 		
@@ -581,7 +577,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// Graphics and GUI-related variables
 	protected final static int SIDEBAR_WIDTH = 350;
 	protected final static int SPECTRUM_WIDTH = 900;
-	protected final static int SPECTRUM_HEIGHT = 200;
+	protected final static int SPECTRUM_HEIGHT = 300;
 	protected final static int PLOTTER_WIDTH = 900;
 	protected final static int PLOTTER_HEIGHT = 300;
 	protected final static int BORDER_SIZE = 10;
@@ -743,7 +739,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		frame.add(gui);
 		frame.pack();
 		gui.setBackground(Color.BLACK);
-		frame.setSize(1500, 1000);
+		frame.setSize(1500, 1100);
 		frame.setLocation(0, 0);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setVisible(true);
@@ -788,7 +784,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
 		
 		// Set up some other GUI elements
-		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 40, 20000, 500.0, BUFFER_SIZE, SAMPLE_RATE);
+		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 40, 20000, 4.0, BUFFER_SIZE, SAMPLE_RATE);
 		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW, Color.GREEN}, 0, 0, PLOTTER_WIDTH, PLOTTER_HEIGHT, 100.0, null);
 		
 		// Choose which color output displayer to use!
