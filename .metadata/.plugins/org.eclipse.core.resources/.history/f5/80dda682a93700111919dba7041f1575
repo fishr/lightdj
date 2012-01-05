@@ -1116,8 +1116,14 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			crossfaderKnob.render(g2D);
 		}
 		
-		// Render the side panel
-		renderSidePanel();
+		// Render the spectrum in the lower left corner
+		spectrumMapper.render();
+		
+		// Render graphs
+		plotter.render();
+		
+		// Render the pulse
+		paintPulseKeeper();
 		
 		Graphics2D g2DGui = (Graphics2D) gui.getGraphics();
 		Graphics2D g2DBuf = (Graphics2D) buffer.getGraphics();
@@ -1151,16 +1157,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 	}
 	
-	protected void renderSidePanel() {
-		// Render the spectrum in the lower left corner
-		spectrumMapper.render();
-		
-		// Render graphs
-		plotter.render();
-		
-		// Render the pulse
-		paintPulseKeeper();
-	}
+	
 	
 	public void paintDJ(Graphics g) {
 		// Repaint the background

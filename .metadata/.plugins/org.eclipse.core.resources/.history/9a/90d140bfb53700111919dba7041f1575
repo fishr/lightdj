@@ -64,90 +64,31 @@ public class ColorOutput {
 	
 	// Determine which type of compression will make the output the smallest!
 	public void determineCompression() {
-		// Overall output compression will have already be determined if a special command, like strobe() was called!
-		
-		// Determine any applicable front, rear, and uvwhite compression.
 		this.rgbFrontColorOutputCompression = getFrontRGBCompression();
 		this.rgbRearColorOutputCompression = getRearRGBCompression();
 		this.uvWhiteColorOutputCompression = getUVWhiteCompression();
 	}
 	
 	protected RGBFrontColorOutputCompression getFrontRGBCompression() {
-		if (allPanelsSame(rgbLightsFront, NUM_FRONT_RGB_PANELS, NUM_LEDS_PER_RGB_BOARD)) {
-			// All the fronts are the same - this means either all the LED's are the same color, or just all the boards.
-			if (isPanelSame(rgbLightsFront, NUM_LEDS_PER_RGB_BOARD)) {
-				// All panels are the same, and all lights within the first panel are the same. Therefore all LED's are the same.
-				return RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
-			} else {
-				return RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
-			}
-		} else {
-			// All the panels are not the same. No compression for the front.
-			return RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
-		}
+		
 	}
 	
 	protected RGBRearColorOutputCompression getRearRGBCompression() {
-		if (allPanelsSame(rgbLightsRear, NUM_REAR_RGB_PANELS, NUM_LEDS_PER_RGB_BOARD)) {
-			// All the fronts are the same - this means either all the LED's are the same color, or just all the boards.
-			if (isPanelSame(rgbLightsRear, NUM_LEDS_PER_RGB_BOARD)) {
-				// All panels are the same, and all lights within the first panel are the same. Therefore all LED's are the same.
-				return RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
-			} else {
-				return RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
-			}
-		} else {
-			// All the panels are not the same. No compression for the front.
-			return RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
-		}
+		
 	}
 	
 	protected UVWhiteColorOutputCompression getUVWhiteCompression() {
-		double val = whiteLights[0];
-		for(int light = 1; light < NUM_UVWHITE_PANELS; light++) {
-			if (whiteLights[light] != val) {
-				return UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
-			}
-		}
 		
-		val = uvLights[0];
-		for(int light = 1; light < NUM_UVWHITE_PANELS; light++) {
-			if (uvLights[light] != val) {
-				return UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
-			}
-		}
-		
-		// If we got here, all the same!
-		return UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
 	}
 	
 	// Check if all of the panels are the same color.
-	protected boolean allPanelsSame(Color[] colors, int numPanels, int numLEDsPerPanel) {
-		for(int light = 0; light < numLEDsPerPanel; light++) {
-			// All colors should be the same as this color.
-			Color c = colors[light];
-			for(int panel = 0; panel < numPanels; panel++) {
-				int index = panel*numLEDsPerPanel + light;
-				if (!c.equals(colors[index])) {
-					// Not all the same!
-					return false;
-				}
-			}
-		}
-		return true;
+	protected boolean allPanelsSame() {
+		
 	}
 	
 	// Check if all of the LED's within some chosen panel are the same color.
-	protected boolean isPanelSame(Color[] colors, int numLEDsPerPanel) {
-		// Simply check the first panel
-		Color c = colors[0];
-		for(int light = 0; light < numLEDsPerPanel; light++) {
-			if (!c.equals(colors[light])) {
-				// Not all true!
-				return false;
-			}
-		}
-		return true;
+	protected boolean isPanelSame() {
+		
 	}
 	
 	// Initialize everything to black
@@ -231,7 +172,7 @@ public class ColorOutput {
 	
 	public void setAllFrontPanels(Color c0, Color c1, Color c2, Color c3) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
+		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
 		
 		for(int panelIndex = 0; panelIndex < NUM_FRONT_RGB_PANELS; panelIndex++) {
 			int i = 4 * panelIndex;
@@ -245,7 +186,7 @@ public class ColorOutput {
 	
 	public void setAllRearPanels(Color c0, Color c1, Color c2, Color c3) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
+		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
 		
 		for(int panelIndex = 0; panelIndex < NUM_REAR_RGB_PANELS; panelIndex++) {
 			int i = 4 * panelIndex;
@@ -258,7 +199,7 @@ public class ColorOutput {
 	
 	public void setAllFrontRGBLEDs(Color c) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
+		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
 		
 		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
 			rgbLightsFront[i] = c;
@@ -268,7 +209,7 @@ public class ColorOutput {
 	
 	public void setAllRearRGBLEDs(Color c) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
+		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
 		
 		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
 			rgbLightsRear[i] = c;
@@ -280,7 +221,7 @@ public class ColorOutput {
 	
 	public void setAllUVWhites(double uv, double white) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
+		uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
 		
 		for(int panelIndex = 0; panelIndex < NUM_UVWHITE_PANELS; panelIndex++) {
 			uvLights[panelIndex] = uv;
@@ -291,7 +232,7 @@ public class ColorOutput {
 	
 	public void setFrontPanel(int panelIndex, Color c0, Color c1, Color c2, Color c3) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
+		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_FRONT_RGB_PANELS) {
 			//throw new RuntimeException("Error: Invalid Front PanelIndex: " + panelIndex);
@@ -310,7 +251,7 @@ public class ColorOutput {
 	
 	public void setRearPanel(int panelIndex, Color c0, Color c1, Color c2, Color c3) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
+		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_REAR_RGB_PANELS) {
 			//throw new RuntimeException("Error: Invalid Rear PanelIndex: " + panelIndex);
@@ -328,7 +269,7 @@ public class ColorOutput {
 	
 	public void setUVWhitePanel(int panelIndex, double uv, double white) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
+		uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
 		
 		if (panelIndex < 0 || panelIndex >= NUM_UVWHITE_PANELS) {
 			//throw new RuntimeException("Error: Invalid UV/White PanelIndex: " + panelIndex);
@@ -352,7 +293,7 @@ public class ColorOutput {
 	
 	public void setFrontRGBLight(int i, Color c) {
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
+		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
 		
 		if (i >= 0 && i < rgbLightsFront.length) { 
 			rgbLightsFront[i] = c; 
@@ -363,8 +304,9 @@ public class ColorOutput {
 	}
 	
 	public void setRearRGBLight(int i, Color c) {
+
 		overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		//rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
+		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
 
 		if (i >= 0 && i < rgbLightsRear.length) { 
 			rgbLightsRear[i] = c; 
@@ -455,34 +397,32 @@ public class ColorOutput {
 			out.uvLights[i] = alpha * c2.uvLights[i] + (1 - alpha) * c1.uvLights[i];
 		}
 		
-		out.overallOutputCompression = OverallOutputCompression.OVERALL_COMPRESSION_NONE;
-		
 		// Compress the data maximally
-		//if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME) {
-		//	out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
-		//} else if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME) {
-		//	out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
-		//} else if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME  || c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME) {
-		//	out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
-		//} else {
-		//	out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
-		//}
+		if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME) {
+			out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
+		} else if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME) {
+			out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
+		} else if (c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME  || c1.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME && c2.rgbFrontColorOutputCompression == RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME) {
+			out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_PANELS_SAME;
+		} else {
+			out.rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_DIFF;
+		}
 		
-		//if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME) {
-		//	out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
-		//} else if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME) {
-		//	out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
-		//} else if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME  || c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME) {
-		//	out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
-		//} else {
-		//	out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
-		//}
+		if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME) {
+			out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
+		} else if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME) {
+			out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
+		} else if (c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME  || c1.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME && c2.rgbRearColorOutputCompression == RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME) {
+			out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_PANELS_SAME;
+		} else {
+			out.rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_DIFF;
+		}
 		
-		//if (c1.uvWhiteColorOutputCompression == UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME && c2.uvWhiteColorOutputCompression == UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME) {
-		//	out.uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
-		//} else {
-		//	out.uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
-		//}
+		if (c1.uvWhiteColorOutputCompression == UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME && c2.uvWhiteColorOutputCompression == UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME) {
+			out.uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
+		} else {
+			out.uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF;
+		}
 		
 		// Done mixing! Return the output.
 		return out;

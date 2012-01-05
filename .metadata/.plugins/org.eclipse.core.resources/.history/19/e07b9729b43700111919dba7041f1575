@@ -160,9 +160,6 @@ public class PartyLightsController16 {
 	 */
 	public void visualize(ColorOutput colorOutput) {
 		
-		// Determine the optimal compression
-		colorOutput.determineCompression();
-		
 		// Apply any overall compression!
 		switch(colorOutput.overallOutputCompression) {
 		case OVERALL_COMPRESSION_EMERGENCY_LIGHTING:

@@ -160,9 +160,6 @@ public class PartyLightsController16 {
 	 */
 	public void visualize(ColorOutput colorOutput) {
 		
-		// Determine the optimal compression
-		colorOutput.determineCompression();
-		
 		// Apply any overall compression!
 		switch(colorOutput.overallOutputCompression) {
 		case OVERALL_COMPRESSION_EMERGENCY_LIGHTING:
@@ -198,36 +195,36 @@ public class PartyLightsController16 {
 				break;
 			}
 			
-			//Rears
-			switch(colorOutput.rgbRearColorOutputCompression) {
-			case RGB_REAR_COMPRESSION_LEDS_SAME:
-				sendRearLEDSame(colorOutput);
-				break;
-				
-			case RGB_REAR_COMPRESSION_PANELS_SAME:
-				sendRearPanelSame(colorOutput);
-				break;
-				
-			case RGB_REAR_COMPRESSION_DIFF:
-				sendRearRGBPanelDiff(colorOutput);
-				break;
-			}
-			
-			
-			// Send UV/Whites
-			switch(colorOutput.uvWhiteColorOutputCompression) {
-			case UVWHITE_COMPRESSION_WHITE_AND_UV_SAME:
-				sendAllWhitesSame(colorOutput);
-				sendAllUVSame(colorOutput);
-				break;
-				
-			case UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF:
-				sendWhiteUVPanelsDiff(colorOutput);
-				break;
-				
-			}
-			
-			break;
+//			//Rears
+//			switch(colorOutput.rgbRearColorOutputCompression) {
+//			case RGB_REAR_COMPRESSION_LEDS_SAME:
+//				sendRearLEDSame(colorOutput);
+//				break;
+//				
+//			case RGB_REAR_COMPRESSION_PANELS_SAME:
+//				sendRearPanelSame(colorOutput);
+//				break;
+//				
+//			case RGB_REAR_COMPRESSION_DIFF:
+//				sendRearRGBPanelDiff(colorOutput);
+//				break;
+//			}
+//			
+//			
+//			// Send UV/Whites
+//			switch(colorOutput.uvWhiteColorOutputCompression) {
+//			case UVWHITE_COMPRESSION_WHITE_AND_UV_SAME:
+//				sendAllWhitesSame(colorOutput);
+//				sendAllUVSame(colorOutput);
+//				break;
+//				
+//			case UVWHITE_COMPRESSION_WHITE_AND_UV_DIFF:
+//				sendWhiteUVPanelsDiff(colorOutput);
+//				break;
+//				
+//			}
+//			
+//			break;
 		
 		}		
 	}
