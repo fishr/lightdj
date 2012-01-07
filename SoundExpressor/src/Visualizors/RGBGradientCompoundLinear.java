@@ -34,4 +34,19 @@ public class RGBGradientCompoundLinear {
 		
 	}
 	
+	// Helper function to bounce a color!
+	protected static Color scaleColor(Color c, float brightness) {
+		float rgb[] = new float[3];
+		c.getRGBColorComponents(rgb);
+
+		float r = rgb[0] * brightness;
+		float g = rgb[1] * brightness;
+		float b = rgb[2] * brightness;
+		
+		Color outputColor = new Color(r, g, b);
+
+		return outputColor;
+		
+	}
+	
 }

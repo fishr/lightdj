@@ -76,10 +76,10 @@ public class PartyLightsController16 {
 	protected static int START_UVWHITE_PANEL_INDEX;
 	
 	// Voloume controls
-	protected float overallVolume = 1.0f;
-	protected float frontVolume = 1.0f;
-	protected float rearVolume = 1.0f;
-	protected float strobeVolume = 1.0f;
+	public float overallVolume = 1.0f;
+	public float frontVolume = 1.0f;
+	public float rearVolume = 1.0f;
+	public float strobeVolume = 1.0f;
 	
 	public enum LightPlacement {
 		PLACEMENT_FRONT,

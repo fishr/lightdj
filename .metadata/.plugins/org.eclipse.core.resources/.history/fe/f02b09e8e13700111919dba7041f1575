@@ -1,0 +1,28 @@
+package PostProcessors;
+
+import Common.ColorOutput;
+import Common.FeatureList;
+import LightDJGUI.GenericKnob;
+
+public class Strobes extends PostProcessor {
+
+	GenericKnob lengthKnob;
+	
+	public Strobes(double updatesPerSecond) {
+		super(updatesPerSecond);
+		
+	}
+
+	@Override
+	public String getName() {
+		return "Strobes";
+	}
+
+	@Override
+	public void init() {
+		
+		
+	}
+
+
+}

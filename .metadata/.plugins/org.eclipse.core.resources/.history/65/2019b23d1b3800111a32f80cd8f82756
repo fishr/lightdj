@@ -1,0 +1,95 @@
+package LightDJGUI;
+
+import java.awt.Graphics2D;
+
+import Common.UserControl;
+
+public class IndicatorLED implements UserControl {
+
+	protected boolean onoff;
+	protected boolean renderNeeded;
+	protected int x;
+	protected int y;
+	protected int width;
+	protected int height;
+	
+	public IndicatorLED() {
+		onoff = false;
+		renderNeeded = true;
+	}
+	
+	@Override
+	public boolean needsToRender() {
+		// TODO Auto-generated method stub
+		return renderNeeded;
+	}
+
+	@Override
+	public void render(Graphics2D g2d) {
+	
+		renderNeeded = false;
+	}
+
+	@Override
+	public void setLocation(int x, int y, int width, int height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;	
+	}
+
+	@Override
+	public void setValue(float val) {
+		boolean newVal;
+		if (val == 0.0f) {
+			newVal = false;
+		} else {
+			newVal = true;
+		}
+		
+		if (newVal != onoff) {
+			renderNeeded = true;
+		}
+		
+		onoff = newVal;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getX() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getY() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return true;
+	}
+
+	@Override
+	public void mouseDown(int x, int y) {}
+
+	@Override
+	public void mouseDragged(int x, int y) {}
+
+	@Override
+	public void mouseUp(int x, int y) {}
+
+}

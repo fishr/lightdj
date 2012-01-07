@@ -1,0 +1,10 @@
+package PostProcessors;
+
+/**
+ * Takes care of all black-out related effects
+ * @author steve
+ *
+ */
+public class Blackout {
+
+}

@@ -155,7 +155,7 @@ public class MainClass {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
 				//line.open(format);
-				line.open(format, 4*1024);	// Change the line-in audio buffer size here. Too big => Higher latency. To small => sounds shitty with audio pass through (buffer not filled fast enough)
+				line.open(format, 8*1024);	// Change the line-in audio buffer size here. Too big => Higher latency. To small => sounds shitty with audio pass through (buffer not filled fast enough)
 				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");

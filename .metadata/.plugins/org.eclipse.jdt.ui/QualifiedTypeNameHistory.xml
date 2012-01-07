@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="LightDJGUI.ColorOutputDisplayerPanel"/>
-<fullyQualifiedTypeName name="Visualizors.RGBGradient"/>
-<fullyQualifiedTypeName name="java.awt.AlphaComposite"/>
-<fullyQualifiedTypeName name="java.awt.RenderingHints"/>
-<fullyQualifiedTypeName name="Visualizors.WhitePulseBass"/>
-<fullyQualifiedTypeName name="javax.swing.JWindow"/>
-<fullyQualifiedTypeName name="java.awt.Frame"/>
-<fullyQualifiedTypeName name="java.awt.Stroke"/>
 <fullyQualifiedTypeName name="Common.ColorOutput.RGBRearColorOutputCompression"/>
 <fullyQualifiedTypeName name="Visualizors.Visualizer"/>
 <fullyQualifiedTypeName name="LightDJGUI.VisualizerChooser"/>
@@ -15,13 +7,11 @@
 <fullyQualifiedTypeName name="SoundEngine.VisualizationEngineParty.LightDJState"/>
 <fullyQualifiedTypeName name="Visualizors.RainbowSlider"/>
 <fullyQualifiedTypeName name="SoundEngine.VisualizationEngineParty.CrossfadeAutomator"/>
-<fullyQualifiedTypeName name="Common.ColorOutput.OverallOutputCompression"/>
 <fullyQualifiedTypeName name="LightDJGUI.PulseKeeper"/>
 <fullyQualifiedTypeName name="Common.ColorOutput.RGBFrontColorOutputCompression"/>
 <fullyQualifiedTypeName name="Common.ColorOutput.UVWhiteColorOutputCompression"/>
 <fullyQualifiedTypeName name="Visualizors.DoubleChaser"/>
 <fullyQualifiedTypeName name="LightDJGUI.ColorOutputDisplayerParty"/>
-<fullyQualifiedTypeName name="Visualizors.RGBGradientLinear"/>
 <fullyQualifiedTypeName name="Visualizors.Ambiance"/>
 <fullyQualifiedTypeName name="Visualizors.UVBass"/>
 <fullyQualifiedTypeName name="Visualizors.FingerPiano"/>
@@ -39,7 +29,6 @@
 <fullyQualifiedTypeName name="FeatureDetectors.SharpClapFinder"/>
 <fullyQualifiedTypeName name="java.awt.Graphics2D"/>
 <fullyQualifiedTypeName name="java.awt.BasicStroke"/>
-<fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="javax.sound.midi.MidiEvent"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
@@ -47,9 +36,7 @@
 <fullyQualifiedTypeName name="javax.sound.midi.MidiMessage"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="SoundEngine.VisualizationEngineParty"/>
-<fullyQualifiedTypeName name="Common.UserControl"/>
 <fullyQualifiedTypeName name="Common.ColorOutput"/>
-<fullyQualifiedTypeName name="LightDJGUI.GenericKnob"/>
 <fullyQualifiedTypeName name="Visualizors.ColorEnergyWave"/>
 <fullyQualifiedTypeName name="PartyLightsController.PartyLightsController16"/>
 <fullyQualifiedTypeName name="Visualizors.HueBass2"/>
@@ -60,4 +47,17 @@
 <fullyQualifiedTypeName name="Visualizors.JazzColors"/>
 <fullyQualifiedTypeName name="LightDJGUI.ConfigFileParser"/>
 <fullyQualifiedTypeName name="Visualizors.RGBGradientCompoundLinear"/>
+<fullyQualifiedTypeName name="PostProcessors.PostProcessor"/>
+<fullyQualifiedTypeName name="LightDJGUI.GenericKnob"/>
+<fullyQualifiedTypeName name="PostProcessors.WhiteBurst"/>
+<fullyQualifiedTypeName name="PostProcessors.Strobes"/>
+<fullyQualifiedTypeName name="Common.UserControl"/>
+<fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
+<fullyQualifiedTypeName name="LightDJGUI.IndicatorLED"/>
+<fullyQualifiedTypeName name="Common.FeatureList"/>
+<fullyQualifiedTypeName name="Visualizors.RGBGradientLinear"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="PostProcessors.Blackout"/>
+<fullyQualifiedTypeName name="org.w3c.dom.css.RGBColor"/>
+<fullyQualifiedTypeName name="Common.ColorOutput.OverallOutputCompression"/>
 </qualifiedTypeNameHistroy>

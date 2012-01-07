@@ -1,0 +1,61 @@
+package PostProcessors;
+
+import Common.ColorOutput;
+import Common.FeatureList;
+import LightDJGUI.GenericKnob;
+
+/**
+ * This post processor takes care of white bursts and the "emergency lighting" commands.
+ * @author steve
+ *
+ */
+public class WhiteBurst extends PostProcessor {
+
+	protected GenericKnob lengthKnob;
+	protected boolean active;
+	protected long startTime;
+	
+	public WhiteBurst(double updatesPerSecond) {
+		super(updatesPerSecond);
+		
+	}
+
+	@Override
+	public String getName() {
+		return "Burst";
+	}
+
+	@Override
+	public void init() {
+		
+		active = false;
+		
+		// Make a user control
+		lengthKnob = new GenericKnob(0.5f, 40, "Length");
+		requestUserControl(lengthKnob);
+		
+	}
+
+	@Override
+	public ColorOutput postProcess(ColorOutput colorInput, FeatureList featureList) {
+		
+		// Continue a burst that is currently running
+		if (active) {
+			
+		} else {
+			// Currently not active. Should it became active?
+			if (((Double) featureList.getFeature("KEY_ENTER")) == 1.0) {
+				// ACTIVATE!
+			}
+		}
+		
+		
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+
+
+}

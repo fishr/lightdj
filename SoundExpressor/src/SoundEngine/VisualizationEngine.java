@@ -19,7 +19,7 @@ import Signals.FFTEngine;
 public abstract class VisualizationEngine {
 	
 	// Audio buffers
-	static protected final int BUFFER_SIZE = 1024; //256
+	static protected final int BUFFER_SIZE = 2048; //256
 	static protected final int BUFFER_OVERLAP = 4;	// Must be a power of 2
 	protected double[][] buffers;
 	protected int[] bufferCursors;

@@ -75,7 +75,7 @@ public class JazzColors extends Visualizer {
 			double theta = (colorTheta + lightPhaseShiftCoeff * light) % 1.0;
 			Color c = gradient.computeGradient(theta);
 			
-			Color lightColor = scaleColor(c, brightness);
+			Color lightColor = RGBGradientCompoundLinear.scaleColor(c, brightness);
 			
 			colorOutput.setFrontRGBLight(light, lightColor);
 		}
@@ -83,23 +83,6 @@ public class JazzColors extends Visualizer {
 		// Return the result
 		return colorOutput;
 	}
-	
-	// Helper function to bounce a color!
-	protected Color scaleColor(Color c, float brightness) {
-		float rgb[] = new float[3];
-		c.getRGBColorComponents(rgb);
-
-		float r = rgb[0] * brightness;
-		float g = rgb[1] * brightness;
-		float b = rgb[2] * brightness;
-		
-		Color outputColor = new Color(r, g, b);
-
-		return outputColor;
-		
-	}
-	
-
 
 
 }

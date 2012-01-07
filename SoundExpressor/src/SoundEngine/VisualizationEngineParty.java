@@ -45,6 +45,7 @@ import LightDJGUI.ColorOutputDisplayerPanel;
 import LightDJGUI.ColorOutputDisplayerParty;
 import LightDJGUI.ConfigFileParser;
 import LightDJGUI.CrossfaderKnob;
+import LightDJGUI.IndicatorLight;
 import LightDJGUI.LightDJGUI;
 import LightDJGUI.MouseAcceptorPanel;
 import LightDJGUI.PulseKeeper;
@@ -53,6 +54,10 @@ import LightDJGUI.VisualizerChooser;
 import MidiInterface.MidiConnector;
 import PartyLightsController.PartyLightsController8;
 import PartyLightsController.PartyLightsController16;
+import PostProcessors.Blackout;
+import PostProcessors.PostProcessor;
+import PostProcessors.Strobes;
+import PostProcessors.WhiteBurst;
 import SignalGUI.ChannelLights;
 import SignalGUI.ColoredLight;
 import SignalGUI.GraphDisplay;
@@ -106,6 +111,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// The list of visualizers
 	public ArrayList<Visualizer> visualizers;
 	
+	// The list of post processing effects
+	public ArrayList<PostProcessor> postProcessors;
+	// A status light indicator for each post processing effect
+	public IndicatorLight[] statusLights;
+	
+	
 	
 	// The arduino LED visualizer
 	//LEDVisualizer ledVisuals;
@@ -150,6 +161,20 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 			// Get the list of controls requested
 			
+		}
+		
+		// Set up all of the post processing effects
+		postProcessors = allPostProcessors();
+		for(PostProcessor p : postProcessors) {
+			p.init();
+			
+			// Get the list of controls requested
+			
+		}
+		// Create a status light for each post processor to show if it's active or not
+		statusLights = new IndicatorLight[postProcessors.size()];
+		for(int i = 0; i < postProcessors.size(); i++) {
+			statusLights[i] = new IndicatorLight();
 		}
 		
 		
@@ -202,7 +227,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		int FFT_SIZE = BUFFER_SIZE;
 		double UPDATES_PER_SECOND = (double) SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
 		
-		// Add the detectors here
+		// Add the visualizers here
 		
 		visualizers.add(new RedBassColoredClapVisualizer(FFT_SIZE, UPDATES_PER_SECOND));
 		visualizers.add(new VUBass(FFT_SIZE, UPDATES_PER_SECOND));
@@ -230,6 +255,27 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 
 	
+	/**
+	 * Return the comprehensive list of all post processors. Must be added here to show up in the LightDJ GUI.
+	 * @return
+	 */
+	public ArrayList<PostProcessor> allPostProcessors() {
+		ArrayList<PostProcessor> postProcessors = new ArrayList<PostProcessor>();
+		int FFT_SIZE = BUFFER_SIZE;
+		double UPDATES_PER_SECOND = (double) SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
+		
+		// Add the post processors here
+		postProcessors.add(new Strobes(UPDATES_PER_SECOND));
+		postProcessors.add(new Blackout(UPDATES_PER_SECOND));
+		// WhiteBurst should always be last for emergency purposes, as it controls
+		// the Emergency Lighting and should have the "final say" of all post processors.
+		postProcessors.add(new WhiteBurst(UPDATES_PER_SECOND));
+		
+		
+		return postProcessors;
+		 
+	}
+	
 	
 	@Override
 	protected RenderFrame computeVisualsRendering(FFT fft) {
@@ -253,16 +299,64 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// Add in specially-computed features.
 		featureList.addFeature("PULSE", pulseKeeper.getPulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
 		featureList.addFeature("PULSE_BASS", pulseKeeper.getWavePulse());	// The pulse wave (simulated bass), as controlled by the LightDJ
-		featureList.addFeature("KEY_A", aKeyPressed);
-		featureList.addFeature("KEY_S", sKeyPressed);
-		featureList.addFeature("KEY_D", dKeyPressed);
-		featureList.addFeature("KEY_F", fKeyPressed);
-		featureList.addFeature("KEY_G", gKeyPressed);
-		featureList.addFeature("KEY_H", hKeyPressed);
-		featureList.addFeature("KEY_J", jKeyPressed);
-		featureList.addFeature("KEY_K", kKeyPressed);
-		featureList.addFeature("KEY_L", lKeyPressed);
+		
+		featureList.addFeature("KEY_ENTER", enterKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_BACKSPACE", backspaceKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_CONTROL", controlKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_ALT", altKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_SHIFT", shiftKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_TAB", tabKeyPressed ? 1.0 : 0.0);
+		
+		featureList.addFeature("KEY_[", leftBracketKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_]", rightBracketKeyPressed ? 1.0 : 0.0);
+		
+		
+		
+		featureList.addFeature("KEY_Q", qKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_W", wKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_E", eKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_R", rKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_T", tKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_Y", yKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_U", uKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_I", iKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_O", oKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_P", pKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_A", aKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_S", sKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_D", dKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F", fKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_G", gKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_H", hKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_J", jKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_K", kKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_L", lKeyPressed ? 1.0 : 0.0);
 
+		featureList.addFeature("KEY_0", zeroKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_1", oneKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_2", twoKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_3", threeKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_4", fourKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_5", fiveKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_6", sixKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_7", sevenKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_8", eightKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_9", nineKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_MINUS", minusKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_PLUS", plusKeyPressed ? 1.0 : 0.0);
+		
+		featureList.addFeature("KEY_F1", f1KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F2", f2KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F3", f3KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F4", f4KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F5", f5KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F6", f6KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F7", f7KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F8", f8KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F9", f9KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F10", f10KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F11", f11KeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_F12", f12KeyPressed ? 1.0 : 0.0);
 		
 		// Now that we have a full-fledged FeatureList, pass it to the Visualizers
 		ColorOutput[] colorOutputs = new ColorOutput[visualizers.size()];
@@ -281,6 +375,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		RenderFrameParty renderFrame = new RenderFrameParty();
 		renderFrame.colorOutputs = colorOutputs;
+		renderFrame.featureList = featureList;
 		
 		
 		
@@ -301,7 +396,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		ColorOutput colorOutput = mixColors(renderFrame);
 		
 		// Apply any necessary post-processing
-		applyPostProcessing(colorOutput);
+		applyPostProcessing(colorOutput, renderFrame.featureList);
 		
 		// Send the command to the LED's
 		ledVisuals.visualize(colorOutput);	// Send SERIAL to the RGB's
@@ -315,240 +410,18 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	}
 	
-	protected void applyPostProcessing(ColorOutput colorOutput) {
-		switch(lightDJPostProcessing) {
-		case POST_PROCESSING_NONE:
-			// Do nothing!
-			break;
-			
-		case POST_PROCESSING_EMERGENCY_LIGHTING:
-			colorOutput.emergencyLighting();
-			break;
-			
-		case POST_PROCESSING_ALL_OFF:
-			colorOutput.allOff();
-			break;
-			
-		case POST_PROCESSING_WHITE_STROBE:
-			whiteStrobe(colorOutput);
-			break;
-			
-		case POST_PROCESSING_UV_STROBE:
-			uvStrobe(colorOutput);
-			break;
-			
-		case POST_PROCESSING_WHITE_BURST:
-			whiteBurst(colorOutput);
-			break;
-			
-		case POST_PROCESSING_WHITE_BURST_WITH_STROBES:
-			whiteBurstWithStrobe(colorOutput);
-			break;
-			
-		case POST_PROCESSING_SHIFT_LEFT:
-			shiftLeft(colorOutput);
-			break;
-			
-		case POST_PROCESSING_SHIFT_RIGHT:
-			shiftRight(colorOutput);
-			break;
-			
-		case POST_PROCESSING_STROBE_SCATTER:
-			scatterStrobe(colorOutput);
-			break;
-			
-		case POST_PROCESSING_HUE_SHIFT:
-			hueShift(colorOutput);
-			break;
-			
-		}
-	}
-	
-	protected void hueShift(ColorOutput colorOutput) {
-		long now = System.currentTimeMillis();
+	// Apply post processing to these computed colors using the feature list.
+	protected void applyPostProcessing(ColorOutput colorOutput, FeatureList featureList) {
 		
-		double delta = (now - effectStartTime);
-		
-		if (delta / HUE_SHIFT_TIME > 1.0) {
-			// It's done!
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		} else {
-			float shift = (float) (0.5 + 0.5 * delta / HUE_SHIFT_TIME);
-			
-			for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-				Color c = colorOutput.rgbLightsFront[light];
-				float[] hsb = new float[3];
-				Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsb);
-				
-				colorOutput.rgbLightsFront[light] = Color.getHSBColor(hsb[0] + shift, hsb[1], hsb[2]);
-				
-			}
-			
-			
-			
-		}
-	}
-	
-	protected void scatterStrobe(ColorOutput colorOutput) {
-		boolean allOff = true;
-		
-		long now = System.currentTimeMillis();
-		
-		for(int strobe = 0; strobe < ColorOutput.NUM_UVWHITE_PANELS; strobe++) {
-			double uv = colorOutput.uvLights[strobe];	// Preserve the UV value - just modify the strobe
-			double delta = (now - scatterStrobes[strobe]);
-			double white;
-			
-			if (delta > scatterTimeLength) {
-				white = 0.0;
-			} else {
-				white = 1.0 - delta / scatterTimeLength;
-				allOff = false;
-			}
-			
-			
-			colorOutput.setUVWhitePanel(strobe, uv, white);
-			
-		}
-		
-		// Are we done yet?
-		if (allOff) {
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		}
-		
-	}
-	
-	
-	protected void shiftRight(ColorOutput colorOutput) {
-		if (shiftCounter++ > SHIFT_SPEED) {
-			shiftCounter = 0;
-			shiftPosition = shiftPosition + 1;
-		}
-		
-		if (shiftPosition < ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE) {
-			// Shift!
-			shiftVisuals(colorOutput, shiftPosition);
-		} else {
-			// Done!
-			shiftPosition = 0;
-			shiftCounter = 0;
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		}
-		
-	}
-	
-	protected void shiftLeft(ColorOutput colorOutput) {
-		if (shiftCounter++ > SHIFT_SPEED) {
-			shiftCounter = 0;
-			shiftPosition = shiftPosition - 1;
-		}
-		
-		if (shiftPosition > 0) {
-			// Shift!
-			shiftVisuals(colorOutput, shiftPosition);
-		} else {
-			// Done!
-			shiftPosition = 0;
-			shiftCounter = 0;
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		}
-	}
-	
-	protected void shiftVisuals(ColorOutput colorOutput, int s) {
-		
-		int shift = (s % (ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE));
-		
-		Color[] shiftedColors = new Color[ColorOutput.NUM_FRONT_RGB_PANELS*4];
-		for(int i = 0; i < ColorOutput.NUM_FRONT_RGB_PANELS*4; i++) {
-			shiftedColors[i] = getShiftColor(colorOutput, i, shift);
-		}
-		
-		for(int panel = 0; panel < ColorOutput.NUM_REAR_RGB_PANELS; panel++) {
-			colorOutput.setFrontPanel(panel, shiftedColors[4*panel], shiftedColors[4*panel + 1], shiftedColors[4*panel + 2], shiftedColors[4*panel + 3]);
+		// Run through each of the post processors and execute.
+		for(PostProcessor postProcessor : postProcessors) {
+			postProcessor.postProcess(colorOutput, featureList);
 		}
 		
 		
 	}
 	
-	protected Color getShiftColor(ColorOutput colorOutput, int pos, int s) {
-		int i = (int) ((pos - s) % (ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE));
-		if (i < 0) {
-			i += ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE;
-		}
-		
-		if (i >= ColorOutput.NUM_FRONT_RGB_PANELS*4) {
-			return Color.BLACK;
-		} else {
-			return colorOutput.rgbLightsFront[i];
-		}
-	}
-	
-	
-	protected void whiteBurst(ColorOutput colorOutput) {
-		// Get the timing parameters
-		long now = System.currentTimeMillis();
-		long delta = (now - effectStartTime);
-		
-		// See if we're done
-		if (delta > WHITE_BURST_TIME) {
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-			return;
-		}
-		
-		// Not done - still fading! Compute how much.
-		double alpha = (double) delta / WHITE_BURST_TIME;
-		
-		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-			colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
-		}
 
-	}
-	
-	
-	protected void whiteBurstWithStrobe(ColorOutput colorOutput) {
-		// Get the timing parameters
-		long now = System.currentTimeMillis();
-		long delta = (now - effectStartTime);
-		
-		// See if we're done
-		if (delta > WHITE_BURST_TIME) {
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-			return;
-		}
-		
-		// Not done - still fading! Compute how much.
-		double alpha = (double) delta / WHITE_BURST_TIME;
-		
-		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-			colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
-		}
-
-		for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
-			colorOutput.uvLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.uvLights[light];
-			colorOutput.whiteLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.whiteLights[light];
-		}
-		
-		
-	}
-	
-	protected void whiteStrobe(ColorOutput colorOutput) {
-		if (strobeFrame == 0) {
-			colorOutput.setWhiteStrobe();
-		} else {
-			colorOutput.allOff();
-		}
-		strobeFrame = (strobeFrame + 1) % strobeFrameLength;
-	}
-	
-	
-	protected void uvStrobe(ColorOutput colorOutput) {
-		if (strobeFrame == 0) {
-			colorOutput.setUVStrobe();
-		} else {
-			colorOutput.allOff();
-		}
-		strobeFrame = (strobeFrame + 1) % strobeFrameLength;
-	}
 	
 	/**
 	 * Takes in the current color frame to be rendered. Retrieves the current cross-fade mixing
@@ -606,6 +479,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static int PULSE_KEEPER_Y = BORDER_SIZE;
 	protected static int PULSE_KEEPER_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
 	protected static int PULSE_KEEPER_HEIGHT = 100;
+	protected static int POSTPROCESSOR_X;
+	protected static int POSTPROCESSOR_Y;
+	protected static int POSTPROCESSOR_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
+	protected static int POSTPROCESSOR_TITLE_HEIGHT = 40;
+	protected static int POSTPROCESSOR_BOTTOM_HEIGHT = 0;
+	protected static int POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT = 40;
 	protected static int USER_CONTROL_SLOT_HEIGHT = 60;
 	
 	// Some color information
@@ -657,16 +536,56 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static boolean controlKeyPressed = false;
 	protected static boolean shiftKeyPressed = false;
 	protected static boolean altKeyPressed = false;
-	protected static double aKeyPressed = 0.0;
-	protected static double sKeyPressed = 0.0;
-	protected static double dKeyPressed = 0.0;
-	protected static double fKeyPressed = 0.0;
-	protected static double gKeyPressed = 0.0;
-	protected static double hKeyPressed = 0.0;
-	protected static double jKeyPressed = 0.0;
-	protected static double kKeyPressed = 0.0;
-	protected static double lKeyPressed = 0.0;
-	
+	protected static boolean enterKeyPressed = false;
+	protected static boolean escapeKeyPressed = false;
+	protected static boolean backspaceKeyPressed = false;
+	protected static boolean tabKeyPressed = false;
+	protected static boolean f1KeyPressed = false;
+	protected static boolean f2KeyPressed = false;
+	protected static boolean f3KeyPressed = false;
+	protected static boolean f4KeyPressed = false;
+	protected static boolean f5KeyPressed = false;
+	protected static boolean f6KeyPressed = false;
+	protected static boolean f7KeyPressed = false;
+	protected static boolean f8KeyPressed = false;
+	protected static boolean f9KeyPressed = false;
+	protected static boolean f10KeyPressed = false;
+	protected static boolean f11KeyPressed = false;
+	protected static boolean f12KeyPressed = false;
+	protected static boolean leftBracketKeyPressed = false;
+	protected static boolean rightBracketKeyPressed = false;
+	protected static boolean qKeyPressed = false;
+	protected static boolean wKeyPressed = false;
+	protected static boolean eKeyPressed = false;
+	protected static boolean rKeyPressed = false;
+	protected static boolean tKeyPressed = false;
+	protected static boolean yKeyPressed = false;
+	protected static boolean uKeyPressed = false;
+	protected static boolean iKeyPressed = false;
+	protected static boolean oKeyPressed = false;
+	protected static boolean pKeyPressed = false;
+	protected static boolean aKeyPressed = false;
+	protected static boolean sKeyPressed = false;
+	protected static boolean dKeyPressed = false;
+	protected static boolean fKeyPressed = false;
+	protected static boolean gKeyPressed = false;
+	protected static boolean hKeyPressed = false;
+	protected static boolean jKeyPressed = false;
+	protected static boolean kKeyPressed = false;
+	protected static boolean lKeyPressed = false;
+	protected static boolean oneKeyPressed = false;
+	protected static boolean twoKeyPressed = false;
+	protected static boolean threeKeyPressed = false;
+	protected static boolean fourKeyPressed = false;
+	protected static boolean fiveKeyPressed = false;
+	protected static boolean sixKeyPressed = false;
+	protected static boolean sevenKeyPressed = false;
+	protected static boolean eightKeyPressed = false;
+	protected static boolean nineKeyPressed = false;
+	protected static boolean zeroKeyPressed = false;
+	protected static boolean minusKeyPressed = false;
+	protected static boolean plusKeyPressed = false;
+
 	// Store the state of the LightDJ
 	public enum LightDJState {
 		LIGHTDJ_STATE_NORMAL,
@@ -684,30 +603,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static double CROSSFADE_SPEED_SLOW = 0.015;
 	protected static double CROSSFADE_SPEED_FAST = 0.04;
 	
-	// Keep track of available post-processings
-	public enum LightDJPostProcessing {
-		POST_PROCESSING_NONE,	// Send the mixed color-data as is
-		POST_PROCESSING_WHITE_STROBE,	// Ignore the color data and instead white strobe
-		POST_PROCESSING_UV_STROBE,	// Ignore the color data and instead UV strobe
-		POST_PROCESSING_ALL_OFF,	// Turn all lights off temporarily
-		POST_PROCESSING_EMERGENCY_LIGHTING,	// Turn on all lights to white
-		POST_PROCESSING_WHITE_BURST,	// Temporarily turn everything to white and then fade back (no white LED's)
-		POST_PROCESSING_WHITE_BURST_WITH_STROBES,	// Same as above, but with white LED's
-		POST_PROCESSING_SHIFT_RIGHT,	// Shift the whole plugin right
-		POST_PROCESSING_SHIFT_LEFT,		// Shift the whole plugin left
-		POST_PROCESSING_STROBE_SCATTER,	// Pick a random strobe and power it
-		POST_PROCESSING_HUE_SHIFT,		// Reverse the hue on all the colors, and fade back into the regular hue
-	}
-	protected LightDJPostProcessing lightDJPostProcessing; 
 	protected long effectStartTime;
 	
 	//  Values and constants associated with post-processing effects
 	// Strobe speeds, for white and UV
 	protected int strobeFrame = 0;
 	protected int strobeFrameLength = 8;
-	
-	// White burst
-	protected long WHITE_BURST_TIME = 500;	// milliseconds
 	
 	// Shifting/
 	protected int SHIFT_SPEED = 1;
@@ -773,14 +674,13 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
 			e.printStackTrace();
 		}
-		
+
 		REGULAR_STROKE = new BasicStroke(1.0f);
 		THICK_STROKE = new BasicStroke(3.0f);
 		alpha = 0.0;
 		
 		// Set the default states
 		lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
-		lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
 		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
 		
 		// Set up some other GUI elements
@@ -793,7 +693,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// Start the crossfader knob
 		crossfaderKnob = new CrossfaderKnob(this);
 		
-		// Start the visualizer chooser
+		// Start the visualizer chooser		startAutoCrossfade(-CROSSFADE_SPEED_SLOW);
 		visualizerChooser = new VisualizerChooser(this, visualizers);
 		
 		// Start the pulse keeper
@@ -804,6 +704,13 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		activePanel = null;
 		mouseAcceptors.add(visualizerChooser);
 		mouseAcceptors.add(crossfaderKnob);
+		// Also add mouse acceptors for the post processing effects
+		for(PostProcessor p : postProcessors) {
+			for(UserControl control : p.getRequestedUserControls()) {
+				mouseAcceptors.add(control);
+			}
+		}
+		
 		
 		// Generate the background
 		generateBackground();
@@ -819,7 +726,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	/**
 	 * Generate a pretty looking background image
 	 */
-	private void generateBackground() {
+	protected void generateBackground() {
 		// Allocate an image of the proper size
 		int width = gui.getWidth();
 		int height = gui.getHeight();
@@ -883,6 +790,50 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		loadVisualizerPlugin(true, visualizerLeftIndex);
 		loadVisualizerPlugin(false, visualizerRightIndex);
 		
+		// Draw the backgrounds for the post processors!
+		POSTPROCESSOR_X = BORDER_SIZE;
+		POSTPROCESSOR_Y = PULSE_KEEPER_Y + PULSE_KEEPER_HEIGHT + BORDER_SIZE;
+		int y = POSTPROCESSOR_Y;
+		int postProcessorIndex = 0;
+		for(PostProcessor postProcessor : postProcessors) {
+			// Determine the height of this box
+			int h = POSTPROCESSOR_TITLE_HEIGHT;
+			for(UserControl control : postProcessor.getRequestedUserControls()) {
+				control.setLocation(2 * BORDER_SIZE, y +h, POSTPROCESSOR_WIDTH - 2*BORDER_SIZE, POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT);
+				h += POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT + BORDER_SIZE;
+			}
+			h += POSTPROCESSOR_BOTTOM_HEIGHT;
+			
+			// Set the location of this post processor's status light
+			statusLights[postProcessorIndex].setLocation(SIDEBAR_WIDTH - BORDER_SIZE - 50, y + 7, 1, 1);
+			
+			// Draw the box
+			g2D.setColor(PANEL_BACKGROUND_COLOR);
+			g2D.fillRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, 40, 40);
+			g2D.setColor(PANEL_BORDER_COLOR);
+			g2D.setStroke(REGULAR_STROKE);
+			g2D.drawRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, 40, 40);
+			
+			// Draw the title and the check box (off right now by default)
+			g2D.setColor(TEXT_COLOR);
+			g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2D.setFont(PANEL_FONT);
+			g2D.drawString(postProcessor.getName(), POSTPROCESSOR_X + BORDER_SIZE, y + 16 + BORDER_SIZE);
+			g2D.setColor(PANEL_BORDER_COLOR);
+			g2D.drawLine(POSTPROCESSOR_X + BORDER_SIZE, y + 25 + BORDER_SIZE, POSTPROCESSOR_X + POSTPROCESSOR_WIDTH - BORDER_SIZE, y + 25 + BORDER_SIZE);
+		
+			// Render all of the controls
+			for(UserControl control : postProcessor.getRequestedUserControls()) {
+				control.render(g2D);
+			}
+			statusLights[postProcessorIndex].render(g2D);
+			
+			y += h + BORDER_SIZE;
+			
+			postProcessorIndex++;
+		}
+		
+		
 		// Resize where the scrolling spectrum goes
 		//spectrumMapper.move(SIDEBAR_WIDTH + BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
 		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
@@ -928,7 +879,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			height = RECORD_CONTROLS_HEIGHT - 2*BORDER_SIZE;
 		}
 		
-		
+
 		g2D.setColor(TEXT_COLOR);
 		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2D.setFont(PANEL_FONT);
@@ -938,7 +889,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 		y += 30;
 		
-		// Set the location of any controls that needed to be rendered, and render them
+		// Set the location of any controls thacontrol.render(g2D);t needed to be rendered, and render them
 		int slotX = 0; int slotY = 0;
 		for(UserControl control : visualizer.getRequestedUserControls()) {
 			control.setLocation(x + slotX * width / 2, y + slotY * USER_CONTROL_SLOT_HEIGHT, width / 2, USER_CONTROL_SLOT_HEIGHT - BORDER_SIZE);
@@ -1110,6 +1061,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			}
 		}
 			
+		
 		// Draw the cross-fader knob
 		//paintCrossfader(false);
 		if (crossfaderKnob.needsToRender()) {
@@ -1152,14 +1104,34 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	
 	protected void renderSidePanel() {
+		Graphics2D g2D = (Graphics2D) background.getGraphics();
+		int width = gui.getWidth();
+		int height = gui.getHeight();
+		
 		// Render the spectrum in the lower left corner
 		spectrumMapper.render();
 		
 		// Render graphs
-		plotter.render();
+		//plotter.render();
 		
 		// Render the pulse
 		paintPulseKeeper();
+		
+		// Render any post-processing user controls
+		for(int postProcessorIndex = 0; postProcessorIndex < postProcessors.size(); postProcessorIndex++) {
+			PostProcessor p = postProcessors.get(postProcessorIndex);
+			for(UserControl control : p.getRequestedUserControls()) {
+				if (control.needsToRender()) {
+					control.render(g2D);
+				}
+			}
+			// Also, don't forget about the status light!
+			statusLights[postProcessorIndex].setValue((p.isActive() ? 1.0f : 0.0f));
+			if (statusLights[postProcessorIndex].needsToRender()) {
+				statusLights[postProcessorIndex].render(g2D);
+			}
+		}
+		
 	}
 	
 	public void paintDJ(Graphics g) {
@@ -1235,17 +1207,110 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	 */
 	public void keyDown(int keyCode) {
 		
-		// Is it a special key?
+		// Record which keys are pressed
 		if (keyCode == KeyEvent.VK_CONTROL) {
 			controlKeyPressed = true;
 		} else if (keyCode == KeyEvent.VK_ALT) {
 			altKeyPressed = true;
-		}
-		
-		// Emergency lighting?
-		if (keyCode == KeyEvent.VK_ESCAPE) {
-			
-		}
+		} else if (keyCode == KeyEvent.VK_ENTER) {
+			enterKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_SHIFT) {
+			shiftKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+			backspaceKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_TAB) {
+			tabKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_A) {
+			aKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_S) {
+			sKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_D) {
+			dKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F) {
+			fKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_G) {
+			gKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_H) {
+			hKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_J) {
+			jKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_K) {
+			kKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_L) {
+			lKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_Q) {
+			qKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_W) {
+			wKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_E) {
+			eKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_R) {
+			rKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_T) {
+			tKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_Y) {
+			yKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_U) {
+			uKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_I) {
+			iKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_O) {
+			oKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_P) {
+			pKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_OPEN_BRACKET) {
+			leftBracketKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_CLOSE_BRACKET) {
+			rightBracketKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F1) {
+			f1KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F2) {
+			f2KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F3) {
+			f3KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F4) {
+			f4KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F5) {
+			f5KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F6) {
+			f6KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F7) {
+			f7KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F8) {
+			f8KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F9) {
+			f9KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F10) {
+			f10KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F11) {
+			f11KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_F12) {
+			f12KeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_0) {
+			zeroKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_1) {
+			oneKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_2) {
+			twoKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_3) {
+			threeKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_4) {
+			fourKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_5) {
+			fiveKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_6) {
+			sixKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_7) {
+			sevenKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_8) {
+			eightKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_9) {
+			nineKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_MINUS) {
+			minusKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_PLUS) {
+			plusKeyPressed = true;
+		} 
 		
 		
 		// Switch based on the current LightDJ state
@@ -1255,6 +1320,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			if (keyCode == KeyEvent.VK_SPACE) {
 				activeLayer = true;
 				lightDJState = LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER;
+				
 			} else if (keyCode == KeyEvent.VK_LEFT) {
 				if (controlKeyPressed) {
 					startAutoCrossfade(-CROSSFADE_SPEED_SLOW);
@@ -1276,6 +1342,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 					alpha = 1.0;
 					crossfaderKnob.setValue((float) alpha);
 				}
+				
 			} else if (keyCode == KeyEvent.VK_DOWN) {
 				// Auto cross-fade to the opposite direction
 				if (alpha > 0.5) {
@@ -1300,28 +1367,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						crossfaderKnob.setValue((float) alpha);
 					}
 				}
-				
-				
-			} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
-				 // This is a trigger for all off - turn off all lights!
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_ALL_OFF;
-				
-			} else if (keyCode == KeyEvent.VK_F12) {
-				// This is a trigger for white-strobing!
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE;
-				
-			} else if (keyCode == KeyEvent.VK_F11){
-				// This is a trigger for white-strobing!
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_UV_STROBE;
-				
-			} else if (keyCode == KeyEvent.VK_ESCAPE) {
-				// Turn emergency lighting on/off
-				if (lightDJPostProcessing == LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING) {
-					lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-				} else {
-					lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_EMERGENCY_LIGHTING;
-				}
-				
+								
 			} else if (keyCode == KeyEvent.VK_SHIFT) {
 				// The shift key is a trigger to start entering the pulse
 				pulseKeeper.startEnteringPulses();
@@ -1331,70 +1377,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				if (shiftKeyPressed) {
 					pulseKeeper.enterPulse();
 				}
-			} else if (keyCode == KeyEvent.VK_F8 || keyCode == KeyEvent.VK_ENTER) {
-				// This is a trigger for a white burst!
-				effectStartTime = System.currentTimeMillis();
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_BURST;
-			} else if (keyCode == KeyEvent.VK_F5) {
-				// Triggers a bigger white burst!
-				effectStartTime = System.currentTimeMillis();
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_WHITE_BURST_WITH_STROBES;
-				
-			} else if (keyCode == KeyEvent.VK_F10) {
-				// Key trigger for shift right!
-				shiftPosition = 0;
-				shiftCounter = 0;
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_SHIFT_RIGHT;
-				
-			} else if (keyCode == KeyEvent.VK_F9) {
-				// Key trigger for shift right!]
-				shiftPosition = ColorOutput.NUM_FRONT_RGB_PANELS*4 + SHIFT_BLOCK_SIZE;
-				shiftCounter = 0;
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_SHIFT_LEFT;
-				
-			} else if (keyCode == KeyEvent.VK_OPEN_BRACKET || keyCode == KeyEvent.VK_CLOSE_BRACKET) {
-				// Key trigger for scatter strobing
-				// Select a random strobe that wasn't the one selected last time and put it up full brightness
-				int strobe = (int) (ColorOutput.NUM_UVWHITE_PANELS * Math.random());
-				while (strobe == lastScatterStrobe) {
-					strobe = (int) (ColorOutput.NUM_UVWHITE_PANELS * Math.random()); // Select a new strobe - not the one from last time
-				}
-				lastScatterStrobe = strobe;
-				
-				// Turn that strobe on full-power
-				scatterStrobes[strobe] = System.currentTimeMillis();
-				
-				
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_STROBE_SCATTER;
-				
-			} else if (keyCode == KeyEvent.VK_F7) {
-				// A key trigger for hue shifting
-				effectStartTime = System.currentTimeMillis();
-				lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_HUE_SHIFT;
-				
-				
-			} else if (keyCode == KeyEvent.VK_A) {
-				aKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_S) {
-				sKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_D) {
-				dKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_F) {
-				fKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_G) {
-				gKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_H) {
-				hKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_J) {
-				jKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_K) {
-				kKeyPressed = 1.0;
-			} else if (keyCode == KeyEvent.VK_L) {
-				lKeyPressed = 1.0;
-			} 
+			}
 			
 			break;
-			
 			
 		case LIGHTDJ_STATE_CHOOSING_VISUALIZER:
 			if (keyCode == KeyEvent.VK_SPACE) {
@@ -1421,43 +1406,113 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	
 	public void keyUp(int keyCode) {
-		// Is it a special key?
+		// Record which key was just released
 		if (keyCode == KeyEvent.VK_CONTROL) {
 			controlKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_ALT) {
 			altKeyPressed = false;
-		} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
-			// This was a trigger for all-off. Now turn stuff back on again.
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		} else if (keyCode == KeyEvent.VK_F12) {
-			// This was a trigger for white-strobing.
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
-		} else if (keyCode == KeyEvent.VK_F11) {
-			// This was a trigger for white-strobing.
-			lightDJPostProcessing = LightDJPostProcessing.POST_PROCESSING_NONE;
+		} else if (keyCode == KeyEvent.VK_ENTER) {
+			enterKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_SHIFT) {
 			// The shift key is a trigger to enter the pulse!
 			pulseKeeper.stopEnteringPulses();
 			shiftKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+			backspaceKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_TAB) {
+			tabKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_A) {
-			aKeyPressed = 0.0;
+			aKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_S) {
-			sKeyPressed = 0.0;
+			sKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_D) {
-			dKeyPressed = 0.0;
+			dKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_F) {
-			fKeyPressed = 0.0;
+			fKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_G) {
-			gKeyPressed = 0.0;
+			gKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_H) {
-			hKeyPressed = 0.0;
+			hKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_J) {
-			jKeyPressed = 0.0;
+			jKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_K) {
-			kKeyPressed = 0.0;
+			kKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_L) {
-			lKeyPressed = 0.0;
-		}
+			lKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_Q) {
+			qKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_W) {
+			wKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_E) {
+			eKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_R) {
+			rKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_T) {
+			tKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_Y) {
+			yKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_U) {
+			uKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_I) {
+			iKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_O) {
+			oKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_P) {
+			pKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_OPEN_BRACKET) {
+			leftBracketKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_CLOSE_BRACKET) {
+			rightBracketKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F1) {
+			f1KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F2) {
+			f2KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F3) {
+			f3KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F4) {
+			f4KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F5) {
+			f5KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F6) {
+			f6KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F7) {
+			f7KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F8) {
+			f8KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F9) {
+			f9KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F10) {
+			f10KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F11) {
+			f11KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_F12) {
+			f12KeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_0) {
+			zeroKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_1) {
+			oneKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_2) {
+			twoKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_3) {
+			threeKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_4) {
+			fourKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_5) {
+			fiveKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_6) {
+			sixKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_7) {
+			sevenKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_8) {
+			eightKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_9) {
+			nineKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_MINUS) {
+			minusKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_PLUS) {
+			plusKeyPressed = false;
+		} 
+		
 		
 	}
 
@@ -1525,10 +1580,6 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	public void endAutomaticCrossfade() {
 		// Disable any automated cross-fading
 		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
-	}
-	
-	public LightDJPostProcessing getPostProcessingMethod() {
-		return lightDJPostProcessing;
 	}
 	
 	
@@ -1646,11 +1697,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 
 
 class RenderFrameParty extends RenderFrame {
-
-	ColorOutput[] colorOutputs;
-	
-	ColorOutput finalOutput;
-	
+	public ColorOutput[] colorOutputs;
+	public ColorOutput finalOutput;
+	public FeatureList featureList;
 }
 
 class RenderTask extends TimerTask {

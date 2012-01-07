@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="20" version="2.0">
+<workbench progressCount="18" version="2.0">
 <workbenchAdvisor/>
 <window height="1022" maximized="true" width="1670" x="21" y="27">
 <fastViewData fastViewLocation="1024"/>
@@ -42,41 +42,41 @@
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngineParty.java" partName="VisualizationEngineParty.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/VisualizationEngineParty.java" title="VisualizationEngineParty.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngineParty.java" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MainClass.java" partName="MainClass.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/MainClass.java" title="MainClass.java" tooltip="SoundExpressor/src/SoundEngine/MainClass.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="5816" selectionTopPixel="2344"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngineParty.java" partName="VisualizationEngineParty.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/VisualizationEngineParty.java" title="VisualizationEngineParty.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngineParty.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/VisualizationEngineParty.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="22854" selectionTopPixel="12220"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="8745" selectionTopPixel="2984"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WhiteBurst.java" partName="WhiteBurst.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/PostProcessors/WhiteBurst.java" title="WhiteBurst.java" tooltip="SoundExpressor/src/PostProcessors/WhiteBurst.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/PostProcessors/WhiteBurst.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="2145" selectionOffset="0" selectionTopPixel="637"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Strobes.java" partName="Strobes.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/PostProcessors/Strobes.java" title="Strobes.java" tooltip="SoundExpressor/src/PostProcessors/Strobes.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/PostProcessors/Strobes.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="645" selectionTopPixel="142"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PostProcessor.java" partName="PostProcessor.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/PostProcessors/PostProcessor.java" title="PostProcessor.java" tooltip="SoundExpressor/src/PostProcessors/PostProcessor.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/PostProcessors/PostProcessor.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="581" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Blackout.java" partName="Blackout.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/PostProcessors/Blackout.java" title="Blackout.java" tooltip="SoundExpressor/src/PostProcessors/Blackout.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/PostProcessors/Blackout.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1070" selectionTopPixel="574"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorOutputDisplayerParty.java" partName="ColorOutputDisplayerParty.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java" title="ColorOutputDisplayerParty.java" tooltip="SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3699" selectionTopPixel="1870"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PartyLightsController16.java" partName="PartyLightsController16.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/PartyLightsController/PartyLightsController16.java" title="PartyLightsController16.java" tooltip="SoundExpressor/src/PartyLightsController/PartyLightsController16.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/PartyLightsController/PartyLightsController16.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4807" selectionTopPixel="1349"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="2415"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MainClass.java" partName="MainClass.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/MainClass.java" title="MainClass.java" tooltip="SoundExpressor/src/SoundEngine/MainClass.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="5816" selectionTopPixel="2202"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SoundVisualizer.java" partName="SoundVisualizer.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/SoundVisualizer.java" title="SoundVisualizer.java" tooltip="SoundExpressor/src/SoundEngine/SoundVisualizer.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/SoundVisualizer.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3636" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngine.java" partName="VisualizationEngine.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/SoundEngine/VisualizationEngine.java" title="VisualizationEngine.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngine.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1131" selectionTopPixel="143"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="BassFinder.java" partName="BassFinder.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/FeatureDetectors/BassFinder.java" title="BassFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/BassFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/FeatureDetectors/BassFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1272" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClapFinder.java" partName="ClapFinder.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/FeatureDetectors/ClapFinder.java" title="ClapFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/ClapFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/FeatureDetectors/ClapFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="341" selectionTopPixel="68"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SharpClapFinder.java" partName="SharpClapFinder.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/FeatureDetectors/SharpClapFinder.java" title="SharpClapFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/SharpClapFinder.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/FeatureDetectors/SharpClapFinder.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="1219"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ScrollingSpectrum.java" partName="ScrollingSpectrum.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java" title="ScrollingSpectrum.java" tooltip="SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1619" selectionTopPixel="0"/>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorOutput.java" partName="ColorOutput.java" path="/home/steve/MusicVisualizer/SoundExpressor/src/Common/ColorOutput.java" title="ColorOutput.java" tooltip="SoundExpressor/src/Common/ColorOutput.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SoundExpressor/src/Common/ColorOutput.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3126" selectionTopPixel="795"/>
 </editor>
 </editors>
 <views>
@@ -422,164 +422,165 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/VisualizationEngineParty.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/SoundVisualizer.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/FeatureDetectors/BassFinder.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/PostProcessors/Strobes.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/PostProcessors/PostProcessor.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/PostProcessors/WhiteBurst.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/PostProcessors/Blackout.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/PartyLightsController/PartyLightsController16.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/LightDJGUI/LightDJGUI.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/Common/ColorOutput.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/SoundExpressor/src/SoundEngine/MainClass.java"/>
 </editors>
-<item historyLabel="ScrollingSpectrum.java" index="2">
-<position info="not_deleted" x="1619" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="1027" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="683" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5363" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5506" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5458" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5502" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="4614" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="4627" y="0"/>
-</item>
-<item historyLabel="SoundVisualizer.java" index="4">
-<position info="not_deleted" x="3636" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="2334" y="0"/>
-</item>
-<item historyLabel="BassFinder.java" index="5">
+<item historyLabel="VisualizationEngineParty.java" index="0">
 <position/>
 </item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="24832" y="0"/>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="707" y="0"/>
 </item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="576" y="0"/>
+<item historyLabel="PostProcessor.java" index="2">
+<position info="not_deleted" x="265" y="0"/>
 </item>
-<item historyLabel="BassFinder.java" index="5">
-<position info="not_deleted" x="1386" y="0"/>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="707" y="0"/>
 </item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="915" y="0"/>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="784" y="0"/>
 </item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="24832" y="0"/>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="16394" y="0"/>
+</item>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="211" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="265" y="0"/>
+</item>
+<item historyLabel="Blackout.java" index="4">
+<position/>
+</item>
+<item historyLabel="PostProcessor.java" index="2">
+<position info="not_deleted" x="265" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="16394" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="48045" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="53901" y="0"/>
+</item>
+<item historyLabel="ColorOutputDisplayerParty.java" index="5">
+<position info="not_deleted" x="3699" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="13789" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="265" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="2079" y="0"/>
+</item>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="545" y="0"/>
+</item>
+<item historyLabel="PostProcessor.java" index="2">
+<position info="not_deleted" x="640" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="14613" y="0"/>
+</item>
+<item historyLabel="PostProcessor.java" index="2">
+<position info="not_deleted" x="581" y="0"/>
+</item>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="514" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="837" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="8782" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="1311" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="22131" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="2031" y="0"/>
+</item>
+<item historyLabel="Strobes.java" index="1">
+<position info="not_deleted" x="645" y="0"/>
 </item>
 <item historyLabel="PartyLightsController16.java" index="6">
-<position info="not_deleted" x="4807" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="4605" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="24832" y="0"/>
-</item>
-<item historyLabel="BassFinder.java" index="5">
-<position info="not_deleted" x="1386" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="9195" y="0"/>
-</item>
-<item historyLabel="BassFinder.java" index="5">
-<position info="not_deleted" x="1317" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="4605" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="9195" y="0"/>
-</item>
-<item historyLabel="PartyLightsController16.java" index="6">
-<position info="not_deleted" x="4807" y="0"/>
-</item>
-<item historyLabel="SoundVisualizer.java" index="4">
-<position info="not_deleted" x="3636" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="4605" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5506" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="5506" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="9195" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="576" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="9376" y="0"/>
-</item>
-<item historyLabel="ScrollingSpectrum.java" index="2">
-<position info="not_deleted" x="1619" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="16753" y="0"/>
-</item>
-<item historyLabel="BassFinder.java" index="5">
-<position info="not_deleted" x="1272" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="576" y="0"/>
-</item>
-<item historyLabel="MainClass.java" index="0">
-<position info="not_deleted" x="1083" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="576" y="0"/>
-</item>
-<item historyLabel="ScrollingSpectrum.java" index="2">
-<position info="not_deleted" x="1619" y="0"/>
-</item>
-<item historyLabel="BassFinder.java" index="5">
-<position info="not_deleted" x="1272" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="576" y="0"/>
-</item>
-<item historyLabel="MainClass.java" index="0">
-<position info="not_deleted" x="1083" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="16753" y="0"/>
-</item>
-<item historyLabel="VisualizationEngine.java" index="1">
-<position info="not_deleted" x="1131" y="0"/>
-</item>
-<item historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="16753" y="0"/>
-</item>
-<item historyLabel="MainClass.java" index="0">
-<position info="not_deleted" x="5816" y="0"/>
-</item>
-<item historyLabel="LightDJGUI.java" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="MainClass.java" index="0">
-<position info="not_deleted" x="5816" y="0"/>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item active="true" historyLabel="VisualizationEngineParty.java" index="3">
-<position info="not_deleted" x="16753" y="0"/>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3179" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3218" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3256" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="2673" y="0"/>
+</item>
+<item historyLabel="PostProcessor.java" index="2">
+<position info="not_deleted" x="581" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="2031" y="0"/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="1258" y="0"/>
+</item>
+<item historyLabel="Blackout.java" index="4">
+<position/>
+</item>
+<item historyLabel="WhiteBurst.java" index="3">
+<position info="not_deleted" x="0" y="2145"/>
+</item>
+<item historyLabel="Blackout.java" index="4">
+<position info="not_deleted" x="1070" y="0"/>
+</item>
+<item historyLabel="VisualizationEngineParty.java" index="0">
+<position info="not_deleted" x="8745" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3297" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="2959" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3027" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3123" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="2997" y="0"/>
+</item>
+<item historyLabel="ColorOutput.java" index="7">
+<position info="not_deleted" x="3019" y="0"/>
+</item>
+<item active="true" historyLabel="MainClass.java" index="8">
+<position info="not_deleted" x="5816" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -598,50 +599,50 @@
 </trimLayout>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="LightDJGUI.java" tooltip="SoundExpressor/src/LightDJGUI/LightDJGUI.java">
-<persistable path="/SoundExpressor/src/LightDJGUI/LightDJGUI.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorOutput.java" tooltip="SoundExpressor/src/Common/ColorOutput.java">
+<persistable path="/SoundExpressor/src/Common/ColorOutput.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ScrollingSpectrum.java" tooltip="SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java">
-<persistable path="/SoundExpressor/src/LightDJGUI/ScrollingSpectrum.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PartyLightsController16.java" tooltip="SoundExpressor/src/PartyLightsController/PartyLightsController16.java">
+<persistable path="/SoundExpressor/src/PartyLightsController/PartyLightsController16.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ConfigFileParser.java" tooltip="SoundExpressor/src/LightDJGUI/ConfigFileParser.java">
-<persistable path="/SoundExpressor/src/LightDJGUI/ConfigFileParser.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorOutputDisplayerParty.java" tooltip="SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java">
+<persistable path="/SoundExpressor/src/LightDJGUI/ColorOutputDisplayerParty.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SharpClapFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/SharpClapFinder.java">
-<persistable path="/SoundExpressor/src/FeatureDetectors/SharpClapFinder.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Blackout.java" tooltip="SoundExpressor/src/PostProcessors/Blackout.java">
+<persistable path="/SoundExpressor/src/PostProcessors/Blackout.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClapFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/ClapFinder.java">
-<persistable path="/SoundExpressor/src/FeatureDetectors/ClapFinder.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="UserControl.java" tooltip="SoundExpressor/src/Common/UserControl.java">
+<persistable path="/SoundExpressor/src/Common/UserControl.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="BassFinder.java" tooltip="SoundExpressor/src/FeatureDetectors/BassFinder.java">
-<persistable path="/SoundExpressor/src/FeatureDetectors/BassFinder.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IndicatorLED.java" tooltip="SoundExpressor/src/LightDJGUI/IndicatorLED.java">
+<persistable path="/SoundExpressor/src/LightDJGUI/IndicatorLED.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngine.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngine.java">
-<persistable path="/SoundExpressor/src/SoundEngine/VisualizationEngine.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="GenericKnob.java" tooltip="SoundExpressor/src/LightDJGUI/GenericKnob.java">
+<persistable path="/SoundExpressor/src/LightDJGUI/GenericKnob.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SoundVisualizer.java" tooltip="SoundExpressor/src/SoundEngine/SoundVisualizer.java">
-<persistable path="/SoundExpressor/src/SoundEngine/SoundVisualizer.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorKnob.java" tooltip="SoundExpressor/src/LightDJGUI/ColorKnob.java">
+<persistable path="/SoundExpressor/src/LightDJGUI/ColorKnob.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PartyLightsController.java" tooltip="SoundExpressor/src/PartyLightsController/PartyLightsController.java">
-<persistable path="/SoundExpressor/src/PartyLightsController/PartyLightsController.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PostProcessor.java" tooltip="SoundExpressor/src/PostProcessors/PostProcessor.java">
+<persistable path="/SoundExpressor/src/PostProcessors/PostProcessor.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FireSlider.java" tooltip="SoundExpressor/src/Visualizors/FireSlider.java">
-<persistable path="/SoundExpressor/src/Visualizors/FireSlider.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JazzColors.java" tooltip="SoundExpressor/src/Visualizors/JazzColors.java">
-<persistable path="/SoundExpressor/src/Visualizors/JazzColors.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColoredBass.java" tooltip="SoundExpressor/src/Visualizors/ColoredBass.java">
-<persistable path="/SoundExpressor/src/Visualizors/ColoredBass.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ColorEnergyWave.java" tooltip="SoundExpressor/src/Visualizors/ColorEnergyWave.java">
-<persistable path="/SoundExpressor/src/Visualizors/ColorEnergyWave.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Strobes.java" tooltip="SoundExpressor/src/PostProcessors/Strobes.java">
+<persistable path="/SoundExpressor/src/PostProcessors/Strobes.java"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VUBass.java" tooltip="SoundExpressor/src/Visualizors/VUBass.java">
 <persistable path="/SoundExpressor/src/Visualizors/VUBass.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WhitePulseBass.java" tooltip="SoundExpressor/src/Visualizors/WhitePulseBass.java">
-<persistable path="/SoundExpressor/src/Visualizors/WhitePulseBass.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FireSlider.java" tooltip="SoundExpressor/src/Visualizors/FireSlider.java">
+<persistable path="/SoundExpressor/src/Visualizors/FireSlider.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WhiteBurst.java" tooltip="SoundExpressor/src/PostProcessors/WhiteBurst.java">
+<persistable path="/SoundExpressor/src/PostProcessors/WhiteBurst.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Visualizer.java" tooltip="SoundExpressor/src/Visualizors/Visualizer.java">
+<persistable path="/SoundExpressor/src/Visualizors/Visualizer.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="VisualizationEngineParty.java" tooltip="SoundExpressor/src/SoundEngine/VisualizationEngineParty.java">
+<persistable path="/SoundExpressor/src/SoundEngine/VisualizationEngineParty.java"/>
 </file>
 </mruList>
 </workbench>

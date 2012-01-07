@@ -64,9 +64,13 @@ public class RGBGradientLinear implements ColorGenerator{
 			alpha = 0.0;
 		}
 		
-		float r = (float) ((alpha * c2.getRed() + (1 - alpha) * c1.getRed()) / 255.0);
-		float g = (float) ((alpha * c2.getGreen() + (1 - alpha) * c1.getGreen()) / 255.0);
-		float b = (float) ((alpha * c2.getBlue() + (1 - alpha) * c1.getBlue()) / 255.0);
+		float[] rgb_c1 = new float[3];
+		float[] rgb_c2 = new float[3];
+		c1.getRGBColorComponents(rgb_c1);
+		c2.getRGBColorComponents(rgb_c2);
+		float r = (float) (alpha * rgb_c2[0] + (1 - alpha) * rgb_c1[0]);
+		float g = (float) (alpha * rgb_c2[1] + (1 - alpha) * rgb_c1[1]);
+		float b = (float) (alpha * rgb_c2[2] + (1 - alpha) * rgb_c1[2]);
 		
 		return new Color(r, g, b);
 	}

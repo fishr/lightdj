@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import SoundEngine.VisualizationEngineParty;
-import SoundEngine.VisualizationEngineParty.LightDJPostProcessing;
 import Visualizors.RGBGradientLinear;
 
 import Common.ColorOutput;
@@ -49,85 +48,85 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 	@Override
 	public void render(ColorOutput c, Graphics2D g2D, int x, int y, int width, int height) {
 		// Do any preprocessing (i.e., apply any overarching compressions to the computed colors)
-		LightDJPostProcessing postProcessing = engine.getPostProcessingMethod();
-		if (postProcessing == LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE) {
-			if (strobeState == 0) {
-				
-				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
-					c.rgbLightsFront[i] = Color.BLACK;
-				}
-				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
-					c.rgbLightsRear[i] = Color.BLACK;
-				}
-				
-				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
-					c.whiteLights[i] = 1.0;
-				}
-				
-				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
-					c.uvLights[i] = 0.0;
-				}
-				
-				
-			} else {
-
-				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
-					c.rgbLightsFront[i] = Color.BLACK;
-				}
-				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
-					c.rgbLightsRear[i] = Color.BLACK;
-				}
-				
-				
-				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
-					c.whiteLights[i] = 0.0;
-				}
-				
-				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
-					c.uvLights[i] = 0.0;
-				}
-			}
-			strobeState = (strobeState + 1) % 2;
-			
-		} else if (postProcessing == LightDJPostProcessing.POST_PROCESSING_UV_STROBE) {
-			if (strobeState == 0) {
-				
-				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
-					c.rgbLightsFront[i] = Color.BLACK;
-				}
-				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
-					c.rgbLightsRear[i] = Color.BLACK;
-				}
-				
-				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
-					c.whiteLights[i] = 0.0;
-				}
-				
-				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
-					c.uvLights[i] = 1.0;
-				}
-				
-				
-			} else {
-
-				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
-					c.rgbLightsFront[i] = Color.BLACK;
-				}
-				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
-					c.rgbLightsRear[i] = Color.BLACK;
-				}
-				
-				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
-					c.whiteLights[i] = 0.0;
-				}
-				
-				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
-					c.uvLights[i] = 0.0;
-				}
-			}
-			strobeState = (strobeState + 1) % 2;
-			
-		}
+//		LightDJPostProcessing postProcessing = engine.getPostProcessingMethod();
+//		if (postProcessing == LightDJPostProcessing.POST_PROCESSING_WHITE_STROBE) {
+//			if (strobeState == 0) {
+//				
+//				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+//					c.rgbLightsFront[i] = Color.BLACK;
+//				}
+//				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+//					c.rgbLightsRear[i] = Color.BLACK;
+//				}
+//				
+//				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+//					c.whiteLights[i] = 1.0;
+//				}
+//				
+//				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+//					c.uvLights[i] = 0.0;
+//				}
+//				
+//				
+//			} else {
+//
+//				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+//					c.rgbLightsFront[i] = Color.BLACK;
+//				}
+//				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+//					c.rgbLightsRear[i] = Color.BLACK;
+//				}
+//				
+//				
+//				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+//					c.whiteLights[i] = 0.0;
+//				}
+//				
+//				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+//					c.uvLights[i] = 0.0;
+//				}
+//			}
+//			strobeState = (strobeState + 1) % 2;
+//			
+//		} else if (postProcessing == LightDJPostProcessing.POST_PROCESSING_UV_STROBE) {
+//			if (strobeState == 0) {
+//				
+//				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+//					c.rgbLightsFront[i] = Color.BLACK;
+//				}
+//				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+//					c.rgbLightsRear[i] = Color.BLACK;
+//				}
+//				
+//				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+//					c.whiteLights[i] = 0.0;
+//				}
+//				
+//				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+//					c.uvLights[i] = 1.0;
+//				}
+//				
+//				
+//			} else {
+//
+//				for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+//					c.rgbLightsFront[i] = Color.BLACK;
+//				}
+//				for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+//					c.rgbLightsRear[i] = Color.BLACK;
+//				}
+//				
+//				for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+//					c.whiteLights[i] = 0.0;
+//				}
+//				
+//				for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+//					c.uvLights[i] = 0.0;
+//				}
+//			}
+//			strobeState = (strobeState + 1) % 2;
+//			
+//		}
 		
 		// Render it
 		drawParty(c, g2D, x, y, width, height);
