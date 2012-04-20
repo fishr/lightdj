@@ -132,7 +132,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// The following map MIDI channels to UserControl indices
 	Map<Integer, Integer> midiLeftPluginIndices;
 	Map<Integer, Integer> midiRightPluginIndices;
-	Map<Integer, Integer> midiGeneralIndices;
+	Map<Integer, Integer> midiGeneralSliderIndices;
+	Map<Integer, Integer> midiGeneralButtonIndices;
+	Map<Integer, Integer> midiVisualizerButtonIndices;
 	int midiCrossfaderChannel;
 	
 	
@@ -456,7 +458,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	// Graphics and GUI-related variables
 	protected final static int SIDEBAR_WIDTH = 350;
 	protected final static int SPECTRUM_WIDTH = 900;
-	protected final static int SPECTRUM_HEIGHT = 600;
+	protected final static int SPECTRUM_HEIGHT = 400;
 	protected final static int PLOTTER_WIDTH = 900;
 	protected final static int PLOTTER_HEIGHT = 300;
 	protected final static int BORDER_SIZE = 10;
@@ -1593,7 +1595,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// Initialize some data structures
 		midiLeftPluginIndices = new HashMap<Integer, Integer>();
 		midiRightPluginIndices = new HashMap<Integer, Integer>();
-		midiGeneralIndices = new HashMap<Integer, Integer>();
+		midiGeneralSliderIndices = new HashMap<Integer, Integer>();
+		midiGeneralButtonIndices = new HashMap<Integer, Integer>();
+		midiVisualizerButtonIndices = new HashMap<Integer, Integer>();
 		midiCrossfaderChannel = 0;
 		
 		// Parse the configuration file		
@@ -1621,12 +1625,37 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			}
 		}
 		
+		// General buttons plugins
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_BUTTONS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiGeneralButtonIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
+		// Plugin controlling buttons
+		// General buttons plugins
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_VISUALIZER_BUTTONS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiVisualizerButtonIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
 		// General sliders
 		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_GENERAL_SLIDER_CHANNELS", "");
 		channels = pluginChannels.split(",");
 		for(int i = 0; i < channels.length; i++) {
 			try {
-				midiGeneralIndices.put(Integer.parseInt(channels[i].trim()), i);
+				midiGeneralSliderIndices.put(Integer.parseInt(channels[i].trim()), i);
 			} catch (Exception e) {
 				System.out.println("Error in configuration file, MIDI section!");
 				e.printStackTrace();
@@ -1660,41 +1689,90 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 			// See if the channel corresponding to this event matches one of the ones specified by the
 			// configuration file
+			int command = event.getCommand();
 			int channel = event.getData1();
 			int index;
 			
-			if (channel == midiCrossfaderChannel) {
-				// Crossfade it!
-				updateControl(crossfaderKnob, event);
-				
-			} else if (midiLeftPluginIndices.containsKey(channel)) {
-				index = midiLeftPluginIndices.get(channel);
-				List<UserControl> userControls = visualizers.get(visualizerLeftIndex).getRequestedUserControls();
-				if (index < userControls.size()) {
-					// We have a valid mapping!
-					updateControl(userControls.get(index), event);
-				}
-			} else if (midiRightPluginIndices.containsKey(channel)) {
-				index = midiRightPluginIndices.get(channel);
-				List<UserControl> userControls = visualizers.get(visualizerRightIndex).getRequestedUserControls();
-				if (index < userControls.size()) {
-					// We have a valid mapping!
-					updateControl(userControls.get(index), event);
-				}
-			} else if (midiGeneralIndices.containsKey(channel)) {
-				
-				// One of the special sliders was changed! Handle these in a custom way.
-				index = midiGeneralIndices.get(channel);
-				if (index == 0) {
-					// Process the volume knob!
-					List<UserControl> userControls = volumePostProcessor.getRequestedUserControls();
-					UserControl volumeKnob = userControls.get(0);
-					updateControl(volumeKnob, event);
+			if (command == 176) { // Slider event
+				if (channel == midiCrossfaderChannel) {
+					// Crossfade it!
+					updateControl(crossfaderKnob, event);
 					
-				} 
+				} else if (midiLeftPluginIndices.containsKey(channel)) {
+					index = midiLeftPluginIndices.get(channel);
+					List<UserControl> userControls = visualizers.get(visualizerLeftIndex).getRequestedUserControls();
+					if (index < userControls.size()) {
+						// We have a valid mapping!
+						updateControl(userControls.get(index), event);
+					}
+				} else if (midiRightPluginIndices.containsKey(channel)) {
+					index = midiRightPluginIndices.get(channel);
+					List<UserControl> userControls = visualizers.get(visualizerRightIndex).getRequestedUserControls();
+					if (index < userControls.size()) {
+						// We have a valid mapping!
+						updateControl(userControls.get(index), event);
+					}
+				} else if (midiGeneralSliderIndices.containsKey(channel)) {
+					
+					// One of the special sliders was changed! Handle these in a custom way.
+					index = midiGeneralSliderIndices.get(channel);
+					if (index == 0) {
+						// Process the volume knob!
+						List<UserControl> userControls = volumePostProcessor.getRequestedUserControls();
+						UserControl volumeKnob = userControls.get(0);
+						updateControl(volumeKnob, event);
+						
+					} 
+				}
+					
+			} else if (command == 144) {// Button press event
+				boolean pushed = (event.getData2() == 127);
 				
+				 if (midiVisualizerButtonIndices.containsKey(channel)) {
+					// Change one of the visualizers!
+					if (pushed) {
+						index = midiVisualizerButtonIndices.get(channel);
+						
+						switch(index) {
+						case 0:  // Left left
+							visualizerLeftIndex--;
+							if (visualizerLeftIndex < 0) {
+								visualizerLeftIndex = visualizers.size() - 1;
+							}
+							loadVisualizerPlugin(true, visualizerLeftIndex);
+							break;
+							
+						case 1:  // Left right
+							visualizerLeftIndex++;
+							if (visualizerLeftIndex == visualizers.size()) {
+								visualizerLeftIndex = 0;
+							}
+							loadVisualizerPlugin(true, visualizerLeftIndex);
+							break;
+							
+						case 2:  // Right left
+							visualizerRightIndex--;
+							if (visualizerRightIndex < 0) {
+								visualizerRightIndex = visualizers.size() - 1;
+							}
+							loadVisualizerPlugin(false, visualizerRightIndex);
+							break;
+							
+						case 3:  // Right right
+							visualizerRightIndex++;
+							if (visualizerRightIndex == visualizers.size()) {
+								visualizerRightIndex = 0;
+							}
+							loadVisualizerPlugin(false, visualizerRightIndex);
+							break;
+							
+						default:
+							// Error! Don't do anything
+						
+						}
+					}
+				 }
 			}
-			
 		}
 	}
 	

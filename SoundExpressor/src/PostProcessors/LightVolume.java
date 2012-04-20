@@ -41,15 +41,8 @@ public class LightVolume extends PostProcessor {
 		float volume = volumeKnob.getValue();
 		
 		// Scale all of the front panels
-		for(int i = 0; i < ColorOutput.NUM_RGB_LIGHTS_FRONT; i++) {
-			Color c = colorOutput.rgbLightsFront[i];
-			float[] rgb = new float[3];
-			c.getRGBColorComponents(rgb);
-			for(int j = 0; j < 3; j++) {
-				rgb[j] *= volume;
-			}
-			c = new Color(rgb[0], rgb[1], rgb[2]);
-			colorOutput.rgbLightsFront[i] = c;
+		for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*ColorOutput.NUM_LEDS_PER_RGB_BOARD; light++) {
+			colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.BLACK, colorOutput.rgbLightsFront[light], volume);
 		}
 		
 	}

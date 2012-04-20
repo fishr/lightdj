@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import Common.ColorOutput;
 import Common.FeatureList;
+import LightDJGUI.ColorKnob;
 import LightDJGUI.GenericKnob;
 import Visualizors.RGBGradientLinear;
 
@@ -15,6 +16,8 @@ import Visualizors.RGBGradientLinear;
 public class WhiteBurst extends PostProcessor {
 
 	protected GenericKnob lengthKnob;
+	protected GenericKnob heatKnob;
+	protected ColorKnob colorKnob;
 	protected boolean active;
 	protected boolean highPower;
 	protected long startTime;
@@ -41,8 +44,12 @@ public class WhiteBurst extends PostProcessor {
 		whiteBurstTime = 500;	
 		
 		// Make a user control
-		lengthKnob = new GenericKnob(0.25f, 40, "Length");
+		lengthKnob = new GenericKnob(0.25f, 40, "Time");
+		heatKnob = new GenericKnob(1.0f, 50, "Heat");
+		colorKnob = new ColorKnob(0.0f, 50, "Color");
 		requestUserControl(lengthKnob);
+		requestUserControl(heatKnob);
+		requestUserControl(colorKnob);
 		
 	}
 
@@ -79,9 +86,10 @@ public class WhiteBurst extends PostProcessor {
 			
 			// Not done - still fading! Compute how much.
 			double alpha = (double) delta / whiteBurstTime;
+			Color c = Color.getHSBColor(colorKnob.getValue(), 1.0f - heatKnob.getValue(), 1.0f);
 			
-			for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*4; light++) {
-				colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
+			for(int light = 0; light < ColorOutput.NUM_FRONT_RGB_PANELS*ColorOutput.NUM_LEDS_PER_RGB_BOARD; light++) {
+				colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(c, colorOutput.rgbLightsFront[light], alpha);
 			}
 
 			if (highPower) {

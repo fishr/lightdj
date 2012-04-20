@@ -22,8 +22,8 @@ public class ClapFinder extends FeatureDetector  {
 	protected double maxFreq;
 	
 	// Low-pass smoothing
-	protected double timeLowPass = 0.2;
-	protected double percentLowPass = 0.05;
+	protected double timeLowPass = 0.1;
+	protected double percentLowPass = 0.25;
 	protected double alpha;
 	protected double clapLevelSmoothed = 0.0;
 	
@@ -41,7 +41,7 @@ public class ClapFinder extends FeatureDetector  {
 		minFreq = 8000;
 		maxFreq = 16000;
 		normalizingVal = 0.1;
-		averageHalfLife = 0.125;
+		averageHalfLife = 0.25;
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));
 		
 		alpha = 1 - Math.exp(Math.log(percentLowPass) / (UPDATES_PER_SECOND * timeLowPass));
