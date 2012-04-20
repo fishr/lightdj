@@ -55,6 +55,7 @@ import MidiInterface.MidiConnector;
 import PartyLightsController.PartyLightsController8;
 import PartyLightsController.PartyLightsController16;
 import PostProcessors.Blackout;
+import PostProcessors.LightVolume;
 import PostProcessors.PostProcessor;
 import PostProcessors.Strobes;
 import PostProcessors.WhiteBurst;
@@ -115,6 +116,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	public ArrayList<PostProcessor> postProcessors;
 	// A status light indicator for each post processing effect
 	public IndicatorLight[] statusLights;
+	// Special post processors that we should keep track of
+	PostProcessor volumePostProcessor;
 	
 	
 	
@@ -265,8 +268,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		double UPDATES_PER_SECOND = (double) SAMPLE_RATE / FFT_SIZE * BUFFER_OVERLAP; 
 		
 		// Add the post processors here
-		postProcessors.add(new Strobes(UPDATES_PER_SECOND));
+		volumePostProcessor = new LightVolume(UPDATES_PER_SECOND);
+		postProcessors.add(volumePostProcessor);
 		postProcessors.add(new Blackout(UPDATES_PER_SECOND));
+		postProcessors.add(new Strobes(UPDATES_PER_SECOND));
+		
 		// WhiteBurst should always be last for emergency purposes, as it controls
 		// the Emergency Lighting and should have the "final say" of all post processors.
 		postProcessors.add(new WhiteBurst(UPDATES_PER_SECOND));
@@ -603,12 +609,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static double CROSSFADE_SPEED_SLOW = 0.015;
 	protected static double CROSSFADE_SPEED_FAST = 0.04;
 	
-	protected long effectStartTime;
 	
-	//  Values and constants associated with post-processing effects
-	// Strobe speeds, for white and UV
-	protected int strobeFrame = 0;
-	protected int strobeFrameLength = 8;
 	
 	// Shifting/
 	protected int SHIFT_SPEED = 1;
@@ -1680,6 +1681,18 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 					// We have a valid mapping!
 					updateControl(userControls.get(index), event);
 				}
+			} else if (midiGeneralIndices.containsKey(channel)) {
+				
+				// One of the special sliders was changed! Handle these in a custom way.
+				index = midiGeneralIndices.get(channel);
+				if (index == 0) {
+					// Process the volume knob!
+					List<UserControl> userControls = volumePostProcessor.getRequestedUserControls();
+					UserControl volumeKnob = userControls.get(0);
+					updateControl(volumeKnob, event);
+					
+				} 
+				
 			}
 			
 		}

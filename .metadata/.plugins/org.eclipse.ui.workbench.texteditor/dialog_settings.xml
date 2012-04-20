@@ -3,18 +3,19 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="314" key="DIALOG_WIDTH"/>
 		<item value="122" key="DIALOG_Y_ORIGIN"/>
-		<item value="437" key="DIALOG_HEIGHT"/>
 		<item value="1406" key="DIALOG_X_ORIGIN"/>
+		<item value="437" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="allPostP" key="selection"/>
+		<item value="strobeFrameLength" key="selection"/>
 		<list key="findhistory">
+			<item value="strobeFrameLength"/>
 			<item value="allPostP"/>
 			<item value="WHITE_BURST"/>
 			<item value="allPost"/>
@@ -22,7 +23,6 @@
 			<item value="RenderFrameParty"/>
 			<item value="applyPostProc"/>
 			<item value="whiteBurst"/>
-			<item value="whiteBurt"/>
 		</list>
 		<list key="replacehistory">
 			<item value="256"/>

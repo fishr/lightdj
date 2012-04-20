@@ -13,7 +13,7 @@ import Common.FeatureList;
  */
 public class HueBass2 extends Visualizer {
 
-	protected static double phaseOffsetBase = 0.12;
+	protected static double phaseOffsetBase = 0.015; // 0.012
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
 	
@@ -44,7 +44,7 @@ public class HueBass2 extends Visualizer {
 		
 		// Retreive any necessary parameters from the FeatureList
 		double bassLevel = (Double) featureList.getFeature("BASS_LEVEL");
-		double clapLevel = (Double) featureList.getFeature("CLAP_LEVEL");
+		double clapLevel = (Double) featureList.getFeature("SHARP_LEVEL");
 		//System.out.println(bassLevel);
 		
 		// Compute a new set of colorings, and store them.
@@ -75,7 +75,14 @@ public class HueBass2 extends Visualizer {
 		double beta = 0.3;
 		
 		for(int light = 0; light < NUM_FRONT_RGB_LIGHTS; light++) {
-			colorOutput.setFrontRGBLight(light, Color.getHSBColor((float) (theta + phaseOffsetBase * light), saturation, (float) (beta + (1 - beta) * bassSmoothed)));
+			if (light % ColorOutput.NUM_LEDS_PER_RGB_BOARD < ColorOutput.NUM_LEDS_PER_RGB_BOARD / 2) {
+				brightness = (float) (beta + (1 - beta) * bassSmoothed);
+			} else {
+				//brightness = (float) (beta + (1 - beta) * clapLevel);
+				brightness = (float) (beta + (1 - beta) * bassSmoothed);
+			}
+			//brightness = (float) (beta + (1 - beta) * bassSmoothed);
+			colorOutput.setFrontRGBLight(light, Color.getHSBColor((float) (theta + phaseOffsetBase * light), saturation, brightness));
 		}
 		
 		theta += deltaOmega;

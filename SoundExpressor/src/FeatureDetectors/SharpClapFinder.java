@@ -47,13 +47,11 @@ public class SharpClapFinder extends FeatureDetector  {
 		double sum = 0;
 		int n = 0;
 		for(int i = minIndex; i <= maxIndex; i++) {
-			sum += magnitudes[i];
+			sum += magnitudes[i]*magnitudes[i];
 			n++;
 		}
-		
 		double level = sum / n;
-		currentSharpLevel = level;
-		
+		currentSharpLevel = level;		
 		recentBassLevels[recentBassIndex] = level;
 		recentBassIndex = (recentBassIndex + 1) % NUM_RECENT_BASS_VALS;
 		
@@ -77,11 +75,10 @@ public class SharpClapFinder extends FeatureDetector  {
 			outputVal = 1.0;
 		}
 		
-		
 		averagedLevel = averagedLevel * phi + level*(1 - phi);
 		averagedSpread = averagedSpread * phi + spread*(1 - phi);
 		
-		double actualOutput;
+		double actualOutput = outputVal;
 		
 //		// Limit how fast the output can fall, in an attempt to minimize flicker
 //		if (outputVal < decayRate * lastOutput) {
@@ -91,11 +88,11 @@ public class SharpClapFinder extends FeatureDetector  {
 //		}
 		
 		// Limit how fast the output can fal, in an attempt to minimize flicker
-		if (outputVal < lastOutput - decayRate) {
-			actualOutput = lastOutput - decayRate;
-		} else {
-			actualOutput = outputVal;
-		}
+//		if (outputVal < lastOutput - decayRate) {
+//			actualOutput = lastOutput - decayRate;
+//		} else {
+//			actualOutput = outputVal;
+//		}
 		
 		//actualOutput = Math.log(actualOutput + 1.0) / Math.log(2);
 		
@@ -110,7 +107,7 @@ public class SharpClapFinder extends FeatureDetector  {
 		
 		
 		lastOutput = actualOutput;
-		return currentSharpLevel;
+		return actualOutput;
 		
 	}
 	
@@ -160,11 +157,11 @@ public class SharpClapFinder extends FeatureDetector  {
 	@Override
 	public void init() {
 		// Initiate other parameters
-		minFreq = 4000;
+		minFreq = 3000;
 		maxFreq = 10000;
 		normalizingVal = 30.0;
 		averageHalfLife = 1.0;
-		decayRate = 1.0 / (25);
+		decayRate = 1.0 / (UPDATES_PER_SECOND / 10.0);
 		
 		// Calculate some parameters
 		phi = Math.pow(0.5, 1/(averageHalfLife * UPDATES_PER_SECOND));

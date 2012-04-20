@@ -16,6 +16,7 @@ public class WhiteBurst extends PostProcessor {
 
 	protected GenericKnob lengthKnob;
 	protected boolean active;
+	protected boolean highPower;
 	protected long startTime;
 	
 	
@@ -36,6 +37,7 @@ public class WhiteBurst extends PostProcessor {
 	public void init() {
 		
 		active = false;
+		highPower = false;
 		whiteBurstTime = 500;	
 		
 		// Make a user control
@@ -49,9 +51,12 @@ public class WhiteBurst extends PostProcessor {
 		
 		
 		// Currently not active. Should it became active?
-		if (((Double) featureList.getFeature("KEY_ENTER")) == 1.0) {
+		if (((Double) featureList.getFeature("KEY_ENTER")) == 1.0 || ((Double) featureList.getFeature("KEY_F5")) == 1.0 || ((Double) featureList.getFeature("KEY_F8")) == 1.0) {
 			// ACTIVATE!
 			active = true;
+			if (((Double) featureList.getFeature("KEY_F5")) == 1.0) {
+				highPower = true;
+			}
 			startTime = System.currentTimeMillis();
 		}
 		
@@ -68,6 +73,7 @@ public class WhiteBurst extends PostProcessor {
 			// See if we're done
 			if (delta > whiteBurstTime) {
 				active = false;
+				highPower = false;
 				return;
 			}
 			
@@ -78,10 +84,12 @@ public class WhiteBurst extends PostProcessor {
 				colorOutput.rgbLightsFront[light] = RGBGradientLinear.linearGradient(Color.WHITE, colorOutput.rgbLightsFront[light], alpha);
 			}
 
-			for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
-				colorOutput.uvLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.uvLights[light];
-				colorOutput.whiteLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.whiteLights[light];
-			}	
+			if (highPower) {
+				for(int light = 0; light < ColorOutput.NUM_UVWHITE_PANELS; light++) {
+					colorOutput.uvLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.uvLights[light];
+					colorOutput.whiteLights[light] = (1 - alpha) * 1.0 + alpha * colorOutput.whiteLights[light];
+				}	
+			}
 		}
 		
 	}

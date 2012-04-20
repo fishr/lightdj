@@ -26,16 +26,16 @@ public class PartyLightsController16 {
 	protected String serialPortName;
 	protected int speed;
 	protected int serialDataBits = 8;
-	protected int serialStopBits = 2;
+	protected int serialStopBits = 0;
 	protected int serialParityBits = 0;
 	private boolean isConnected;
 	private OutputStream outStream;
 	
 	// Protocol information
-	protected static final int MAX_COLOR_CHANNEL_VALUE = 4095;
-	protected static final int BYTES_PER_COLOR_CHANNEL = 2;
+	protected static final int MAX_COLOR_CHANNEL_VALUE = 255; // 4095
+	protected static final int BYTES_PER_COLOR_CHANNEL = 1; // 1
 	
-	protected static final int SPECIAL_SYNC_BYTE = 255;
+	protected static final int SPECIAL_SYNC_BYTE = 170;
 	protected static final int ACTION_EMERGENCY_LIGHTING = 254;
 	protected static final int ACTION_EVERYTHING_OFF = 253;
 	protected static final int ACTION_FRONT_LEDS_SAME = 252;
@@ -77,8 +77,8 @@ public class PartyLightsController16 {
 	
 	// Voloume controls
 	public float overallVolume = 1.0f;
-	public float frontVolume = 1.0f;
-	public float rearVolume = 1.0f;
+	public float frontVolume = 0.3f;
+	public float rearVolume = 0.03f;
 	public float strobeVolume = 1.0f;
 	
 	public enum LightPlacement {
@@ -198,6 +198,7 @@ public class PartyLightsController16 {
 				break;
 			}
 			
+			/*
 			//Rears
 			switch(colorOutput.rgbRearColorOutputCompression) {
 			case RGB_REAR_COMPRESSION_LEDS_SAME:
@@ -212,6 +213,7 @@ public class PartyLightsController16 {
 				sendRearRGBPanelDiff(colorOutput);
 				break;
 			}
+			*/
 			
 			
 			// Send UV/Whites
@@ -270,7 +272,7 @@ public class PartyLightsController16 {
 		int index = startIndex;
 		
 		// Fill in the data.
-		data[index++] = upper;
+	//	data[index++] = upper;
 		data[index++] = lower;
 		
 		return index - startIndex;

@@ -22,7 +22,7 @@ public class ClapFinder extends FeatureDetector  {
 	protected double maxFreq;
 	
 	// Low-pass smoothing
-	protected double timeLowPass = 1.0;
+	protected double timeLowPass = 0.2;
 	protected double percentLowPass = 0.05;
 	protected double alpha;
 	protected double clapLevelSmoothed = 0.0;

@@ -35,8 +35,8 @@ public class Blackout extends PostProcessor {
 		active = false;
 		
 		// Make a user control
-		lengthKnob = new GenericKnob(0.25f, 40, "Length");
-		requestUserControl(lengthKnob);
+		//lengthKnob = new GenericKnob(0.25f, 40, "Length");
+		//requestUserControl(lengthKnob);
 		
 	}
 

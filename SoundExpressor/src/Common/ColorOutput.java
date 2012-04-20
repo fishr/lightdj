@@ -225,7 +225,7 @@ public class ColorOutput {
 		}
 		
 		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
-			rgbLightsFront[i] = Color.BLACK;
+			rgbLightsRear[i] = Color.BLACK;
 		}
 		
 		for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
