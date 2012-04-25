@@ -14,17 +14,17 @@
 ###############################################################################
 
 # The number of different types of panels we have
-NUM_FRONT_RGB_PANELS = 6
-NUM_REAR_RGB_PANELS = 6
-NUM_UVWHITE_PANELS = 8
+NUM_FRONT_RGB_PANELS = 8
+NUM_REAR_RGB_PANELS = 8
+NUM_UVWHITE_PANELS = 7
 NUM_LEDS_PER_RGB_BOARD = 4
 
 # The starting addresses for rear and UVwhite PANELS when being individually addressed 
 # (function of the firmware), Please note that each front and rear panel
 # consists of a group of 4 LED's. Historically, these values were chosen for 8
 # front and rear panels, but will work fine for less than that too.
-START_REAR_PANEL_ADDRESSES = 4
-START_UVWHITE_PANEL_ADDRESSES = 6 
+START_REAR_PANEL_ADDRESSES = 8
+START_UVWHITE_PANEL_ADDRESSES = 16 
 
 ###############################################################################
 ##
@@ -103,5 +103,9 @@ MIDI_LEFT_PLUGIN_CHANNELS = 24, 27, 25, 28, 26, 29, 44, 46, 43, 70, 58
 MIDI_RIGHT_PLUGIN_CHANNELS = 34, 31, 35, 32, 36, 33, 45, 56, 57, 69, 59
 MIDI_GENERAL_SLIDER_CHANNELS = 12, 11, 14, 15
 MIDI_CROSSFADER_CHANNEL = 17
+# Various buttons
+MIDI_BUTTONS = 44, 45, 70, 58, 59, 59
+MIDI_VISUALIZER_BUTTONS = 46, 43, 56, 57
+
 
 

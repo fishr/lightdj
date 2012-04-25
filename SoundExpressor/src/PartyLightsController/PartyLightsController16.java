@@ -77,9 +77,9 @@ public class PartyLightsController16 {
 	
 	// Voloume controls
 	public float overallVolume = 1.0f;
-	public float frontVolume = 0.3f;
+	public float frontVolume = 0.6f;
 	public float rearVolume = 0.03f;
-	public float strobeVolume = 1.0f;
+	public float strobeVolume = 0.8f;
 	
 	public enum LightPlacement {
 		PLACEMENT_FRONT,
@@ -162,6 +162,7 @@ public class PartyLightsController16 {
 		
 		// Determine the optimal compression
 		colorOutput.determineCompression();
+		//System.out.println(colorOutput.uvWhiteColorOutputCompression);
 		
 		// Apply any overall compression!
 		switch(colorOutput.overallOutputCompression) {
@@ -250,7 +251,7 @@ public class PartyLightsController16 {
 		
 		// Convert to the PWM range
 		int out = (int) (val * MAX_COLOR_CHANNEL_VALUE + 0.5f);
-		
+
 		// Hard limit saturate at max value
 		if (out > MAX_COLOR_CHANNEL_VALUE) {
 			out = MAX_COLOR_CHANNEL_VALUE;
@@ -433,7 +434,7 @@ public class PartyLightsController16 {
 		byte[] output = new byte[LENGTH_WHITE_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_WHITES;
-		fillValueData(output, 2, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.whiteLights[0] + 0.5f), LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (float) colorOutput.whiteLights[0], LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -448,7 +449,7 @@ public class PartyLightsController16 {
 		byte[] output = new byte[LENGTH_UV_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_UVS;
-		fillValueData(output, 2, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.uvLights[0] + 0.5f), LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (float) colorOutput.uvLights[0], LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -467,9 +468,9 @@ public class PartyLightsController16 {
 			
 			data[cursor++] = (byte) SPECIAL_SYNC_BYTE;
 			data[cursor++] = (byte) (board + START_UVWHITE_PANEL_INDEX);
-			cursor += fillValueData(data, cursor, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.uvLights[board] + 0.5f), LightPlacement.PLACEMENT_STROBES);
-			cursor += fillValueData(data, cursor, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.whiteLights[board] + 0.5f), LightPlacement.PLACEMENT_STROBES);
-			
+			cursor += fillValueData(data, cursor, (float) colorOutput.uvLights[board], LightPlacement.PLACEMENT_STROBES);
+			cursor += fillValueData(data, cursor, (float) colorOutput.whiteLights[board], LightPlacement.PLACEMENT_STROBES);
+			//System.out.println(colorOutput.whiteLights[board]);
 		}
 		
 		debugPrint(data);

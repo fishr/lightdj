@@ -13,7 +13,7 @@ import Common.FeatureList;
  */
 public class HueBass2 extends Visualizer {
 
-	protected static double phaseOffsetBase = 0.015; // 0.012
+	protected static double phaseOffsetBase = 0.02; // 0.012
 	protected static double deltaOmega = -0.001;
 	protected static double theta;
 	

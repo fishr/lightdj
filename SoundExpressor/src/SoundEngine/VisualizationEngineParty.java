@@ -339,6 +339,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		featureList.addFeature("KEY_J", jKeyPressed ? 1.0 : 0.0);
 		featureList.addFeature("KEY_K", kKeyPressed ? 1.0 : 0.0);
 		featureList.addFeature("KEY_L", lKeyPressed ? 1.0 : 0.0);
+		featureList.addFeature("KEY_;", semiColonKeyPressed ? 1.0 : 0.0);
 
 		featureList.addFeature("KEY_0", zeroKeyPressed ? 1.0 : 0.0);
 		featureList.addFeature("KEY_1", oneKeyPressed ? 1.0 : 0.0);
@@ -581,6 +582,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static boolean jKeyPressed = false;
 	protected static boolean kKeyPressed = false;
 	protected static boolean lKeyPressed = false;
+	protected static boolean semiColonKeyPressed = false;
 	protected static boolean oneKeyPressed = false;
 	protected static boolean twoKeyPressed = false;
 	protected static boolean threeKeyPressed = false;
@@ -1241,6 +1243,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			kKeyPressed = true;
 		} else if (keyCode == KeyEvent.VK_L) {
 			lKeyPressed = true;
+		} else if (keyCode == KeyEvent.VK_SEMICOLON) {
+			semiColonKeyPressed = true;
 		} else if (keyCode == KeyEvent.VK_Q) {
 			qKeyPressed = true;
 		} else if (keyCode == KeyEvent.VK_W) {
@@ -1442,6 +1446,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			kKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_L) {
 			lKeyPressed = false;
+		} else if (keyCode == KeyEvent.VK_SEMICOLON) {
+			semiColonKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_Q) {
 			qKeyPressed = false;
 		} else if (keyCode == KeyEvent.VK_W) {
