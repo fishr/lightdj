@@ -168,6 +168,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 		}
 		
+		
 		// Set up all of the post processing effects
 		postProcessors = allPostProcessors();
 		for(PostProcessor p : postProcessors) {
@@ -1106,6 +1107,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			g2DGui.drawImage(background, 0, 0, null);
 		}
 		
+		
+		
+		// Step the AutoDJ
+		autoDJStep();
+		
 	}
 	
 	protected void renderSidePanel() {
@@ -1379,7 +1385,29 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				// The shift key is a trigger to start entering the pulse
 				pulseKeeper.startEnteringPulses();
 				shiftKeyPressed = true;
-			} else if (keyCode == KeyEvent.VK_Z) {
+			} else if (keyCode == KeyEvent.VK_Z) {// Auto cross-fade to the opposite direction
+				if (alpha > 0.5) {
+					// Cross-fade left
+					if (controlKeyPressed) {
+						startAutoCrossfade(-CROSSFADE_SPEED_SLOW);
+					} else if (altKeyPressed) {
+						startAutoCrossfade(-CROSSFADE_SPEED_FAST);
+					} else {
+						alpha = 0.0;
+						crossfaderKnob.setValue((float) alpha);
+					}
+					
+				} else {
+					// Cross-fade right
+					if (controlKeyPressed) {
+						startAutoCrossfade(CROSSFADE_SPEED_SLOW);
+					} else if (altKeyPressed) {
+						startAutoCrossfade(CROSSFADE_SPEED_FAST);
+					} else {
+						alpha = 1.0;
+						crossfaderKnob.setValue((float) alpha);
+					}
+				}
 				// If the shift key is being held down, then this is a trigger to enter a pulse.
 				if (shiftKeyPressed) {
 					pulseKeeper.enterPulse();
@@ -1786,6 +1814,63 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	private void updateControl(UserControl control, ShortMessage event) {
 		float value = event.getData2() / 127.0f;
 		control.setValue(value);
+	}
+	
+	
+	
+	/**
+	 * Auto-DJ functionality!!!
+	 */
+	protected int STEPS_PER_TRANSITION = 500;
+	protected int autoDJStepCounter = 0;
+	protected boolean useAutoDJ = false;
+	
+	public void autoDJStep() {
+
+		if (useAutoDJ) {
+			autoDJStepCounter++;
+			if (autoDJStepCounter == STEPS_PER_TRANSITION) {
+				// Transition
+				System.out.println("AutoDJ - transitioning!");
+				
+				// Determine which is the active plugin
+				int activePlugin = (int) (1.0 - Math.round(alpha));
+				
+				// Select a random plugin
+				int randPluginIndex = selectRandomAutoPlugin();
+				
+				// Load that plugin!
+				chooseVisualizer(randPluginIndex, activePlugin);
+				
+				// Start a fast auto transition
+				if (alpha > 0.5) {
+					startAutoCrossfade(-CROSSFADE_SPEED_FAST);
+				} else {
+					startAutoCrossfade(CROSSFADE_SPEED_FAST);
+				}
+				
+				
+				// Reset the hacky step counter.... do this better when you have more time and this isn't right before the party!!! ;-)
+				autoDJStepCounter = 0;
+			}
+		
+		
+		}
+		
+		
+		
+	}
+	
+	// Select a random plugin that can autoDJ!
+	public int selectRandomAutoPlugin() {
+		while(true) {
+			int randomIndex = (int) (visualizers.size() * Math.random());
+			Visualizer viz = visualizers.get(randomIndex);
+			if (viz.canAutoDJ()) {
+				return randomIndex;
+			}
+			
+		}
 	}
 	
 	

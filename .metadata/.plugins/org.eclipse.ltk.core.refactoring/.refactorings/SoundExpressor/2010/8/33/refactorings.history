@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename method &apos;SoundEngine.BassFinder.getBassLevel(...)&apos; to &apos;getBass&apos;&#x0A;- Original project: &apos;SoundExpressor&apos;&#x0A;- Original element: &apos;SoundEngine.BassFinder.getBassLevel(...)&apos;&#x0A;- Renamed element: &apos;SoundEngine.BassFinder.getBass(...)&apos;&#x0A;- Update references to refactored element" delegate="false" deprecate="false" description="Rename method &apos;getBassLevel&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.method" input="/src&lt;SoundEngine{BassFinder.java[BassFinder~getBassLevel~\[D~\[D" name="getBass" references="true" stamp="1281228935247" version="1.0"/>
-</session>

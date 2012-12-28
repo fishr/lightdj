@@ -110,6 +110,9 @@ public class BlockShifter extends Visualizer {
 		colorOutput.setRearRGBLight(HALF_SIZE + i, c);
 	}
 
-	
+	@Override
+	public boolean canAutoDJ() {
+		return false;
+	}
 
 }

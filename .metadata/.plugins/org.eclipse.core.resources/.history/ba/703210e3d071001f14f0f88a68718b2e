@@ -1,7 +1,0 @@
-package SoundEngine;
-
-import java.awt.*;
-
-public class GUIVisualizer extends JFrame {
-
-}

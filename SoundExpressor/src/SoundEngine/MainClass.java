@@ -24,7 +24,7 @@ public class MainClass {
 	protected static int AUDIO_READ_BUFFER_SIZE;
 	protected static final int SAMPLE_RATE = 44100;
 	protected static boolean USE_CAPTURED_AUDIO = true;
-	protected static boolean AUDIO_PASS_THRU = true;
+	protected static boolean AUDIO_PASS_THRU = false;
 	
 	// The following parameters shouldn't generally be used. They were used if INSTANT_PLAY was
 	// set to false in VisualiationEngine. It was an attempt to better synchronize audio and video,

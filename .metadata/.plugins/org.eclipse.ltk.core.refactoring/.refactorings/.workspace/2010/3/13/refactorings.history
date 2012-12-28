@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;RSS-I-group&apos;" deleteContents="false" description="Delete resource &apos;RSS-I-group&apos;" element1="/RSS-I-group" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1269194663147"/>
-</session>

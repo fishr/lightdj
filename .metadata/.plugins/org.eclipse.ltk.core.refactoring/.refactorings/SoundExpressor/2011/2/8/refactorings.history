@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename field &apos;scatterDecayRate&apos; in &apos;SoundEngine.VisualizationEngineParty&apos; to &apos;scatterTimeLength&apos;&#x0A;- Original project: &apos;SoundExpressor&apos;&#x0A;- Original element: &apos;SoundEngine.VisualizationEngineParty.scatterDecayRate&apos;&#x0A;- Renamed element: &apos;SoundEngine.VisualizationEngineParty.scatterTimeLength&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;scatterDecayRate&apos;" flags="589830" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;SoundEngine{VisualizationEngineParty.java[VisualizationEngineParty^scatterDecayRate" name="scatterTimeLength" references="true" setter="false" stamp="1298151635583" textual="false" version="1.0"/>
-</session>

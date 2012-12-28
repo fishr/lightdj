@@ -53,6 +53,9 @@ public class UVBass extends Visualizer {
 		return colorOutput;
 	}
 
-
+	@Override
+	public boolean canAutoDJ() {
+		return false;
+	}
 
 }

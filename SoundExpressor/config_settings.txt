@@ -14,9 +14,9 @@
 ###############################################################################
 
 # The number of different types of panels we have
-NUM_FRONT_RGB_PANELS = 8
-NUM_REAR_RGB_PANELS = 8
-NUM_UVWHITE_PANELS = 7
+NUM_FRONT_RGB_PANELS = 2
+NUM_REAR_RGB_PANELS = 2
+NUM_UVWHITE_PANELS = 2
 NUM_LEDS_PER_RGB_BOARD = 4
 
 # The starting addresses for rear and UVwhite PANELS when being individually addressed 
@@ -36,11 +36,11 @@ START_UVWHITE_PANEL_ADDRESSES = 16
 # Uncomment the proper group of lines, or edit for your own system's settings.
 
 ## The following settings work great for the wired Next Lighting system:
-SERIAL_PORT = /dev/ttyUSB0
-SERIAL_BAUDRATE = 38400
-SERIAL_DATABITS = 8
-SERIAL_STOPBITS = 1
-SERIAL_PARITY = 2
+#SERIAL_PORT = /dev/ttyUSB0
+#SERIAL_BAUDRATE = 38400
+#SERIAL_DATABITS = 8
+#SERIAL_STOPBITS = 1
+#SERIAL_PARITY = 2
 
 ## The following settings work great for an Arduino Uno-based system:
 #SERIAL_PORT = /dev/ttyACM0
@@ -53,11 +53,11 @@ SERIAL_PARITY = 2
 ## (note that setting 2 stop bits here and 1 stop bit on the Xbee
 ## configuration is a hack to account for the clock difference between
 ## the Xbee (16MHz) and a regular UART)
-#SERIAL_PORT = /dev/ttyUSB0
-#SERIAL_BAUDRATE = 115200
-#SERIAL_DATABITS = 8
-#SERIAL_STOPBITS = 2
-#SERIAL_PARITY = 0
+SERIAL_PORT = /dev/ttyUSB0
+SERIAL_BAUDRATE = 115200
+SERIAL_DATABITS = 8
+SERIAL_STOPBITS = 2
+SERIAL_PARITY = 0
 
 
 ###############################################################################

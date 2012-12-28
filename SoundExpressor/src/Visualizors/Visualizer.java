@@ -54,4 +54,11 @@ public abstract class Visualizer {
 		return controls;
 	}
 	
+	/**
+	 * Is this an interactive visualizers? Or is it fully automatic?
+	 */
+	public boolean canAutoDJ() {
+		return true;
+	}
+	
 }

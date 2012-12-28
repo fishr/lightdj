@@ -71,7 +71,7 @@ public class RainbowSlider extends Visualizer {
 		double a = 1.0;
 		
 		for(int light = 0; light < NUM_FRONT_RGB_LIGHTS; light++) {
-			colorOutput.setFrontRGBLight(light, Color.getHSBColor((float) (theta + phaseOffsetBase*symLight*(1 - bassLevel*Math.exp(-0.00005*symLight*symLight*symLight*symLight))), saturation, brightness));
+			colorOutput.setFrontRGBLight(light, Color.getHSBColor((float) wrapPhase(theta + phaseOffsetBase*symLight*(1 - bassLevel*Math.exp(-0.00005*symLight*symLight*symLight*symLight))), saturation, brightness));
 			symLight++;
 		}
 		
@@ -86,6 +86,12 @@ public class RainbowSlider extends Visualizer {
 		return colorOutput;
 	}
 
-
+	public double wrapPhase(double phase) {
+		double phaseOut = phase % 1.0;
+		if (phaseOut < 0.0) {
+			phaseOut += 1.0;
+		}
+		return phaseOut;
+	}
 
 }

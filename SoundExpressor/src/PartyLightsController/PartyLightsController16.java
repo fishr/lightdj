@@ -32,10 +32,10 @@ public class PartyLightsController16 {
 	private OutputStream outStream;
 	
 	// Protocol information
-	protected static final int MAX_COLOR_CHANNEL_VALUE = 255; // 4095
-	protected static final int BYTES_PER_COLOR_CHANNEL = 1; // 1
+	protected static final int MAX_COLOR_CHANNEL_VALUE = 4095;
+	protected static final int BYTES_PER_COLOR_CHANNEL = 2;
 	
-	protected static final int SPECIAL_SYNC_BYTE = 170;
+	protected static final int SPECIAL_SYNC_BYTE = 255;
 	protected static final int ACTION_EMERGENCY_LIGHTING = 254;
 	protected static final int ACTION_EVERYTHING_OFF = 253;
 	protected static final int ACTION_FRONT_LEDS_SAME = 252;
@@ -77,9 +77,9 @@ public class PartyLightsController16 {
 	
 	// Voloume controls
 	public float overallVolume = 1.0f;
-	public float frontVolume = 0.6f;
-	public float rearVolume = 0.03f;
-	public float strobeVolume = 0.8f;
+	public float frontVolume = 1.0f;
+	public float rearVolume = 1.0f;
+	public float strobeVolume = 1.0f;
 	
 	public enum LightPlacement {
 		PLACEMENT_FRONT,
@@ -149,6 +149,17 @@ public class PartyLightsController16 {
 	 * Writes data to the port
 	 */
 	protected void write(byte[] data) throws IOException {
+		
+		//System.out.println("*********");
+		//for(int i = 0; i < data.length; i++) {
+		//	int d = data[i];
+		//	if (d < 0) {
+		//		System.out.println(d + 256);
+		//	} else {
+		//		System.out.println(d);
+		//	}
+		//}
+		
 		if (isConnected) {
 			outStream.write(data);
 			outStream.flush();
@@ -237,7 +248,7 @@ public class PartyLightsController16 {
 	
 	// Gamma correct to approximate the sRGB colorspace
 	protected float gammaCorrect(float val) {
-		double gamma = 2.2;
+		double gamma = 3.4;	// 2.2
 		return (float) Math.pow(val, gamma);
 	}
 	
@@ -273,7 +284,7 @@ public class PartyLightsController16 {
 		int index = startIndex;
 		
 		// Fill in the data.
-	//	data[index++] = upper;
+		data[index++] = upper;
 		data[index++] = lower;
 		
 		return index - startIndex;

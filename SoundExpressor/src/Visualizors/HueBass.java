@@ -84,6 +84,11 @@ public class HueBass extends Visualizer {
 		return colorOutput;
 	}
 
-
+	@Override
+	public boolean canAutoDJ() {
+		return false;
+	}
+	
+	
 
 }

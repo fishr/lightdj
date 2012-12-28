@@ -1,5 +1,0 @@
-package PostProcessors;
-
-public class WhiteBurst extends PostProcessor {
-
-}
