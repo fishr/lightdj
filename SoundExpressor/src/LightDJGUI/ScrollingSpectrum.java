@@ -150,7 +150,9 @@ public class ScrollingSpectrum {
 	}
 	
 	private void outputGraph() {
-		outputG2D.drawImage(buffer, screenX, screenY, null);
+		if (outputG2D != null) {
+			outputG2D.drawImage(buffer, screenX, screenY, null);
+		}
 	}
 	
 	/**

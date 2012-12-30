@@ -8,11 +8,13 @@ import java.awt.FontFormatException;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -149,6 +151,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	@Override
 	protected void initVisualizations() {
 
+		// Make sure the HiDPI setting is loaded if necessary!
+		DPI_MULT = Float.parseFloat(ConfigFileParser.getSettingOrDefault("DPI_MULTIPLIER", "1.0"));
+		
 		// Set up the feature detector plugins
 		featureDetectors = allFeatureDetectors();
 		for(FeatureDetector f : featureDetectors) {
@@ -390,7 +395,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		
 		// Update (but do not render) relevant visual GUI elements
-		plotter.update(new double[] {(100.0 * (Double) featureList.getFeature("BASS_LEVEL")), 0.0, 0.0});
+		// plotter.update(new double[] {(100.0 * (Double) featureList.getFeature("BASS_LEVEL")), 0.0, 0.0});
 		spectrumMapper.updateWithNewSpectrum(frequencies, magnitudes);
 		
 		
@@ -457,45 +462,50 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	 * TODO
 	 * TODO
 	 */
-	// Graphics and GUI-related variables
-	protected final static int SIDEBAR_WIDTH = 350;
-	protected final static int SPECTRUM_WIDTH = 900;
-	protected final static int SPECTRUM_HEIGHT = 400;
-	protected final static int PLOTTER_WIDTH = 900;
-	protected final static int PLOTTER_HEIGHT = 300;
-	protected final static int BORDER_SIZE = 10;
-	protected final static int LIGHTBAR_HEIGHT = 300;
-	protected final static int RECORD_CONTROLS_WIDTH = 500;
-	protected final static int RECORD_CONTROLS_HEIGHT = 400;
-	protected final static int RECORD_WIDTH = 400;
-	protected final static int RECORDS_WIDTH = 2*RECORD_CONTROLS_WIDTH + BORDER_SIZE;
-	protected static int ACTIVE_LAYER_X = 9*BORDER_SIZE;
-	protected static int ACTIVE_LAYER_Y = 9*BORDER_SIZE;
+	// Graphics and GUI-related variables 
+	public static float DPI_MULT;
+	protected static int SIDEBAR_WIDTH;
+	protected static int SPECTRUM_WIDTH;
+	protected static int SPECTRUM_HEIGHT;
+	protected static int SPECTRUM_HEIGHT_MIN;
+	protected static int PLOTTER_WIDTH;
+	protected static int PLOTTER_HEIGHT;
+	protected static int BORDER_SIZE;
+	protected static int LIGHTBAR_HEIGHT;
+	protected static int RECORD_CONTROLS_WIDTH;
+	protected static int RECORD_CONTROLS_HEIGHT;
+	protected static int RECORD_WIDTH;
+	protected static int RECORD_HEIGHT;
+	protected static int RECORDS_WIDTH;
+	protected static int ACTIVE_LAYER_X;
+	protected static int ACTIVE_LAYER_Y;
 	protected static int ACTIVE_LAYER_WIDTH;
 	protected static int ACTIVE_LAYER_HEIGHT;
 	protected static int RECORD_BOX_LEFT_X;
 	protected static int RECORD_BOX_LEFT_Y;
 	protected static int RECORD_BOX_RIGHT_X;
 	protected static int RECORD_BOX_RIGHT_Y;
-	protected static final int RECORD_BOX_COLOR_DISPLAY_HEIGHT = 100;
+	protected static int RECORD_BOX_COLOR_DISPLAY_HEIGHT;
 	protected static int CROSSFADER_X;
 	protected static int CROSSFADER_Y;
 	protected static int CROSSFADER_WIDTH;
 	protected static int CROSSFADER_HEIGHT;
-	protected static int CROSSFADER_INDENT = 10;
-	protected static int PLUGIN_THUMBNAIL_WIDTH = 430; // 550
-	protected static int PLUGIN_THUMBNAIL_HEIGHT = 80; // 100
-	protected static int PULSE_KEEPER_X = BORDER_SIZE;
-	protected static int PULSE_KEEPER_Y = BORDER_SIZE;
-	protected static int PULSE_KEEPER_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
-	protected static int PULSE_KEEPER_HEIGHT = 100;
+	protected static int CROSSFADER_INDENT;
+	protected static int PLUGIN_THUMBNAIL_WIDTH; // 550
+	protected static int PLUGIN_THUMBNAIL_HEIGHT; // 100
+	protected static int PULSE_KEEPER_X;
+	protected static int PULSE_KEEPER_Y;
+	protected static int PULSE_KEEPER_WIDTH;
+	protected static int PULSE_KEEPER_HEIGHT;
 	protected static int POSTPROCESSOR_X;
 	protected static int POSTPROCESSOR_Y;
-	protected static int POSTPROCESSOR_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
-	protected static int POSTPROCESSOR_TITLE_HEIGHT = 40;
-	protected static int POSTPROCESSOR_BOTTOM_HEIGHT = 0;
-	protected static int POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT = 40;
-	protected static int USER_CONTROL_SLOT_HEIGHT = 60;
+	protected static int POSTPROCESSOR_WIDTH;
+	protected static int POSTPROCESSOR_TITLE_HEIGHT;
+	protected static int POSTPROCESSOR_BOTTOM_HEIGHT;
+	protected static int POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT;
+	protected static int USER_CONTROL_SLOT_HEIGHT;
+	public static int PANEL_BORDER_RADIUS;
+	public static int LAYER_BORDER_RADIUS;
 	
 	// Some color information
 	public static Color PANEL_BACKGROUND_COLOR;
@@ -652,10 +662,40 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		frame.setVisible(true);
 		frame.addComponentListener(this);
 		
+		// Set some geometric parameters!
+		SIDEBAR_WIDTH = scale(350);
+		SPECTRUM_WIDTH = scale(900);
+		SPECTRUM_HEIGHT = scale(400);
+		SPECTRUM_HEIGHT_MIN = 10;
+		PLOTTER_WIDTH = scale(900);
+		PLOTTER_HEIGHT = scale(300);
+		BORDER_SIZE = scale(10);
+		LIGHTBAR_HEIGHT = scale(200);
+		RECORD_CONTROLS_WIDTH = scale(500);
+		RECORD_CONTROLS_HEIGHT = scale(250);
+		RECORD_WIDTH = scale(400);
+		RECORD_HEIGHT = scale(200);
+		RECORDS_WIDTH = 2*RECORD_CONTROLS_WIDTH + BORDER_SIZE;
+		ACTIVE_LAYER_X = 9*BORDER_SIZE;
+		ACTIVE_LAYER_Y = 9*BORDER_SIZE;
+		RECORD_BOX_COLOR_DISPLAY_HEIGHT = scale(100);
+		CROSSFADER_INDENT = scale(10);
+		PLUGIN_THUMBNAIL_WIDTH = scale(430); // 550
+		PLUGIN_THUMBNAIL_HEIGHT = scale(80); // 100
+		PULSE_KEEPER_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
+		PULSE_KEEPER_HEIGHT = scale(100);
+		POSTPROCESSOR_WIDTH = SIDEBAR_WIDTH - 2*BORDER_SIZE;
+		POSTPROCESSOR_TITLE_HEIGHT = scale(40);
+		POSTPROCESSOR_BOTTOM_HEIGHT = scale(0);
+		POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT = scale(40);
+		USER_CONTROL_SLOT_HEIGHT = scale(60);
+		PANEL_BORDER_RADIUS = scale(40);
+		LAYER_BORDER_RADIUS = scale(60);
+		
 		
 		// Set some colors
-		PANEL_BACKGROUND_COLOR = new Color(10, 10, 10);
-		PANEL_BORDER_COLOR = new Color(30, 30, 30);
+		PANEL_BACKGROUND_COLOR = new Color(20, 20, 20);
+		PANEL_BORDER_COLOR = new Color(40, 40, 40);
 		TEXT_COLOR = new Color(160, 160, 160);
 		HOT_COLOR = new Color(200, 114, 0);
 		COMPOSITE_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
@@ -665,34 +705,30 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// try to use ones that may be installed (which may result in completely different fonts)
 		try {
 			Font eraser = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/Eraser.ttf"));
-			PANEL_FONT = eraser.deriveFont(24.0f);
-			PANEL_FONT_SMALL = eraser.deriveFont(16.0f);
-			PANEL_FONT_LARGE = eraser.deriveFont(48.0f);
+			PANEL_FONT = eraser.deriveFont(24.0f * DPI_MULT);
+			PANEL_FONT_SMALL = eraser.deriveFont(16.0f * DPI_MULT);
+			PANEL_FONT_LARGE = eraser.deriveFont(48.0f * DPI_MULT);
 			
 			Font nimbus = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts/LiberationMono-Bold.ttf"));
-			PULSE_KEEPER_FONT = nimbus.deriveFont(72.0f);
+			PULSE_KEEPER_FONT = nimbus.deriveFont(72.0f * DPI_MULT);
 			
 		} catch (Exception e) {
 			System.out.println("Error: Could not load custom fonts from the Fonts/ directory!");
-			PANEL_FONT = new Font("Eraser", Font.PLAIN, 24);
-			PANEL_FONT_SMALL= new Font("Eraser", Font.PLAIN, 16);
-			PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, 48);
-			PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, 72);
+			PANEL_FONT = new Font("Eraser", Font.PLAIN, scale(24));
+			PANEL_FONT_SMALL= new Font("Eraser", Font.PLAIN, scale(16));
+			PANEL_FONT_LARGE = new Font("Eraser", Font.PLAIN, scale(48));
+			PULSE_KEEPER_FONT = new Font("Nimbus Mono L", Font.BOLD, scale(72));
 			e.printStackTrace();
 		}
 
-		REGULAR_STROKE = new BasicStroke(1.0f);
-		THICK_STROKE = new BasicStroke(3.0f);
+		REGULAR_STROKE = new BasicStroke(1.0f * DPI_MULT);
+		THICK_STROKE = new BasicStroke(3.0f * DPI_MULT);
 		alpha = 0.0;
 		
 		// Set the default states
 		lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
 		crossfadeAutomator = CrossfadeAutomator.CROSSFADE_MANUAL;
-		
-		// Set up some other GUI elements
-		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 40, 20000, 4.0, BUFFER_SIZE, SAMPLE_RATE);
-		plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW, Color.GREEN}, 0, 0, PLOTTER_WIDTH, PLOTTER_HEIGHT, 100.0, null);
-		
+			
 		// Choose which color output displayer to use!
 		colorOutputDisplayer = new ColorOutputDisplayerParty(this);
 		
@@ -704,6 +740,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		// Start the pulse keeper
 		pulseKeeper = new PulseKeeper();
+		
+		// Set up some other GUI elements
+		spectrumMapper = new ScrollingSpectrum(0, 0, SPECTRUM_WIDTH, SPECTRUM_HEIGHT, null, 40, 20000, 4.0, BUFFER_SIZE, SAMPLE_RATE);
+		// plotter = new RealtimePlotter(new Color[]{Color.RED, Color.YELLOW, Color.GREEN}, 0, 0, PLOTTER_WIDTH, PLOTTER_HEIGHT, 100.0, null);
+	
 		
 		// Set up the mouse acceptors
 		mouseAcceptors = new LinkedList<MouseAcceptorPanel>();
@@ -719,7 +760,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		
 		// Generate the background
-		generateBackground();
+		// generateBackground();
 	
 		// Start a tast to render regularly!
 		Timer t = new Timer();
@@ -728,6 +769,10 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		System.out.println("Light DJ started.");
 	}
 	
+	
+	public static int scale(int val) {
+		return (int) Math.round(VisualizationEngineParty.DPI_MULT * val);
+	}
 	
 	/**
 	 * Generate a pretty looking background image
@@ -750,11 +795,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		ACTIVE_LAYER_HEIGHT = height - 18*BORDER_SIZE;
 		
 		CROSSFADER_X = RECORD_BOX_LEFT_X + RECORD_CONTROLS_WIDTH / 2;
-		CROSSFADER_Y = RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT + 200;
+		CROSSFADER_Y = RECORD_BOX_LEFT_Y + RECORD_CONTROLS_HEIGHT + scale(175);
 		CROSSFADER_WIDTH = RECORD_CONTROLS_WIDTH + BORDER_SIZE;
-		CROSSFADER_HEIGHT = 150;
+		CROSSFADER_HEIGHT = scale(150);
 		if (crossfaderKnob != null) {
 			crossfaderKnob.setLocation(CROSSFADER_X, CROSSFADER_Y, CROSSFADER_WIDTH, CROSSFADER_HEIGHT);
+			crossfaderKnob.needsToRender();
 		}
 		
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -769,9 +815,17 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		if (turntableLogo == null) {
 			// Try and load it
 			try {
+				
 				turntableLogo = ImageIO.read(new File("Images/background.png"));
-				recordLeft = ImageIO.read(new File("Images/record_left.png"));
-				recordRight = ImageIO.read(new File("Images/record_right.png"));
+				
+				BufferedImage recordLeftRaw = ImageIO.read(new File("Images/record_left_large.png"));
+				BufferedImage recordRightRaw = ImageIO.read(new File("Images/record_right_large.png"));
+				recordLeft = scaleImage(recordLeftRaw, RECORD_WIDTH, RECORD_HEIGHT);
+				recordRight = scaleImage(recordRightRaw, RECORD_WIDTH, RECORD_HEIGHT);
+				
+				//recordLeft = ImageIO.read(new File("Images/record_left.png"));
+				//recordRight = ImageIO.read(new File("Images/record_right.png"));
+				
 			} catch (IOException e) {
 				System.out.println("Warning: Could not load LightDJ background image!");
 				e.printStackTrace();
@@ -805,28 +859,28 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			// Determine the height of this box
 			int h = POSTPROCESSOR_TITLE_HEIGHT;
 			for(UserControl control : postProcessor.getRequestedUserControls()) {
-				control.setLocation(2 * BORDER_SIZE, y +h, POSTPROCESSOR_WIDTH - 2*BORDER_SIZE, POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT);
+				control.setLocation(2 * BORDER_SIZE, y + h, POSTPROCESSOR_WIDTH - 2*BORDER_SIZE, POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT);
 				h += POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT + BORDER_SIZE;
 			}
 			h += POSTPROCESSOR_BOTTOM_HEIGHT;
 			
 			// Set the location of this post processor's status light
-			statusLights[postProcessorIndex].setLocation(SIDEBAR_WIDTH - BORDER_SIZE - 50, y + 7, 1, 1);
+			statusLights[postProcessorIndex].setLocation(SIDEBAR_WIDTH - BORDER_SIZE - scale(50), y + scale(7), 1, 1);
 			
 			// Draw the box
 			g2D.setColor(PANEL_BACKGROUND_COLOR);
-			g2D.fillRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, 40, 40);
+			g2D.fillRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			g2D.setColor(PANEL_BORDER_COLOR);
 			g2D.setStroke(REGULAR_STROKE);
-			g2D.drawRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, 40, 40);
+			g2D.drawRoundRect(POSTPROCESSOR_X, y, POSTPROCESSOR_WIDTH, h, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			
 			// Draw the title and the check box (off right now by default)
 			g2D.setColor(TEXT_COLOR);
 			g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g2D.setFont(PANEL_FONT);
-			g2D.drawString(postProcessor.getName(), POSTPROCESSOR_X + BORDER_SIZE, y + 16 + BORDER_SIZE);
+			g2D.drawString(postProcessor.getName(), POSTPROCESSOR_X + BORDER_SIZE, y + scale(16) + BORDER_SIZE);
 			g2D.setColor(PANEL_BORDER_COLOR);
-			g2D.drawLine(POSTPROCESSOR_X + BORDER_SIZE, y + 25 + BORDER_SIZE, POSTPROCESSOR_X + POSTPROCESSOR_WIDTH - BORDER_SIZE, y + 25 + BORDER_SIZE);
+			g2D.drawLine(POSTPROCESSOR_X + BORDER_SIZE, y + scale(25) + BORDER_SIZE, POSTPROCESSOR_X + POSTPROCESSOR_WIDTH - BORDER_SIZE, y + scale(25) + BORDER_SIZE);
 		
 			// Render all of the controls
 			for(UserControl control : postProcessor.getRequestedUserControls()) {
@@ -841,13 +895,16 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		
 		// Resize where the scrolling spectrum goes
-		//spectrumMapper.move(SIDEBAR_WIDTH + BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE , gui.getWidth() - SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
-		spectrumMapper.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE, SIDEBAR_WIDTH - 2*BORDER_SIZE, SPECTRUM_HEIGHT);
+		int specHeight = Math.min(SPECTRUM_HEIGHT, height - y - BORDER_SIZE);
+		if (specHeight < SPECTRUM_HEIGHT_MIN) {
+			specHeight = SPECTRUM_HEIGHT_MIN;
+		}
+		spectrumMapper.move(BORDER_SIZE, height - specHeight - BORDER_SIZE, SIDEBAR_WIDTH - 2*BORDER_SIZE, specHeight);
 		spectrumMapper.setGraphics((Graphics2D) background.getGraphics());
 		
 		// Resize where the graphs go
-		plotter.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE * 2 - PLOTTER_HEIGHT, SIDEBAR_WIDTH - 2*BORDER_SIZE, PLOTTER_HEIGHT);
-		plotter.setGraphics((Graphics2D) background.getGraphics());
+		// plotter.move(BORDER_SIZE, gui.getHeight() - SPECTRUM_HEIGHT - BORDER_SIZE * 2 - PLOTTER_HEIGHT, SIDEBAR_WIDTH - 2*BORDER_SIZE, PLOTTER_HEIGHT);
+		// plotter.setGraphics((Graphics2D) background.getGraphics());
 		
 		// Make sure the visualizer chooser is set up correctly
 		visualizerChooser.setPosition(ACTIVE_LAYER_X, ACTIVE_LAYER_Y, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT);		
@@ -855,9 +912,66 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	}
 	
 	/**
+	 * Helper function to do some image scaling.
+	 */
+	public static BufferedImage scaleImage(BufferedImage imageOrig, int w, int h) {
+		/**
+		 * Alternate method - higher quality, but a lot slower.
+		 */
+		//BufferedImage imageNew  = new BufferedImage(w, h, imageOrig.getType());
+		//Graphics2D g2D = (Graphics2D) imageNew.getGraphics();
+		//g2D.drawImage(imageOrig.getScaledInstance(w, h, Image.SCALE_SMOOTH), 0, 0, null);
+		
+		// Assume the two images have the same aspect ratio.
+		BufferedImage img_t = imageOrig;
+		int w_t = imageOrig.getWidth();
+		int w_h = imageOrig.getHeight();
+		while((float) w_t / w >= 2.0f) {
+			// Downsize by an exact factor of 2.0
+			w_t /= 2;
+			w_h /= 2;
+			BufferedImage img_tt = new BufferedImage(w_t, w_h, img_t.getType());
+			Graphics2D g2D = (Graphics2D) img_tt.getGraphics();
+			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2D.drawImage(img_t, 0, 0, w_t, w_h, null);
+			img_t = img_tt;
+			
+		}
+		
+		
+		// Perform the final resize
+		if (w != w_t) {
+			BufferedImage imageNew  = new BufferedImage(w, h, imageOrig.getType());
+			Graphics2D g2D = (Graphics2D) imageNew.getGraphics();
+			g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2D.drawImage(img_t, 0, 0, w, h, null);
+			return imageNew;
+		} else {
+			return img_t;
+		}
+		
+		
+//		BufferedImage imageNew  = new BufferedImage(w, h, imageOrig.getType());
+//		Graphics2D g2D = (Graphics2D) imageNew.getGraphics();
+//		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//		g2D.drawImage(imageOrig, 0, 0, w, h, null);
+		
+		// Return it
+		//return imageNew;
+
+	}
+	
+	
+	/**
 	 * Draws everything for the visualizer plugin
 	 */
-	private void loadVisualizerPlugin(boolean left, int pluginIndex) {
+	protected void loadVisualizerPlugin(boolean left, int pluginIndex) {
 		
 		int x; int y; int width; int height;
 		
@@ -866,9 +980,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		if (left) {
 			g2D.setColor(PANEL_BACKGROUND_COLOR);
-			g2D.fillRoundRect(RECORD_BOX_LEFT_X, RECORD_BOX_LEFT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, 40, 40);
+			g2D.fillRoundRect(RECORD_BOX_LEFT_X, RECORD_BOX_LEFT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			g2D.setColor(PANEL_BORDER_COLOR);
-			g2D.drawRoundRect(RECORD_BOX_LEFT_X, RECORD_BOX_LEFT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, 40, 40);
+			g2D.drawRoundRect(RECORD_BOX_LEFT_X, RECORD_BOX_LEFT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			x = RECORD_BOX_LEFT_X + BORDER_SIZE;
 			y = RECORD_BOX_LEFT_Y + BORDER_SIZE;
 			width = RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE;
@@ -876,9 +990,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 		} else {
 			g2D.setColor(PANEL_BACKGROUND_COLOR);
-			g2D.fillRoundRect(RECORD_BOX_RIGHT_X, RECORD_BOX_RIGHT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, 40, 40);
+			g2D.fillRoundRect(RECORD_BOX_RIGHT_X, RECORD_BOX_RIGHT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			g2D.setColor(PANEL_BORDER_COLOR);
-			g2D.drawRoundRect(RECORD_BOX_RIGHT_X, RECORD_BOX_RIGHT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, 40, 40);
+			g2D.drawRoundRect(RECORD_BOX_RIGHT_X, RECORD_BOX_RIGHT_Y, RECORD_CONTROLS_WIDTH, RECORD_CONTROLS_HEIGHT, PANEL_BORDER_RADIUS, PANEL_BORDER_RADIUS);
 			x = RECORD_BOX_RIGHT_X + BORDER_SIZE;
 			y = RECORD_BOX_RIGHT_Y + BORDER_SIZE;
 			width = RECORD_CONTROLS_WIDTH - 2*BORDER_SIZE;
@@ -889,11 +1003,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		g2D.setColor(TEXT_COLOR);
 		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2D.setFont(PANEL_FONT);
-		g2D.drawString(visualizer.getName(), x, y + 16);
+		g2D.drawString(visualizer.getName(), x, y + scale(16));
 		g2D.setColor(PANEL_BORDER_COLOR);
-		g2D.drawLine(x, y + 25, x + width, y + 25);
+		g2D.drawLine(x, y + scale(25), x + width, y + scale(25));
 	
-		y += 30;
+		y += scale(30);
 		
 		// Set the location of any controls thacontrol.render(g2D);t needed to be rendered, and render them
 		int slotX = 0; int slotY = 0;
@@ -936,7 +1050,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		g2D.setFont(PANEL_FONT_LARGE);
 		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING , RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2D.setColor(TEXT_COLOR);
-		g2D.drawString("Visualizorz", ACTIVE_LAYER_X, ACTIVE_LAYER_Y - 10);
+		g2D.drawString("Visualizorz", ACTIVE_LAYER_X, ACTIVE_LAYER_Y - scale(10));
 		
 		// Now, draw each plugin.
 		int col = 0;
@@ -945,20 +1059,20 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		for(int pluginIndex = 0; pluginIndex < visualizers.size(); pluginIndex++) {
 			Visualizer v = visualizers.get(pluginIndex);
 			int x = ACTIVE_LAYER_X + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_WIDTH + BORDER_SIZE) * col;
-			int y = ACTIVE_LAYER_Y + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_HEIGHT + BORDER_SIZE + 30) * row;
+			int y = ACTIVE_LAYER_Y + 2*BORDER_SIZE + (PLUGIN_THUMBNAIL_HEIGHT + BORDER_SIZE + scale(30)) * row;
 			
 			g2D.setColor(PANEL_BORDER_COLOR);
-			g2D.drawRoundRect(x, y, PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT, 20, 20);
+			g2D.drawRoundRect(x, y, PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT, scale(20), scale(20));
 			
 			g2D.setFont(PANEL_FONT);
 			g2D.setColor(TEXT_COLOR);
-			g2D.drawString(v.getName(), x + 30, y);
+			g2D.drawString(v.getName(), x + scale(30), y);
 			
 			g2D.setFont(PANEL_FONT);
 			g2D.setColor(HOT_COLOR);
 			g2D.drawString("abcdefghijklmnopqrstuvwxyz".substring(i, i+1), x, y);
 			
-			colorOutputDisplayer.render(renderFrame.colorOutputs[pluginIndex], g2D, x, y + 40, PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT - 40);
+			colorOutputDisplayer.render(renderFrame.colorOutputs[pluginIndex], g2D, x, y + scale(40), PLUGIN_THUMBNAIL_WIDTH, PLUGIN_THUMBNAIL_HEIGHT - scale(40));
 			
 			
 			// Now increment
@@ -996,9 +1110,9 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		String pulseString = String.format("%d:%d", beat, subBeat);
 		String bpmString = String.format("BPM: %.3f", pulseKeeper.getBPM());
 		
-		g2D.drawString(pulseString, PULSE_KEEPER_X, PULSE_KEEPER_Y + 52);
+		g2D.drawString(pulseString, PULSE_KEEPER_X, PULSE_KEEPER_Y + scale(52));
 		g2D.setFont(PANEL_FONT);
-		g2D.drawString(bpmString, PULSE_KEEPER_X + 10, PULSE_KEEPER_Y + 90);
+		g2D.drawString(bpmString, PULSE_KEEPER_X + scale(10), PULSE_KEEPER_Y + scale(90));
 		
 	}
 	
@@ -1087,11 +1201,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			
 			g2DBuf.setColor(PANEL_BACKGROUND_COLOR);
 			//g2DBuf.setComposite(COMPOSITE_TRANSLUCENT);
-			g2DBuf.fillRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, 50, 50);
+			g2DBuf.fillRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, LAYER_BORDER_RADIUS, LAYER_BORDER_RADIUS);
 			//g2DBuf.setComposite(COMPOSITE_OPAQUE);
 			 
 			g2DBuf.setColor(PANEL_BORDER_COLOR);
-			g2DBuf.drawRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, 50, 50);
+			g2DBuf.drawRoundRect(ACTIVE_LAYER_X, ACTIVE_LAYER_Y - BORDER_SIZE, ACTIVE_LAYER_WIDTH, ACTIVE_LAYER_HEIGHT, LAYER_BORDER_RADIUS, LAYER_BORDER_RADIUS);
 			
 			// Now, depending on the state
 			if (lightDJState == LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER) {

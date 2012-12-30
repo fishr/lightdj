@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import SoundEngine.VisualizationEngineParty;
+
 import Common.ColorOutput;
 import Common.FeatureList;
 import Common.UserControl;
@@ -61,4 +63,10 @@ public abstract class Visualizer {
 		return true;
 	}
 	
+	/**
+	 * Scale helper function
+	 */
+	public int scale(int val) {
+		return VisualizationEngineParty.scale(val);
+	}
 }

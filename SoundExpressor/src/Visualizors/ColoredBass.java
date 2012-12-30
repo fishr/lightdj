@@ -38,9 +38,9 @@ public class ColoredBass extends Visualizer {
 
 		
 		// Request user controls
-		hueKnob = new ColorKnob(0.0f, 50, "Hue");
-		//colorSpeed = new GenericKnob(0.1f, 50, "Color rotate speed");
-		bassBounce = new GenericKnob(0.7f, 50, "Bass Bounce");
+		hueKnob = new ColorKnob(0.0f, scale(50), "Hue");
+		//colorSpeed = new GenericKnob(0.1f, scale(50), "Color rotate speed");
+		bassBounce = new GenericKnob(0.7f, scale(50), "Bass Bounce");
 		requestUserControl(hueKnob);
 		//requestUserControl(colorSpeed);
 		requestUserControl(bassBounce);

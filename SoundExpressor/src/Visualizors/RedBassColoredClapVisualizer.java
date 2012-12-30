@@ -38,8 +38,8 @@ public class RedBassColoredClapVisualizer extends Visualizer {
 		rgbController = new HueRotator(0.0, 0.373);
 		
 		// Request controls for this plugin
-		knob = new GenericKnob(0.4f, 50, "Label");
-		colorKnob = new ColorKnob(0.0f, 50, "Color!one!");
+		knob = new GenericKnob(0.4f, scale(50), "Label");
+		colorKnob = new ColorKnob(0.0f, scale(50), "Color!one!");
 		requestUserControl(knob);
 		requestUserControl(colorKnob);
 		

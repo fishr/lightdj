@@ -13,7 +13,10 @@ import SoundEngine.VisualizationEngineParty;
  */
 public class CrossfaderKnob implements UserControl {
 	
-	protected static int CROSSFADER_INDENT = 10;
+	protected static int CROSSFADER_INDENT;
+	protected static int TICK_RADIUS;
+	protected static int BOX_SIZE_X;
+	protected static int BOX_SIZE_Y;
 	
 	protected VisualizationEngineParty engine;
 	protected int x;
@@ -27,6 +30,11 @@ public class CrossfaderKnob implements UserControl {
 	
 	public CrossfaderKnob(VisualizationEngineParty eng) {
 		this.engine = eng;
+		
+		CROSSFADER_INDENT = scale(10);
+		TICK_RADIUS = scale(10);
+		BOX_SIZE_X = scale(10);
+		BOX_SIZE_Y = scale(40);
 	}
 
 	@Override
@@ -97,8 +105,12 @@ public class CrossfaderKnob implements UserControl {
 	public void render(Graphics2D g2D) {
 		
 		// Erase what was there before
-		g2D.setColor(Color.BLACK);
-		g2D.fillRect(x, y, width, height);
+		g2D.setColor(VisualizationEngineParty.PANEL_BACKGROUND_COLOR);
+		g2D.fillRoundRect(x, y, width, height, VisualizationEngineParty.PANEL_BORDER_RADIUS, VisualizationEngineParty.PANEL_BORDER_RADIUS);
+		g2D.setColor(VisualizationEngineParty.PANEL_BORDER_COLOR);
+		g2D.setStroke(VisualizationEngineParty.REGULAR_STROKE);
+		g2D.drawRoundRect(x, y, width, height, VisualizationEngineParty.PANEL_BORDER_RADIUS, VisualizationEngineParty.PANEL_BORDER_RADIUS);
+		//g2D.fillRect(x, y, width, height);
 		
 		
 		g2D.setColor(VisualizationEngineParty.PANEL_BORDER_COLOR);
@@ -110,7 +122,7 @@ public class CrossfaderKnob implements UserControl {
 		// Draw hair lines
 		for (int i = 0; i  <= 8; i++) {
 			int xh = x + CROSSFADER_INDENT + i * (width - 2*CROSSFADER_INDENT) / 8;
-			g2D.drawLine(xh, yCenter - 10, xh, yCenter + 10);
+			g2D.drawLine(xh, yCenter - TICK_RADIUS, xh, yCenter + TICK_RADIUS);
 		}
 	
 		// Now draw the main box
@@ -119,16 +131,16 @@ public class CrossfaderKnob implements UserControl {
 		if (isHot) {
 			g2D.setColor(VisualizationEngineParty.HOT_COLOR);
 		} else {
-			g2D.setColor(VisualizationEngineParty.PANEL_BACKGROUND_COLOR);
+			g2D.setColor(VisualizationEngineParty.TEXT_COLOR);
 		}
-		g2D.fillRect(xb - 10, yCenter - 40, 19, 80);
+		g2D.fillRect(xb - BOX_SIZE_X, yCenter - BOX_SIZE_Y, 2*BOX_SIZE_X-1, 2*BOX_SIZE_Y);
 		if (isHot) {
 			g2D.setColor(Color.WHITE);
 		} else {
-			g2D.setColor(VisualizationEngineParty.PANEL_BORDER_COLOR);
+			g2D.setColor(Color.WHITE);
 		}
 		
-		g2D.drawRect(xb - 10, yCenter - 40, 19, 80);
+		g2D.drawRect(xb - BOX_SIZE_X, yCenter - BOX_SIZE_Y, 2*BOX_SIZE_X-1, 2*BOX_SIZE_Y);
 
 		// No longer need to render
 		needsRender = false;
@@ -153,5 +165,8 @@ public class CrossfaderKnob implements UserControl {
 		isHot = hot;
 	}
 	
+	protected int scale(int val) {
+		return VisualizationEngineParty.scale(val);
+	}
 	
 }

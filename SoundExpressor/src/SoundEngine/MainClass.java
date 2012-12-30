@@ -58,7 +58,7 @@ public class MainClass {
 	protected static void loadConfigurationFile() {
 		// Parse the configuration file
 		System.out.println("Parsing configuration file...");
-		ConfigFileParser.parseFile("config_settings.txt");
+		ConfigFileParser.parseFile("config_settings.conf");
 		
 		// Process settings related to lighting
 		// Now process the configuration file!
@@ -155,7 +155,7 @@ public class MainClass {
 			try {
 				line = (TargetDataLine) AudioSystem.getLine(info);
 				//line.open(format);
-				line.open(format, 8*1024);	// Change the line-in audio buffer size here. Too big => Higher latency. To small => sounds shitty with audio pass through (buffer not filled fast enough)
+				line.open(format, 16*1024);	// 8*1024 Change the line-in audio buffer size here. Too big => Higher latency. To small => sounds shitty with audio pass through (buffer not filled fast enough)
 				System.out.println("Line-in buffer size: " + line.getBufferSize());
 			} catch (Exception e) {
 				System.out.println("Error: Could not open input audio line!");

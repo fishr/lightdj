@@ -5,6 +5,7 @@ import java.awt.Color;
 import Common.ColorOutput;
 import Common.FeatureList;
 import LightDJGUI.GenericKnob;
+import SoundEngine.VisualizationEngineParty;
 
 /**
  * A basic visualizer that sets the first light to red corresponding to how much bass there is,
@@ -53,7 +54,7 @@ public class VUBass extends Visualizer {
 		colorGradient = new RGBGradientCompoundLinear(new Color[] {Color.GREEN, Color.YELLOW, Color.RED, Color.RED}, new double[] {0.0, 0.333, 0.667, 1.0});
 		
 		// Request user controls
-		knobSensitivity = new GenericKnob(0.5f, 50, "Level sensitivity");
+		knobSensitivity = new GenericKnob(0.2f, VisualizationEngineParty.scale(50), "Level sensitivity");
 		requestUserControl(knobSensitivity);
 		
 	}

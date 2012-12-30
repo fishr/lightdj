@@ -40,8 +40,8 @@ public class JazzColors extends Visualizer {
 
 		
 		// Request user controls
-		colorSpeed = new GenericKnob(0.05f, 50, "Color rotate speed");
-		bassBounce = new GenericKnob(0.7f, 50, "Bass Bounce");
+		colorSpeed = new GenericKnob(0.05f, scale(50), "Color rotate speed");
+		bassBounce = new GenericKnob(0.7f, scale(50), "Bass Bounce");
 		requestUserControl(colorSpeed);
 		requestUserControl(bassBounce);
 		

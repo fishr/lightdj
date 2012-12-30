@@ -44,9 +44,9 @@ public class WhiteBurst extends PostProcessor {
 		whiteBurstTime = 500;	
 		
 		// Make a user control
-		lengthKnob = new GenericKnob(0.25f, 40, "Time");
-		heatKnob = new GenericKnob(1.0f, 50, "Heat");
-		colorKnob = new ColorKnob(0.0f, 50, "Color");
+		lengthKnob = new GenericKnob(0.25f, scale(50), "Time");
+		heatKnob = new GenericKnob(1.0f, scale(50), "Heat");
+		colorKnob = new ColorKnob(0.0f, scale(50), "Color");
 		requestUserControl(lengthKnob);
 		requestUserControl(heatKnob);
 		requestUserControl(colorKnob);

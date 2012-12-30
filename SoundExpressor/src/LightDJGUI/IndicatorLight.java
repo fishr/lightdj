@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import SoundEngine.VisualizationEngineParty;
+
 import Common.UserControl;
 
 /**
@@ -24,24 +26,46 @@ public class IndicatorLight implements UserControl {
 	protected int width;
 	protected int height;
 	
-	protected BufferedImage onImage;
-	protected BufferedImage offImage;
+	protected static int INDICATOR_LIGHT_WIDTH;
+	protected static int INDICATOR_LIGHT_HEIGHT;
+	protected static BufferedImage onImage = null;
+	protected static BufferedImage offImage = null;
 	
 	public IndicatorLight() {
+		// Make sure static information is loaded!
+		loadStaticData();
+		
 		// Set state variables
 		onoff = false;
 		renderNeeded = true;
-		
-		// Load images
-		try {
-			onImage = ImageIO.read(new File("Images/led-bright.png"));
-			offImage = ImageIO.read(new File("Images/led-dark.png"));
-		} catch (IOException e) {
-			System.out.println("Warning: Could not load indicator light images!");
-			e.printStackTrace();
-			return;
+	}
+	
+	protected static void loadStaticData() {
+		// Load images / static information
+		if (onImage == null) {
+			try {
+				// Select appropriate size based on user's DPI settings
+				INDICATOR_LIGHT_WIDTH = scale(32);
+				INDICATOR_LIGHT_HEIGHT = scale(20);
+						
+				// Load the large raw images
+				BufferedImage onImageRaw = ImageIO.read(new File("Images/led_bright_large.png"));
+				BufferedImage offImageRaw = ImageIO.read(new File("Images/led_dark_large.png"));
+						
+				// Scale them down to the appropriate size (controlled by user's DPI settings)
+				onImage = VisualizationEngineParty.scaleImage(onImageRaw, INDICATOR_LIGHT_WIDTH, INDICATOR_LIGHT_HEIGHT);
+				offImage = VisualizationEngineParty.scaleImage(offImageRaw, INDICATOR_LIGHT_WIDTH, INDICATOR_LIGHT_HEIGHT);
+						
+			} catch (IOException e) {
+				System.out.println("Warning: Could not load indicator light images!");
+				e.printStackTrace();
+				return;
+			}
 		}
-
+	}
+	
+	protected static int scale(int val) {
+		return VisualizationEngineParty.scale(val);
 	}
 	
 	@Override

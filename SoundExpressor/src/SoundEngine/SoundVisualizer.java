@@ -20,7 +20,7 @@ public class SoundVisualizer {
 
 	// Constants
 	private int SOUNDCARD_BUFFER_SIZE = 1024*64; //1024*64	// The size of the audio buffer used by Java
-	private int AUDIO_BUFFER_SIZE;					// The size fo the audio buffer used by this software
+	private int AUDIO_BUFFER_SIZE;					// The size for the audio buffer used by this software
 													// to lock-step synchronize audio with visuals
 	
 	// Audio stuff
@@ -102,8 +102,7 @@ public class SoundVisualizer {
 	
 	// Write bytes into the buffer
 	public void write(byte[] data, int offset, int length) {
-		// Pass through to the audio buffer and to the visuals
-		
+		// Pass through to the audio buffer and to the visuals		
 		if (passThru) {
 			
 			// Add this data to the audio buffer

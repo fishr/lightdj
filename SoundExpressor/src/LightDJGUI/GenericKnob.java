@@ -35,6 +35,10 @@ public class GenericKnob implements UserControl {
 	protected float startVal;
 	protected boolean isDragging;
 	
+	protected static int GAP;
+	protected static int THIN_GAP;
+	protected static int MOUSE_NORMALIZER;
+	
 	public GenericKnob(float defaultVal, int diameter, String label) {
 		super();
 		this.renderNeeded = false;
@@ -44,6 +48,7 @@ public class GenericKnob implements UserControl {
 		// Set the default value
 		this.value = defaultVal;
 		this.label = label;
+		
 		
 	}
 	
@@ -58,6 +63,9 @@ public class GenericKnob implements UserControl {
 	@Override
 	public void render(Graphics2D g2D) {
 		// Render
+		GAP = VisualizationEngineParty.scale(6);
+		THIN_GAP = VisualizationEngineParty.scale(2);
+		MOUSE_NORMALIZER = VisualizationEngineParty.scale(200);
 		
 		// Clear what was there
 		g2D.setColor(VisualizationEngineParty.PANEL_BACKGROUND_COLOR);
@@ -70,17 +78,17 @@ public class GenericKnob implements UserControl {
 		//g2D.fillOval(x, y, diameter, diameter);
 		
 		g2D.setColor(VisualizationEngineParty.TEXT_COLOR);
-		g2D.fillArc(x + 6, y + 6, diameter - 11, diameter - 11, 270, (int)(-this.value * 350));
+		g2D.fillArc(x + GAP, y + GAP, diameter - (2*GAP-1), diameter - (2*GAP-1), 270, (int)(-this.value * 350));
 		
 		// Draw a black outline
 		g2D.setColor(Color.DARK_GRAY);
-		g2D.setStroke(new BasicStroke(2.0f));
-		g2D.drawOval(x + 2, y + 2, diameter - 4, diameter - 4);
+		g2D.setStroke(new BasicStroke(2.0f * VisualizationEngineParty.DPI_MULT));
+		g2D.drawOval(x + THIN_GAP, y + THIN_GAP, diameter - 2*THIN_GAP, diameter - 2*THIN_GAP);
 		
 		// Write the text next to it
 		g2D.setFont(VisualizationEngineParty.PANEL_FONT_SMALL);
 		g2D.setColor(VisualizationEngineParty.TEXT_COLOR);
-		g2D.drawString(label, x + diameter + 10, y + 30);
+		g2D.drawString(label, x + diameter + VisualizationEngineParty.scale(10), y + VisualizationEngineParty.scale(30));
 		
 		// No longer requesting to be rendered
 		renderNeeded = false;
@@ -141,7 +149,7 @@ public class GenericKnob implements UserControl {
 	public void mouseDragged(int x, int y) {
 		if (isDragging) {
 			float diff = y - yStartDrag;
-			setValue(startVal - (1.0f / 200) * diff);
+			setValue(startVal - (1.0f / MOUSE_NORMALIZER) * diff);
 		}
 	}
 

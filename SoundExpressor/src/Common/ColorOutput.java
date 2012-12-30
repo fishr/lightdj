@@ -186,7 +186,35 @@ public class ColorOutput {
 		rgbFrontColorOutputCompression = RGBFrontColorOutputCompression.RGB_FRONT_COMPRESSION_LEDS_SAME;
 		rgbRearColorOutputCompression = RGBRearColorOutputCompression.RGB_REAR_COMPRESSION_LEDS_SAME;
 		uvWhiteColorOutputCompression = UVWhiteColorOutputCompression.UVWHITE_COMPRESSION_WHITE_AND_UV_SAME;
+	}
+	
+	// Constructor that makes a copy
+	public ColorOutput(ColorOutput c) {
+		rgbLightsFront = new Color[NUM_RGB_LIGHTS_FRONT];
+		for(int i = 0; i < NUM_RGB_LIGHTS_FRONT; i++) {
+			rgbLightsFront[i] = c.rgbLightsFront[i];
+		}
 		
+		rgbLightsRear = new Color[NUM_RGB_LIGHTS_REAR];
+		for(int i = 0; i < NUM_RGB_LIGHTS_REAR; i++) {
+			rgbLightsRear[i] = c.rgbLightsRear[i];
+		}
+		
+		whiteLights = new double[NUM_STROBE_LIGHTS];
+		for(int i = 0; i < NUM_STROBE_LIGHTS; i++) {
+			whiteLights[i] = c.whiteLights[i];
+		}
+		
+		uvLights = new double[NUM_UV_LIGHTS];
+		for(int i = 0; i < NUM_UV_LIGHTS; i++) {
+			uvLights[i] = c.uvLights[i];
+		}
+		
+		// Set the current compression
+		overallOutputCompression = c.overallOutputCompression;
+		rgbFrontColorOutputCompression = c.rgbFrontColorOutputCompression;
+		rgbRearColorOutputCompression = c.rgbRearColorOutputCompression;
+		uvWhiteColorOutputCompression = c.uvWhiteColorOutputCompression;
 	}
 	
 	/**
@@ -440,10 +468,10 @@ public class ColorOutput {
 		
 		if (alpha < 0.01) {
 			alpha = 0.0;
-			return c1;
+			return new ColorOutput(c1);
 		} else if (alpha > 0.99) {
 			alpha = 1.0;
-			return c2;
+			return new ColorOutput(c2);
 		}
 		
 		// Mix RGB lights
@@ -496,6 +524,5 @@ public class ColorOutput {
 		// Done mixing! Return the output.
 		return out;
 	}
-	
 	
 }

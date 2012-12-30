@@ -31,7 +31,7 @@ public class LightVolume extends PostProcessor {
 	@Override
 	public void init() {
 		// Make a user control
-		volumeKnob = new GenericKnob(1.0f, 40, "Volume");
+		volumeKnob = new GenericKnob(1.0f, scale(40), "Volume");
 		requestUserControl(volumeKnob);
 		
 	}

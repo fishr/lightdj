@@ -49,6 +49,7 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 	@Override
 	public void render(ColorOutput c, Graphics2D g2D, int x, int y, int width, int height) {
 		// Do any preprocessing (i.e., apply any overarching compressions to the computed colors)
+		
 		if (c.overallOutputCompression == OverallOutputCompression.OVERALL_COMPRESSION_WHITE_STROBE) {
 			if (strobeState == 0) {
 				
@@ -147,7 +148,7 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 		//g2D.setColor(Color.BLACK);
 		//g2D.fillRect(x, y, width, height);
 		
-		// Draw color 1, and then color 2
+		Color panelBorderColor = VisualizationEngineParty.PANEL_BORDER_COLOR;
 		
 		// Draw the top RGB panels
 		for(int panelIndex = 0; panelIndex < NUM_FRONT_RGB_PANELS; panelIndex++) {
@@ -159,6 +160,12 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 				g2D.setColor(c.rgbLightsFront[LIGHTS_PER_RGB_PANEL*panelIndex + light]);
 				g2D.fillRect(currentX + light*size, currentY, size, size);
 			}
+			
+			// Draw a border around this panel?
+			g2D.setColor(panelBorderColor);
+			//g2D.setStroke(VisualizationEngineParty.REGULAR_STROKE);
+			g2D.drawRect(currentX, currentY, LIGHTS_PER_RGB_PANEL*size, size);
+			
 		}
 			
 		// Draw the bottom RGB
@@ -171,6 +178,10 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 				g2D.setColor(c.rgbLightsRear[LIGHTS_PER_RGB_PANEL*panelIndex + light]);
 				g2D.fillRect(currentX + light*size, currentY, size, size);
 			}
+			
+			// Draw a border around this panel?
+			g2D.setColor(panelBorderColor);
+			g2D.drawRect(currentX, currentY, LIGHTS_PER_RGB_PANEL*size, size);
 		}
 		
 		// Draw the UV white boards
@@ -184,6 +195,9 @@ public class ColorOutputDisplayerParty implements ColorOutputDisplayer {
 			g2D.setColor(RGBGradientLinear.linearGradient(Color.BLACK, Color.MAGENTA, c.uvLights[panelIndex]));
 			g2D.fillRect(currentX + size, currentY, size, size);
 			
+			// Draw a border around this panel?
+			g2D.setColor(panelBorderColor);
+			g2D.drawRect(currentX, currentY, LIGHTS_PER_UVWHITE_BOARD*size, size);
 			
 		}
 		
