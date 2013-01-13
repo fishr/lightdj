@@ -41,8 +41,8 @@ public class Blackout extends PostProcessor {
 		active = false;
 		
 		// Make a user control
-		fallKnob = new GenericKnob(0.4f, 40, "Fall");
-		riseKnob = new GenericKnob(0.4f, 40, "Rise");
+		fallKnob = new GenericKnob(0.4f, scale(40), "Fall");
+		riseKnob = new GenericKnob(0.4f, scale(40), "Rise");
 		requestUserControl(fallKnob);
 		requestUserControl(riseKnob);
 		
