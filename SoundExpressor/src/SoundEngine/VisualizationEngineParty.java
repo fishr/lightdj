@@ -854,14 +854,23 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		POSTPROCESSOR_X = BORDER_SIZE;
 		POSTPROCESSOR_Y = PULSE_KEEPER_Y + PULSE_KEEPER_HEIGHT + BORDER_SIZE;
 		int y = POSTPROCESSOR_Y;
+		int w = (POSTPROCESSOR_WIDTH - 5*BORDER_SIZE)/2;
 		int postProcessorIndex = 0;
 		for(PostProcessor postProcessor : postProcessors) {
 			// Determine the height of this box
 			int h = POSTPROCESSOR_TITLE_HEIGHT;
+			int xi = 1;
+			int yi = -1;
 			for(UserControl control : postProcessor.getRequestedUserControls()) {
-				control.setLocation(2 * BORDER_SIZE, y + h, POSTPROCESSOR_WIDTH - 2*BORDER_SIZE, POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT);
-				h += POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT + BORDER_SIZE;
+				if (xi == 1) {
+					xi = 0;
+					yi += 1;
+				} else {
+					xi = 1;
+				}
+				control.setLocation(2 * BORDER_SIZE + xi*(w + BORDER_SIZE), y + h + yi * (POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT + BORDER_SIZE), w, POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT);
 			}
+			h += (yi + 1) * (POST_PROCESSOR_USER_CONTROL_SLOT_HEIGHT + BORDER_SIZE);
 			h += POSTPROCESSOR_BOTTOM_HEIGHT;
 			
 			// Set the location of this post processor's status light
