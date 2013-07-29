@@ -24,7 +24,7 @@ public class DoubleChaser extends Visualizer {
 	protected int counter = 0;
 	protected int position = 0;
 	
-	protected static int NUM_RGB_LEDS = 48;
+	protected static int NUM_RGB_LEDS = ColorOutput.NUM_LEDS_PER_RGB_BOARD*(ColorOutput.NUM_FRONT_RGB_PANELS+ColorOutput.NUM_REAR_RGB_PANELS);
 	
 	@Override
 	public String getName() {

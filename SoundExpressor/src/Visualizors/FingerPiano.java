@@ -18,7 +18,7 @@ public class FingerPiano extends Visualizer {
 	protected static double theta;
 	protected double b0, b1, b2, b3, b4, b5, b6, b7;
 	
-	protected static int NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS*4;
+	protected static int NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS*ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	
 	@Override
 	public String getName() {

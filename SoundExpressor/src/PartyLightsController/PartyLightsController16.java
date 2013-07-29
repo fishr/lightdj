@@ -32,10 +32,10 @@ public class PartyLightsController16 {
 	private OutputStream outStream;
 	
 	// Protocol information
-	protected static final int MAX_COLOR_CHANNEL_VALUE = 4095;
-	protected static final int BYTES_PER_COLOR_CHANNEL = 2;
+	protected static final int MAX_COLOR_CHANNEL_VALUE = 255; // 4095
+	protected static final int BYTES_PER_COLOR_CHANNEL = 1; // 1
 	
-	protected static final int SPECIAL_SYNC_BYTE = 255;
+	protected static final int SPECIAL_SYNC_BYTE = 170;
 	protected static final int ACTION_EMERGENCY_LIGHTING = 254;
 	protected static final int ACTION_EVERYTHING_OFF = 253;
 	protected static final int ACTION_FRONT_LEDS_SAME = 252;
@@ -77,8 +77,8 @@ public class PartyLightsController16 {
 	
 	// Voloume controls
 	public float overallVolume = 1.0f;
-	public float frontVolume = 1.0f;
-	public float rearVolume = 1.0f;
+	public float frontVolume = 0.3f;
+	public float rearVolume = 0.03f;
 	public float strobeVolume = 1.0f;
 	
 	public enum LightPlacement {
@@ -98,12 +98,12 @@ public class PartyLightsController16 {
 		
 		// Set some defaults
 		
-		final String serialPortNameDefault = "/dev/ttyUSB0";	// Xbee
-		final int serialPortSpeedDefault = 115200;				// Friggin XBee
+		final String serialPortNameDefault = "COM7";
+		final int serialPortSpeedDefault = 115200;
 		
 		
-		this.serialPortName = ConfigFileParser.getSettingOrDefault("SERIAL_PORT_NAME", "/dev/ttyUSB0");
-		this.speed = ConfigFileParser.getSettingOrDefault("SERIAL_BAUDRATE", 115200);
+		this.serialPortName = ConfigFileParser.getSettingOrDefault("SERIAL_PORT_NAME", serialPortNameDefault);
+		this.speed = ConfigFileParser.getSettingOrDefault("SERIAL_BAUDRATE", serialPortSpeedDefault);
 		this.serialDataBits = ConfigFileParser.getSettingOrDefault("SERIAL_DATABITS", 8);
 		this.serialParityBits = ConfigFileParser.getSettingOrDefault("SERIAL_PARITY", 0);
 		this.serialStopBits = ConfigFileParser.getSettingOrDefault("SERIAL_STOPBITS", 2);
@@ -248,7 +248,7 @@ public class PartyLightsController16 {
 	
 	// Gamma correct to approximate the sRGB colorspace
 	protected float gammaCorrect(float val) {
-		double gamma = 3.4;	// 2.2
+		double gamma = 2.2;
 		return (float) Math.pow(val, gamma);
 	}
 	
@@ -284,7 +284,7 @@ public class PartyLightsController16 {
 		int index = startIndex;
 		
 		// Fill in the data.
-		data[index++] = upper;
+	//	data[index++] = upper;
 		data[index++] = lower;
 		
 		return index - startIndex;
@@ -445,7 +445,7 @@ public class PartyLightsController16 {
 		byte[] output = new byte[LENGTH_WHITE_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_WHITES;
-		fillValueData(output, 2, (float) colorOutput.whiteLights[0], LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.whiteLights[0] + 0.5f), LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -460,7 +460,7 @@ public class PartyLightsController16 {
 		byte[] output = new byte[LENGTH_UV_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_UVS;
-		fillValueData(output, 2, (float) colorOutput.uvLights[0], LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.uvLights[0] + 0.5f), LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -479,9 +479,9 @@ public class PartyLightsController16 {
 			
 			data[cursor++] = (byte) SPECIAL_SYNC_BYTE;
 			data[cursor++] = (byte) (board + START_UVWHITE_PANEL_INDEX);
-			cursor += fillValueData(data, cursor, (float) colorOutput.uvLights[board], LightPlacement.PLACEMENT_STROBES);
-			cursor += fillValueData(data, cursor, (float) colorOutput.whiteLights[board], LightPlacement.PLACEMENT_STROBES);
-			//System.out.println(colorOutput.whiteLights[board]);
+			cursor += fillValueData(data, cursor, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.uvLights[board] + 0.5f), LightPlacement.PLACEMENT_STROBES);
+			cursor += fillValueData(data, cursor, (int) (MAX_COLOR_CHANNEL_VALUE*colorOutput.whiteLights[board] + 0.5f), LightPlacement.PLACEMENT_STROBES);
+			
 		}
 		
 		debugPrint(data);

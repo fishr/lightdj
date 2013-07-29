@@ -17,7 +17,7 @@ public class HueBass extends Visualizer {
 	protected static double deltaOmega = -0.0003;
 	protected static double theta;
 	
-	protected static int NUM_FRONT_RGB_LIGHTS = 24;
+	protected static int NUM_FRONT_RGB_LIGHTS = ColorOutput.NUM_FRONT_RGB_PANELS*ColorOutput.NUM_LEDS_PER_RGB_BOARD;
 	protected boolean trigger;
 	protected static final double THRESHOLD_HIGH = 0.98;
 	protected static final double THRESHOLD_LOW = 0.2;

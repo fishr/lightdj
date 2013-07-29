@@ -25,8 +25,7 @@ public class MidiTest {
 				MidiDevice dev = MidiSystem.getMidiDevice(info);
 				dev.open();
 				Transmitter trans = dev.getTransmitter();
-				trans.setReceiver(rec);
-				
+				trans.setReceiver(rec);				
 			} catch (Exception e) {
 				// Nothing!
 			}

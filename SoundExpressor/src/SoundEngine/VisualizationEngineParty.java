@@ -120,7 +120,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	public IndicatorLight[] statusLights;
 	// Special post processors that we should keep track of
 	PostProcessor volumePostProcessor;
-	
+	PostProcessor whiteBurst;
 	
 	
 	// The arduino LED visualizer
@@ -137,6 +137,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	Map<Integer, Integer> midiGeneralSliderIndices;
 	Map<Integer, Integer> midiGeneralButtonIndices;
 	Map<Integer, Integer> midiVisualizerButtonIndices;
+	Map<Integer, Integer> midiPianoButtonIndices;
+	Map<Integer, Integer> midiSpecialButtonIndices;
 	int midiCrossfaderChannel;
 	
 	
@@ -172,7 +174,6 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			// Get the list of controls requested
 			
 		}
-		
 		
 		// Set up all of the post processing effects
 		postProcessors = allPostProcessors();
@@ -283,8 +284,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		// WhiteBurst should always be last for emergency purposes, as it controls
 		// the Emergency Lighting and should have the "final say" of all post processors.
-		postProcessors.add(new WhiteBurst(UPDATES_PER_SECOND));
-		
+		whiteBurst = new WhiteBurst(UPDATES_PER_SECOND);
+		postProcessors.add(whiteBurst);
 		
 		return postProcessors;
 		 
@@ -606,6 +607,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	protected static boolean zeroKeyPressed = false;
 	protected static boolean minusKeyPressed = false;
 	protected static boolean plusKeyPressed = false;
+	protected static boolean spaceKeyPressed = false;
 
 	// Store the state of the LightDJ
 	public enum LightDJState {
@@ -1446,14 +1448,16 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			minusKeyPressed = true;
 		} else if (keyCode == KeyEvent.VK_PLUS) {
 			plusKeyPressed = true;
-		} 
+		} else if (keyCode == KeyEvent.VK_SPACE){
+			spaceKeyPressed = !spaceKeyPressed;
+		}
 		
 		
 		// Switch based on the current LightDJ state
 		switch(lightDJState) {
 
 		case LIGHTDJ_STATE_NORMAL:
-			if (keyCode == KeyEvent.VK_SPACE) {
+			if (spaceKeyPressed) {
 				activeLayer = true;
 				lightDJState = LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER;
 				
@@ -1508,6 +1512,11 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				// The shift key is a trigger to start entering the pulse
 				pulseKeeper.startEnteringPulses();
 				shiftKeyPressed = true;
+			} else if (keyCode == KeyEvent.VK_Q) {
+				// If the shift key is being held down, then this is a trigger to enter a pulse.
+				if (shiftKeyPressed) {
+					pulseKeeper.enterPulse();
+				}
 			} else if (keyCode == KeyEvent.VK_Z) {// Auto cross-fade to the opposite direction
 				if (alpha > 0.5) {
 					// Cross-fade left
@@ -1531,16 +1540,12 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						crossfaderKnob.setValue((float) alpha);
 					}
 				}
-				// If the shift key is being held down, then this is a trigger to enter a pulse.
-				if (shiftKeyPressed) {
-					pulseKeeper.enterPulse();
-				}
 			}
 			
 			break;
 			
 		case LIGHTDJ_STATE_CHOOSING_VISUALIZER:
-			if (keyCode == KeyEvent.VK_SPACE) {
+			if (!spaceKeyPressed) {
 				activeLayer = false;
 				lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
 			} else if (keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z) {
@@ -1755,6 +1760,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		midiGeneralSliderIndices = new HashMap<Integer, Integer>();
 		midiGeneralButtonIndices = new HashMap<Integer, Integer>();
 		midiVisualizerButtonIndices = new HashMap<Integer, Integer>();
+		midiPianoButtonIndices = new HashMap<Integer, Integer>();
+		midiSpecialButtonIndices = new HashMap<Integer, Integer>();
 		midiCrossfaderChannel = 0;
 		
 		// Parse the configuration file		
@@ -1782,12 +1789,36 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 			}
 		}
 		
-		// General buttons plugins
+		/*// General buttons plugins
 		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_BUTTONS", "");
 		channels = pluginChannels.split(",");
 		for(int i = 0; i < channels.length; i++) {
 			try {
 				midiGeneralButtonIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}*/
+		
+		//Piano plugin buttons
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_PIANO_BUTTONS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiPianoButtonIndices.put(Integer.parseInt(channels[i].trim()), i);
+			} catch (Exception e) {
+				System.out.println("Error in configuration file, MIDI section!");
+				e.printStackTrace();
+			}
+		}
+		
+		//Piano plugin buttons
+		pluginChannels = ConfigFileParser.getSettingOrDefault("MIDI_SPECIAL_BUTTONS", "");
+		channels = pluginChannels.split(",");
+		for(int i = 0; i < channels.length; i++) {
+			try {
+				midiSpecialButtonIndices.put(Integer.parseInt(channels[i].trim()), i);
 			} catch (Exception e) {
 				System.out.println("Error in configuration file, MIDI section!");
 				e.printStackTrace();
@@ -1843,18 +1874,18 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		// For now, only deal with short messages
 		if (message instanceof ShortMessage) {
 			ShortMessage event = (ShortMessage) message;
-			
+
 			// See if the channel corresponding to this event matches one of the ones specified by the
 			// configuration file
 			int command = event.getCommand();
 			int channel = event.getData1();
 			int index;
-			
+
 			if (command == 176) { // Slider event
 				if (channel == midiCrossfaderChannel) {
 					// Crossfade it!
 					updateControl(crossfaderKnob, event);
-					
+
 				} else if (midiLeftPluginIndices.containsKey(channel)) {
 					index = midiLeftPluginIndices.get(channel);
 					List<UserControl> userControls = visualizers.get(visualizerLeftIndex).getRequestedUserControls();
@@ -1870,7 +1901,7 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						updateControl(userControls.get(index), event);
 					}
 				} else if (midiGeneralSliderIndices.containsKey(channel)) {
-					
+
 					// One of the special sliders was changed! Handle these in a custom way.
 					index = midiGeneralSliderIndices.get(channel);
 					if (index == 0) {
@@ -1878,57 +1909,232 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 						List<UserControl> userControls = volumePostProcessor.getRequestedUserControls();
 						UserControl volumeKnob = userControls.get(0);
 						updateControl(volumeKnob, event);
-						
-					} 
+					} else if (index == 1) {
+						// Process the volume knob!
+						List<UserControl> userControls = whiteBurst.getRequestedUserControls();
+						UserControl hueKnob = userControls.get(2);
+						updateControl(hueKnob, event);
+					}
 				}
-					
+
 			} else if (command == 144) {// Button press event
-				boolean pushed = (event.getData2() == 127);
-				
-				 if (midiVisualizerButtonIndices.containsKey(channel)) {
+				boolean pushed = (event.getData2() != 0 );  //== 127);    <-- altered this because I use piano keys, which are touch sensitive
+
+				if (midiVisualizerButtonIndices.containsKey(channel)) {
 					// Change one of the visualizers!
 					if (pushed) {
 						index = midiVisualizerButtonIndices.get(channel);
-						
+
 						switch(index) {
 						case 0:  // Left left
 							visualizerLeftIndex--;
+							if (visualizerLeftIndex==visualizerRightIndex || visualizerLeftIndex + visualizers.size() == visualizerRightIndex){
+								visualizerLeftIndex--;
+							}
 							if (visualizerLeftIndex < 0) {
-								visualizerLeftIndex = visualizers.size() - 1;
+								visualizerLeftIndex += visualizers.size();
 							}
 							loadVisualizerPlugin(true, visualizerLeftIndex);
 							break;
-							
-						case 1:  // Left right
+
+						case 1:  // Left right	
 							visualizerLeftIndex++;
-							if (visualizerLeftIndex == visualizers.size()) {
-								visualizerLeftIndex = 0;
+							if (visualizerLeftIndex==visualizerRightIndex || visualizerLeftIndex - visualizers.size() == visualizerRightIndex){
+								visualizerLeftIndex++;
+							}
+							if (visualizerLeftIndex >= visualizers.size()) {
+								visualizerLeftIndex -= visualizers.size();
 							}
 							loadVisualizerPlugin(true, visualizerLeftIndex);
 							break;
 							
-						case 2:  // Right left
+						case 2:
+							spaceKeyPressed = !spaceKeyPressed;
+							if (spaceKeyPressed) {
+								activeLayer = true;
+								lightDJState = LightDJState.LIGHTDJ_STATE_CHOOSING_VISUALIZER;
+							}else if (!spaceKeyPressed) {
+								activeLayer = false;
+								lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
+							}
+							break;
+
+						case 3:  // Right left
 							visualizerRightIndex--;
+							if (visualizerRightIndex == visualizerLeftIndex || visualizerRightIndex + visualizers.size() == visualizerLeftIndex) {
+								visualizerRightIndex--;
+							}
 							if (visualizerRightIndex < 0) {
-								visualizerRightIndex = visualizers.size() - 1;
+								visualizerRightIndex += visualizers.size();
 							}
 							loadVisualizerPlugin(false, visualizerRightIndex);
 							break;
-							
-						case 3:  // Right right
+
+						case 4:  // Right right
 							visualizerRightIndex++;
-							if (visualizerRightIndex == visualizers.size()) {
-								visualizerRightIndex = 0;
+							if (visualizerRightIndex == visualizerLeftIndex || visualizerRightIndex - visualizers.size() == visualizerLeftIndex) {
+								visualizerRightIndex++;
+							}
+							if (visualizerRightIndex >= visualizers.size()) {
+								visualizerRightIndex -= visualizers.size();
 							}
 							loadVisualizerPlugin(false, visualizerRightIndex);
 							break;
-							
+
 						default:
 							// Error! Don't do anything
-						
+
 						}
 					}
-				 }
+				}
+				else if (midiPianoButtonIndices.containsKey(channel)) {  //processes the piano keys for finger piano
+					if (pushed) {
+						index = midiPianoButtonIndices.get(channel);
+
+						switch(index) {
+						case 0:  // Left left
+							aKeyPressed = true;
+							break;
+
+						case 1:  // Left right
+							sKeyPressed = true;
+							break;
+
+						case 2:  // Right left
+							dKeyPressed = true;
+							break;
+
+						case 3:  // Right right
+							fKeyPressed = true;
+							break;
+						case 4:  // Left left
+							jKeyPressed = true;
+							break;
+
+						case 5:  // Left right
+							kKeyPressed = true;
+							break;
+
+						case 6:  // Right left
+							lKeyPressed = true;
+							break;
+
+						case 7:  // Right right
+							semiColonKeyPressed = true;
+							break;	
+
+						default:
+							// Error! Don't do anything
+
+						}
+					}
+
+				}
+				else if (midiSpecialButtonIndices.containsKey(channel)) {  //processes the buttons that will trigger strobe
+					// Change one of the visualizers!
+					if (pushed) {
+						index = midiSpecialButtonIndices.get(channel);
+
+						switch(index) {
+						case 0:  // Left left
+							f12KeyPressed = true;
+							break;
+
+						case 1:  // Left right
+							f8KeyPressed = true;
+							break;
+
+						case 2:  // Right left
+							f5KeyPressed = true;
+							break;
+
+						case 3:  // Right right
+							backspaceKeyPressed = true;
+							break;
+
+						default:
+							// Error! Don't do anything
+
+						}
+					}
+				}
+
+			}
+
+			else if (command == 128) {// Button release event
+
+				if (midiPianoButtonIndices.containsKey(channel)) { 
+
+					index = midiPianoButtonIndices.get(channel);
+
+					switch(index) {
+					case 0:
+						aKeyPressed = false;
+						break;
+
+					case 1: 
+						sKeyPressed = false;
+						break;
+
+					case 2:  
+						dKeyPressed = false;
+						break;
+
+					case 3: 
+						fKeyPressed = false;
+						break;
+					case 4:  
+						jKeyPressed = false;
+						break;
+
+					case 5: 
+						kKeyPressed = false;
+						break;
+
+					case 6:  
+						lKeyPressed = false;
+						break;
+
+					case 7:  
+						semiColonKeyPressed = false;
+						break;	
+
+					default:
+						// Error! Don't do anything
+
+
+					}
+
+				}
+				else if (midiSpecialButtonIndices.containsKey(channel)) {
+					// Change one of the visualizers!
+
+					index = midiSpecialButtonIndices.get(channel);
+
+					switch(index) {
+					case 0:  
+						f12KeyPressed = false;
+						break;
+
+					case 1: 
+						f8KeyPressed = false;
+						break;
+
+					case 2:  
+						f5KeyPressed = false;
+						break;
+
+					case 3:  
+						backspaceKeyPressed = false;
+						break;
+
+					default:
+						// Error! Don't do anything
+
+
+					}
+				}
+
 			}
 		}
 	}

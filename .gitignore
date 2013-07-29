@@ -1,3 +1,4 @@
 # Ignore the following files!
 .metadata/*
 SoundExpressor/bin/*
+*/Thumbs.db
