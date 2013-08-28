@@ -6,6 +6,7 @@ import java.io.OutputStream;
 
 import Common.ColorOutput;
 import Common.ColorOutput.OverallOutputCompression;
+import LightDJGUI.ConfigFileParser;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -19,12 +20,18 @@ import gnu.io.SerialPort;
 public class PartyLightsController8 {
 
 	// Serial port fields
-	private String serialPortName;
-	private int speed;
+	protected String serialPortName;
+	protected int speed;
+	protected int serialDataBits = 8;
+	protected int serialStopBits = 1;
+	protected int serialParityBits = 2;
 	private boolean isConnected;
 	private OutputStream outStream;
 	
 	// Protocol information
+	protected static final int MAX_COLOR_CHANNEL_VALUE = 255;
+	protected static final int BYTES_PER_COLOR_CHANNEL = 1;
+	
 	protected static final int SPECIAL_SYNC_BYTE = 170;
 	protected static final int ACTION_EMERGENCY_LIGHTING = 254;
 	protected static final int ACTION_EVERYTHING_OFF = 253;
@@ -42,23 +49,34 @@ public class PartyLightsController8 {
 	protected static int NUM_RGB_REAR_PANELS;
 	protected static int NUM_UV_STROBE_BOARDS;
 	
-	protected static final int LENGTH_FRONT_RGB_INDIV_PACKET = 14;
-	protected static final int LENGTH_REAR_RGB_INDIV_PACKET = 14;
-	protected static final int LENGTH_FRONT_LEDS_SAME_PACKET = 5;
-	protected static final int LENGTH_REAR_LEDS_SAME_PACKET = 5;
-	protected static final int LENGTH_FRONT_PANELS_SAME_PACKET = 14;
-	protected static final int LENGTH_REAR_PANELS_SAME_PACKET = 14;
+	protected static final int LENGTH_HEADER = 2;
+	protected static final int LIGHTS_PER_BOARD = 4;
+	protected static final int CHANNELS_PER_LIGHT = 3;
+	protected static final int UVCHANNELS_PER_BOARD = 2;
 	
-	protected static final int LENGTH_UVWHITE_INDIV_PACKET = 4;
-	protected static final int LENGTH_WHITE_STROBE_PACKET = 2;
-	protected static final int LENGTH_UV_STROBE_PACKET = 2;
-	protected static final int LENGTH_ALL_OFF_PACKET = 2;
-	protected static final int LENGTH_EMERGENCY_LIGHTING_PACKET = 2;
-	protected static final int LENGTH_WHITE_SET_ALL_PACKET = 3;
-	protected static final int LENGTH_UV_SET_ALL_PACKET = 3;
+	protected static final int LENGTH_FRONT_RGB_INDIV_PACKET = LENGTH_HEADER + LIGHTS_PER_BOARD*CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_REAR_RGB_INDIV_PACKET = LENGTH_HEADER + LIGHTS_PER_BOARD*CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_FRONT_LEDS_SAME_PACKET = LENGTH_HEADER + CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_REAR_LEDS_SAME_PACKET = LENGTH_HEADER + CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_FRONT_PANELS_SAME_PACKET = LENGTH_HEADER + LIGHTS_PER_BOARD*CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_REAR_PANELS_SAME_PACKET = LENGTH_HEADER + LIGHTS_PER_BOARD*CHANNELS_PER_LIGHT*BYTES_PER_COLOR_CHANNEL;
+	
+	protected static final int LENGTH_UVWHITE_INDIV_PACKET = LENGTH_HEADER + UVCHANNELS_PER_BOARD*BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_WHITE_STROBE_PACKET = LENGTH_HEADER;
+	protected static final int LENGTH_UV_STROBE_PACKET = LENGTH_HEADER;
+	protected static final int LENGTH_ALL_OFF_PACKET = LENGTH_HEADER;
+	protected static final int LENGTH_EMERGENCY_LIGHTING_PACKET = LENGTH_HEADER;
+	protected static final int LENGTH_WHITE_SET_ALL_PACKET = LENGTH_HEADER + BYTES_PER_COLOR_CHANNEL;
+	protected static final int LENGTH_UV_SET_ALL_PACKET = LENGTH_HEADER + BYTES_PER_COLOR_CHANNEL;
 	
 	protected static int START_REAR_PANEL_INDEX;
 	protected static int START_UVWHITE_PANEL_INDEX;
+	
+	// Voloume controls
+	public float overallVolume = 1.0f;
+	public float frontVolume = .8f;
+	public float rearVolume = .1f;
+	public float strobeVolume = 1.0f;
 	
 	public enum LightPlacement {
 		PLACEMENT_FRONT,
@@ -76,8 +94,16 @@ public class PartyLightsController8 {
 		START_UVWHITE_PANEL_INDEX = ColorOutput.START_UVWHITE_PANEL_ADDRESSES;
 		
 		// Set some defaults
-		this.serialPortName = "/dev/ttyUSB0";
-		this.speed = 38400;
+		
+		final String serialPortNameDefault = "COM7";
+		final int serialPortSpeedDefault = 115200;
+		
+		
+		this.serialPortName = ConfigFileParser.getSettingOrDefault("SERIAL_PORT_NAME", serialPortNameDefault);
+		this.speed = ConfigFileParser.getSettingOrDefault("SERIAL_BAUDRATE", serialPortSpeedDefault);
+		this.serialDataBits = ConfigFileParser.getSettingOrDefault("SERIAL_DATABITS", 8);
+		this.serialParityBits = ConfigFileParser.getSettingOrDefault("SERIAL_PARITY", 0);
+		this.serialStopBits = ConfigFileParser.getSettingOrDefault("SERIAL_STOPBITS", 2);
 		isConnected = false;
 		outStream = null;
 		
@@ -95,14 +121,15 @@ public class PartyLightsController8 {
 	 * If there's an error, it is thrown.
 	 */
 	protected void connect() throws Exception {
-		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPortName);
+		System.out.println("Serial: " + this.serialPortName + " " + this.serialDataBits + "-" + this.serialParityBits + "-" + this.serialStopBits);
+		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(this.serialPortName);
 		if (portIdentifier.isCurrentlyOwned()) {
 			throw new RuntimeException("Error: The serial port " + serialPortName + " is already owned!");
 		} else {
 			CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
 			if (commPort instanceof SerialPort) {
 				SerialPort serialPort = (SerialPort) commPort;
-				serialPort.setSerialPortParams(speed, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_EVEN);
+				serialPort.setSerialPortParams(this.speed, this.serialDataBits, this.serialStopBits, this.serialParityBits);
 				
 				//serialPort.setLowLatency();
 	
@@ -129,6 +156,10 @@ public class PartyLightsController8 {
 	 * Write color output data!
 	 */
 	public void visualize(ColorOutput colorOutput) {
+		
+		// Determine the optimal compression
+		colorOutput.determineCompression();
+		//System.out.println(colorOutput.uvWhiteColorOutputCompression);
 		
 		// Apply any overall compression!
 		switch(colorOutput.overallOutputCompression) {
@@ -202,8 +233,67 @@ public class PartyLightsController8 {
 //			}
 			break;
 		
+		}		
+	}
+	
+	// Gamma correct to approximate the sRGB colorspace
+	protected float gammaCorrect(float val) {
+		double gamma = 3.4;	// 2.2
+		return (float) Math.pow(val, gamma);
+	}
+	
+	protected int fillValueData(byte[] data, int startIndex, float val, LightPlacement placement) {
+		
+		// Apply gamma correction
+		val = gammaCorrect(val);
+		
+		// Apply any volume attenuations
+		val = limit(val, placement);
+		
+		// Convert to the PWM range
+		int out = (int) (val * MAX_COLOR_CHANNEL_VALUE + 0.5f);
+
+		// Hard limit saturate at max value
+		if (out > MAX_COLOR_CHANNEL_VALUE) {
+			out = MAX_COLOR_CHANNEL_VALUE;
 		}
-			
+		
+		// Split it into 2 bytes
+		byte lower = (byte) (out & 0xFF);
+		byte upper = (byte) ((out >> 8) & 0xFF);
+		
+		// Make sure we're not sending the special sync byte.
+		if (upper == (byte) SPECIAL_SYNC_BYTE) {
+			upper = (byte) (SPECIAL_SYNC_BYTE - 1);
+		}
+		
+		if (lower == (byte) SPECIAL_SYNC_BYTE) {
+			lower = (byte) (SPECIAL_SYNC_BYTE - 1);
+		}
+		
+		int index = startIndex;
+		
+		// Fill in the data.
+	//	data[index++] = upper;
+		data[index++] = lower;
+		
+		return index - startIndex;
+	}
+	
+	// Utility function to fill in a field of data. Returns the number of bytes used.
+	protected int fillColorData(byte[] data, int startIndex, Color c, LightPlacement placement) {
+		// Extract floating point precision values of the colors
+		float[] colors = new float[3];
+		c.getRGBColorComponents(colors);
+		
+		int index = startIndex;
+		
+		for(int channel = 0; channel < 3; channel++) {
+			// Write this val (checks limits, does gamma correction, conversino to max PWM value, etc.)
+			index += fillValueData(data, index, colors[channel], placement);
+		}
+		
+		return (index - startIndex);
 	}
 	
 	protected void sendFrontRGBPanelDiff(ColorOutput colorOutput) {
@@ -214,31 +304,20 @@ public class PartyLightsController8 {
 			
 			Color c;
 			
-			data[cursor] = (byte) SPECIAL_SYNC_BYTE;
-			data[cursor + 1] = (byte) board;
+			data[cursor++] = (byte) SPECIAL_SYNC_BYTE;
+			data[cursor++] = (byte) board;
 			
 			c = colorOutput.rgbLightsFront[getFrontLightIndexFromBoard(board, 0)];
-			data[cursor + 2] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 3] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 4] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLightsFront[getFrontLightIndexFromBoard(board, 1)];
-			data[cursor + 5] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 6] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 7] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLightsFront[getFrontLightIndexFromBoard(board, 2)];
-			data[cursor + 8] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 9] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 10] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_FRONT);
 			
 			c = colorOutput.rgbLightsFront[getFrontLightIndexFromBoard(board, 3)];
-			data[cursor + 11] = limit(c.getRed(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 12] = limit(c.getGreen(), LightPlacement.PLACEMENT_FRONT);
-			data[cursor + 13] = limit(c.getBlue(), LightPlacement.PLACEMENT_FRONT);
-
-			
-			cursor += LENGTH_FRONT_RGB_INDIV_PACKET;
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_FRONT);
 			
 		}
 		
@@ -255,9 +334,7 @@ public class PartyLightsController8 {
 		byte[] output = new byte[LENGTH_FRONT_LEDS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_FRONT_LEDS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLightsFront[0].getRed(), LightPlacement.PLACEMENT_FRONT);
-		output[3] = (byte) limit(colorOutput.rgbLightsFront[0].getGreen(), LightPlacement.PLACEMENT_FRONT);
-		output[4] = (byte) limit(colorOutput.rgbLightsFront[0].getBlue(), LightPlacement.PLACEMENT_FRONT);
+		fillColorData(output, 2, colorOutput.rgbLightsFront[0], LightPlacement.PLACEMENT_FRONT);
 		
 		debugPrint(output);
 		try {
@@ -269,20 +346,14 @@ public class PartyLightsController8 {
 	
 	protected void sendFrontPanelSame(ColorOutput colorOutput) {
 		byte[] output = new byte[LENGTH_FRONT_PANELS_SAME_PACKET];
-		output[0] = (byte) SPECIAL_SYNC_BYTE;
-		output[1] = (byte) ACTION_FRONT_PANELS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLightsFront[0].getRed(), LightPlacement.PLACEMENT_FRONT);
-		output[3] = (byte) limit(colorOutput.rgbLightsFront[0].getGreen(), LightPlacement.PLACEMENT_FRONT);
-		output[4] = (byte) limit(colorOutput.rgbLightsFront[0].getBlue(), LightPlacement.PLACEMENT_FRONT);
-		output[5] = (byte) limit(colorOutput.rgbLightsFront[1].getRed(), LightPlacement.PLACEMENT_FRONT);
-		output[6] = (byte) limit(colorOutput.rgbLightsFront[1].getGreen(), LightPlacement.PLACEMENT_FRONT);
-		output[7] = (byte) limit(colorOutput.rgbLightsFront[1].getBlue(), LightPlacement.PLACEMENT_FRONT);
-		output[8] = (byte) limit(colorOutput.rgbLightsFront[2].getRed(), LightPlacement.PLACEMENT_FRONT);
-		output[9] = (byte) limit(colorOutput.rgbLightsFront[2].getGreen(), LightPlacement.PLACEMENT_FRONT);
-		output[10] = (byte) limit(colorOutput.rgbLightsFront[2].getBlue(), LightPlacement.PLACEMENT_FRONT);
-		output[11] = (byte) limit(colorOutput.rgbLightsFront[3].getRed(), LightPlacement.PLACEMENT_FRONT);
-		output[12] = (byte) limit(colorOutput.rgbLightsFront[3].getGreen(), LightPlacement.PLACEMENT_FRONT);
-		output[13] = (byte) limit(colorOutput.rgbLightsFront[3].getBlue(), LightPlacement.PLACEMENT_FRONT);
+		int cursor = 0;
+		output[cursor++] = (byte) SPECIAL_SYNC_BYTE;
+		output[cursor++] = (byte) ACTION_FRONT_PANELS_SAME;
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsFront[0], LightPlacement.PLACEMENT_FRONT);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsFront[1], LightPlacement.PLACEMENT_FRONT);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsFront[2], LightPlacement.PLACEMENT_FRONT);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsFront[3], LightPlacement.PLACEMENT_FRONT);
+		
 		
 		debugPrint(output);
 		try {
@@ -300,31 +371,20 @@ public class PartyLightsController8 {
 			
 			Color c;
 			
-			data[cursor] = (byte) SPECIAL_SYNC_BYTE;
-			data[cursor + 1] = (byte) (board + START_REAR_PANEL_INDEX);
+			data[cursor++] = (byte) SPECIAL_SYNC_BYTE;
+			data[cursor++] = (byte) (board + START_REAR_PANEL_INDEX);
 			
-			c = colorOutput.rgbLightsRear[getFrontLightIndexFromBoard(board, 0)];
-			data[cursor + 2] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 3] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 4] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
+			c = colorOutput.rgbLightsRear[getRearLightIndexFromBoard(board, 0)];
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_REAR);
 			
-			c = colorOutput.rgbLightsRear[getFrontLightIndexFromBoard(board, 1)];
-			data[cursor + 5] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 6] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 7] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
+			c = colorOutput.rgbLightsRear[getRearLightIndexFromBoard(board, 1)];
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_REAR);
 			
-			c = colorOutput.rgbLightsRear[getFrontLightIndexFromBoard(board, 2)];
-			data[cursor + 8] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 9] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 10] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
+			c = colorOutput.rgbLightsRear[getRearLightIndexFromBoard(board, 2)];
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_REAR);
 			
-			c = colorOutput.rgbLightsRear[getFrontLightIndexFromBoard(board, 3)];
-			data[cursor + 11] = limit(c.getRed(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 12] = limit(c.getGreen(), LightPlacement.PLACEMENT_REAR);
-			data[cursor + 13] = limit(c.getBlue(), LightPlacement.PLACEMENT_REAR);
-
-			
-			cursor += LENGTH_REAR_RGB_INDIV_PACKET;
+			c = colorOutput.rgbLightsRear[getRearLightIndexFromBoard(board, 3)];
+			cursor += fillColorData(data, cursor, c, LightPlacement.PLACEMENT_REAR);
 			
 		}
 		
@@ -341,9 +401,7 @@ public class PartyLightsController8 {
 		byte[] output = new byte[LENGTH_REAR_LEDS_SAME_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_REAR_LEDS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLightsRear[0].getRed(), LightPlacement.PLACEMENT_REAR);
-		output[3] = (byte) limit(colorOutput.rgbLightsRear[0].getGreen(), LightPlacement.PLACEMENT_REAR);
-		output[4] = (byte) limit(colorOutput.rgbLightsRear[0].getBlue(), LightPlacement.PLACEMENT_REAR);
+		fillColorData(output, 2, colorOutput.rgbLightsRear[0], LightPlacement.PLACEMENT_REAR);
 		
 		debugPrint(output);
 		try {
@@ -356,20 +414,13 @@ public class PartyLightsController8 {
 	
 	protected void sendRearPanelSame(ColorOutput colorOutput) {
 		byte[] output = new byte[LENGTH_REAR_PANELS_SAME_PACKET];
-		output[0] = (byte) SPECIAL_SYNC_BYTE;
-		output[1] = (byte) ACTION_REAR_PANELS_SAME;
-		output[2] = (byte) limit(colorOutput.rgbLightsRear[0].getRed(), LightPlacement.PLACEMENT_REAR);
-		output[3] = (byte) limit(colorOutput.rgbLightsRear[0].getGreen(), LightPlacement.PLACEMENT_REAR);
-		output[4] = (byte) limit(colorOutput.rgbLightsRear[0].getBlue(), LightPlacement.PLACEMENT_REAR);
-		output[5] = (byte) limit(colorOutput.rgbLightsRear[1].getRed(), LightPlacement.PLACEMENT_REAR);
-		output[6] = (byte) limit(colorOutput.rgbLightsRear[1].getGreen(), LightPlacement.PLACEMENT_REAR);
-		output[7] = (byte) limit(colorOutput.rgbLightsRear[1].getBlue(), LightPlacement.PLACEMENT_REAR);
-		output[8] = (byte) limit(colorOutput.rgbLightsRear[2].getRed(), LightPlacement.PLACEMENT_REAR);
-		output[9] = (byte) limit(colorOutput.rgbLightsRear[2].getGreen(), LightPlacement.PLACEMENT_REAR);
-		output[10] = (byte) limit(colorOutput.rgbLightsRear[2].getBlue(), LightPlacement.PLACEMENT_REAR);
-		output[11] = (byte) limit(colorOutput.rgbLightsRear[3].getRed(), LightPlacement.PLACEMENT_REAR);
-		output[12] = (byte) limit(colorOutput.rgbLightsRear[3].getGreen(), LightPlacement.PLACEMENT_REAR);
-		output[13] = (byte) limit(colorOutput.rgbLightsRear[3].getBlue(), LightPlacement.PLACEMENT_REAR);
+		int cursor = 0;
+		output[cursor++] = (byte) SPECIAL_SYNC_BYTE;
+		output[cursor++] = (byte) ACTION_REAR_PANELS_SAME;
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsRear[0], LightPlacement.PLACEMENT_REAR);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsRear[1], LightPlacement.PLACEMENT_REAR);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsRear[2], LightPlacement.PLACEMENT_REAR);
+		cursor += fillColorData(output, cursor, colorOutput.rgbLightsRear[3], LightPlacement.PLACEMENT_REAR);
 		
 		debugPrint(output);
 		try {
@@ -383,7 +434,7 @@ public class PartyLightsController8 {
 		byte[] output = new byte[LENGTH_WHITE_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_WHITES;
-		output[2] = (byte) limit((int) (256.0*colorOutput.whiteLights[0]), LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (float) colorOutput.whiteLights[0], LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -398,7 +449,7 @@ public class PartyLightsController8 {
 		byte[] output = new byte[LENGTH_UV_SET_ALL_PACKET];
 		output[0] = (byte) SPECIAL_SYNC_BYTE;
 		output[1] = (byte) ACTION_SET_ALL_UVS;
-		output[2] = (byte) limit((int) (256.0*colorOutput.uvLights[0]), LightPlacement.PLACEMENT_STROBES);
+		fillValueData(output, 2, (float) colorOutput.uvLights[0], LightPlacement.PLACEMENT_STROBES);
 		
 		debugPrint(output);
 		try {
@@ -415,14 +466,11 @@ public class PartyLightsController8 {
 		int cursor = 0;
 		for(int board = 0; board < NUM_UV_STROBE_BOARDS; board++) {
 			
-			
-			data[cursor] = (byte) SPECIAL_SYNC_BYTE;
-			data[cursor + 1] = (byte) (board + START_UVWHITE_PANEL_INDEX);
-			data[cursor + 2] = (byte) limit((int) (256.0 * colorOutput.uvLights[board]), LightPlacement.PLACEMENT_STROBES);
-			data[cursor + 3] = (byte) limit((int) (256.0 * colorOutput.whiteLights[board]), LightPlacement.PLACEMENT_STROBES);
-			
-			cursor += LENGTH_UVWHITE_INDIV_PACKET;
-			
+			data[cursor++] = (byte) SPECIAL_SYNC_BYTE;
+			data[cursor++] = (byte) (board + START_UVWHITE_PANEL_INDEX);
+			cursor += fillValueData(data, cursor, (float) colorOutput.uvLights[board], LightPlacement.PLACEMENT_STROBES);
+			cursor += fillValueData(data, cursor, (float) colorOutput.whiteLights[board], LightPlacement.PLACEMENT_STROBES);
+			//System.out.println(colorOutput.whiteLights[board]);
 		}
 		
 		debugPrint(data);
@@ -507,46 +555,42 @@ public class PartyLightsController8 {
 	}
 	
 	
-	protected byte limit(int a, LightPlacement placement) {
+	protected float limit(float a, LightPlacement placement) {
 		// Placement: 0 => front
 		//            1 => rear
 		//            2 => white, uv strobes
 		
-		double overallVolume = 0.3;
-		double frontVolume = 0.5;
-		double rearVolume = 0.10;
-		double strobeVolume = 1.0;
-		int val = 0;
+//		double overallVolume = 0.3;
+//		double frontVolume = 0.5;
+//		double rearVolume = 0.10;
+//		double strobeVolume = 1.0;
+		
+		float val = 0;
 		
 		switch(placement) {
 		case PLACEMENT_FRONT:
-			val = (int) (overallVolume * frontVolume * a);
+			val = (overallVolume * frontVolume * a);
 			break;
 			
 		case PLACEMENT_REAR:
-			val = (int) (overallVolume * rearVolume * a);
+			val = (overallVolume * rearVolume * a);
 			break;
 			
 		case PLACEMENT_STROBES:
-			val = (int) (overallVolume * strobeVolume * a);
+			val = (overallVolume * strobeVolume * a);
 			break;
 		}
 		
 
-		
-		if (val == 170) {
-			return (byte) 171 ;
-		} else {
-			return (byte) val;
-		}
+		return val;
 	}
 	
 	protected int getFrontLightIndexFromBoard(int board, int light) { 
-		return 4*board + light;
+		return  ColorOutput.NUM_LEDS_PER_RGB_BOARD*board + light;
 	}
 	
 	protected int getRearLightIndexFromBoard(int board, int light) {
-		return 4*board + light + START_REAR_PANEL_INDEX;
+		return ColorOutput.NUM_LEDS_PER_RGB_BOARD*board + light;
 	}
 	
 	
