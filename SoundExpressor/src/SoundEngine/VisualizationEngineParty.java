@@ -1560,7 +1560,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 				// Set that effect
 				chooseVisualizer(rawIndex, activePlugin);
 				activeLayer = false;
-				
+				spaceKeyPressed = !spaceKeyPressed;
+				lightDJState = LightDJState.LIGHTDJ_STATE_NORMAL;
 			}
 		
 			break;
