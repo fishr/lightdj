@@ -2,6 +2,10 @@
 <classpath>
 	<classpathentry kind="src" output="bin" path="src"/>
 	<classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
-	<classpathentry exported="true" kind="lib" path="lib/RXTXcomm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/RXTXcomm.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Ryan/Desktop/testLight/SoundExpressor/lib/rxtx-2.2pre2-bins/win64"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
