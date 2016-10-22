@@ -125,8 +125,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 	
 	// The arduino LED visualizer
 	//LEDVisualizer ledVisuals;
-	//PartyLightsController ledVisuals;
-	PartyLightsController16 ledVisuals;
+	PartyLightsController8 ledVisuals;
+	//PartyLightsController16 ledVisuals;
 	
 	// MIDI stuff
 	// The following class allows for MIDI communication
@@ -192,8 +192,8 @@ public class VisualizationEngineParty extends VisualizationEngine implements Com
 		
 		try {
 			//ledVisuals = new LEDVisualizer();
-			//ledVisuals = new PartyLightsController();
-			ledVisuals = new PartyLightsController16();
+			ledVisuals = new PartyLightsController8();
+			//ledVisuals = new PartyLightsController16();
 		} catch (Throwable o) {
 			System.out.println("WARNING: Couldn't connect to LEDs!");
 		}
